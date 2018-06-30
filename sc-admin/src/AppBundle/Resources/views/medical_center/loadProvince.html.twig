@@ -1,0 +1,164 @@
+{% if opcion == 1 %}    
+    <select class="form-control select-province" style="" name="province" id="province">
+        <option value="">Select...</option>     
+        {% for arrayProvince in arrayProvince %}
+            {% set selected = '' %}
+            <option value="{{loop.index-1}}">{{arrayProvince.name}}</option>
+        {% endfor %}
+    </select>
+{% elseif opcion == 3 %}  
+    <select class="form-control select-licenses" name="license" id="license" onchange="loadAjax('license', 'divLicenses', 4);
+            loadInfoLicense();">
+        <option value="">Select...</option> 
+        {% for licensecountry in licensecountry %}
+            {% set selected = '' %}
+            <option value="{{licensecountry.id}}">{{licensecountry.license}}</option>
+        {% endfor %}
+    </select>
+{% elseif opcion == 4 %}    
+    <span class="close" onclick="">&times;</span>
+    <table align="center" id="tablelicenses" class="table table-bordered table-hover" style="width: 100%; border-radius: 40px">
+        <tr align="center" style="">
+            <th colspan="2" align="center"><img src="{{ asset('img/sc.png') }}" alt="License" width="280px" height="80px"/></th>                                                            
+        </tr>
+        <tr align="center" style="">
+            <th style="width: 30px" align="center"><b>License</b></th>   
+        <input name="licenseid" id="licenseid" type="hidden" value="{{ license.id }}" >                    
+        <input name="inputLicense" id="inputLicense" type="hidden" value="{{ license.license }}" >                    
+        <input name="inputUsersQuantity" id="inputUsersQuantity" type="hidden" value="{{ license.usersquantity }}" >                    
+        <input name="inputNumberClients" id="inputNumberClients" type="hidden" value="{{ license.numberclients }}" >                    
+        <input name="inputNumberExams" id="inputNumberExams" type="hidden" value="{{ license.numberexams }}" >                    
+        <input name="inputDurationTime" id="inputDurationTime" type="hidden" value="{{ license.durationtime }}" >                    
+        <input name="inputAmount" id="inputAmount" type="hidden" value="{{ license.amount }}" >                    
+        <input name="inputCurrentSymbol" id="inputCurrentSymbol" type="hidden" value="{{ country.currencySymbol }}" >                    
+        <th style="width: 30px" align="center" id="thLicense">{{ license.license }}</th>                                                            
+    </tr>
+    <tr align="center" style="">
+        <th style="width: 30px" align="center"><b>Users Quantity</b></th>                                                            
+        <th style="width: 30px" align="center">{{ license.usersquantity }}</th>                                                            
+    </tr>
+    <tr align="center" style="">
+        <th style="width: 30px" align="center"><b>Number of Clients</b></th>                                                            
+        <th style="width: 30px" align="center">{{ license.numberclients }}</th>                                                            
+    </tr>
+    <tr align="center" style="">
+        <th style="width: 30px" align="center"><b>Number of Exams</b></th>                                                            
+        <th style="width: 30px" align="center">{{ license.numberexams }}</th>                                                            
+    </tr>
+    <tr align="center" style="">
+        <th style="width: 30px" align="center"><b>Duration Time</b></th>                                                            
+        <th style="width: 30px" align="center">{{ license.durationtime }}</th>                                                            
+    </tr>
+    <tr align="center" style="">
+        <th style="width: 30px" align="center"><b>Amount</b></th>                                                            
+        <th style="width: 30px" align="center">{{ license.amount }} {{ country.currencySymbol }}</th>                                                            
+    </tr>    
+</table>        
+{% elseif opcion == 5 %}  
+    <select class="form-control select-waytopay" style="width: 95%" name="waytopay" id="waytopay" onchange="wayToPayOperation();">            
+        <option value="">Select...</option> 
+        {% for waytopay in waytopay %}
+            {% set selected = '' %}
+            <option value="{{loop.index-1}}">{{waytopay}}</option>
+        {% endfor %}
+    </select>
+{% elseif opcion == 6 %}  
+    <select class="form-control select-issuingbank" style="width: 95%" name="issuingbank" id="issuingbank" onchange="" disabled="">  
+        <option value="">Select...</option> 
+        {% for issuingbank in issuingbank %}
+            {% set selected = '' %}
+            <option value="{{loop.index-1}}">{{issuingbank}}</option>
+        {% endfor %}
+    </select>
+{% elseif opcion == 7 %}  
+    <select class="form-control select-receivingbank" style="width: 95%" name="receivingbank" id="receivingbank" onchange="" disabled="">
+        <option value="">Select...</option> 
+        {% for receivingbank in receivingbank %}
+            {% set selected = '' %}
+            <option value="{{loop.index-1}}">{{receivingbank}}</option>
+        {% endfor %}
+    </select>
+{% elseif opcion == 8 %}      
+    <tr align="center">
+        <th align="center">1</th>                            
+        <th align="center">2</th>                            
+        <th align="center">3</th>                            
+        <th align="center">4</th>                            
+        <th align="center">5</th>                            
+        <th align="center">REMOVES</th>
+    </tr>
+{% elseif opcion == 20 %}     
+    <select class="form-control select-province" style="" name="province" id="province">
+        <option value="">Select...</option>     
+        {% for arrayProvince in arrayProvince %}
+            {% if loop.index-1 == valoredit %}
+                {% set selected = 'selected' %}
+                <option value="{{loop.index-1}}" {{ selected }}>{{arrayProvince.name}}</option>
+            {% else %}
+                <option value="{{loop.index-1}}">{{arrayProvince.name}}</option>
+            {% endif %}
+        {% endfor %}
+    </select>
+{% elseif opcion == 30 %}    
+{% elseif opcion == 40 %}    
+{% elseif opcion == 50 %}    
+{% elseif opcion == 100 %}    
+
+{% endif %}    
+
+
+<style type="text/css">      
+    /* The Close Button */
+    .close {
+        color: #aaa;
+        float: end;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+</style> 
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        var myModalLicense = document.getElementById('myModalLicense');
+        var span = document.getElementsByClassName("close")[0];
+        span.onclick = function () {
+            myModalLicense.style.display = "none";   
+             $('#license').val("").trigger('chosen:updated');
+        }
+
+        $(".select-province").chosen({
+            placeholder_text_single: "Select the province",
+            width: "100%"
+        });
+
+        $(".select-licenses").chosen({
+            placeholder_text_single: "Select the license",
+            width: "100%"
+        });
+
+        $(".select-waytopay").chosen({
+            placeholder_text_single: "Select the way to pay",
+            width: "100%"
+        });
+
+        $(".select-issuingbank").chosen({
+            placeholder_text_single: "Select the way to pay",
+            width: "100%"
+        });
+
+        $(".select-receivingbank").chosen({
+            placeholder_text_single: "Select the way to pay",
+            width: "100%"
+        });
+
+
+    });
+
+</script>

@@ -1,0 +1,57 @@
+{% extends '@App/base.html.twig' %}
+
+{% block body %}
+    <br>
+    <div><a class="btn btn-primary" href="{{ path('license_create') }}" role="button"><i class="fas fa-plus-circle"></i> New</a></div>
+    <br>    
+    {#    {{countries}}#}
+
+    <table id="tableCountry" class="display nowrap dataTable dtr-inline collapsed"> 
+        <thead> 
+            <tr> 
+                <th>License</th>    
+                <th>Users Quantity</th>    
+                <th>Number of Clients</th>    
+                <th>Number of Exams</th>    
+                <th>Duration Time</th>    
+                <th>Amount</th>                                    
+                <th>Status</th>                                    
+                <th>Accion</th>                                                                                                    
+            </tr> 
+        </thead> 
+        <tbody> 
+            {% for licenses in licenses %}   
+                {% if licenses.active == true %}
+                    {% set status = "ACTIVE" %}                
+                {% else %}    
+                    {% set status = "INACTIVE" %}
+                {% endif %}
+                <tr> 
+                    <td>{{licenses.license}}</td>                                 
+                    <td>{{licenses.usersquantity}}</td>                                 
+                    <td>{{licenses.numberclients}}</td>                                 
+                    <td>{{licenses.numberexams}}</td>                                 
+                    <td>{{licenses.durationtime}}</td>                                                                                      
+                    <td>{{licenses.amount}}</td>                                 
+                    <td>{{status}}</td>                                 
+                    <td style="width: 110px">
+                        <a title="VIEW" href="{{ path('license_details', { 'id': licenses.id }) }}" class="btn btn-info"><i class="fas fa-eye"></i> </a>
+                        <a title="EDIT" href="{{ path('license_edit', { 'id': licenses.id }) }}" class="btn btn-default"  style="background-color: #a1c9c2; color: black "><i class="fas fa-edit"></i> </a>
+                        <a title="DELETE" href="{{ path('license_delete', { 'id': licenses.id }) }}" class="btn btn-danger" onclick="return confirm('¿Be sure to eliminate the license?');"><i class="fas fa-minus-circle"></i> </a>
+                    </td> 
+                </tr>   
+            {% endfor %}
+        </tbody> 
+    </table>    
+
+    <script type="text/javascript">
+{#tableCountry#}
+        $(document).ready(function () {
+           $('#tableCountry')
+                    .addClass('nowrap')
+                    .dataTable();
+        });
+
+    </script>  
+
+{% endblock %}

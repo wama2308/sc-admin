@@ -1,0 +1,50 @@
+{% extends '@App/base.html.twig' %}
+{% block body %}
+    <br>
+    <div><a class="btn btn-primary" href="{{ path('fos_user_registration_register') }}" role="button"><i class="fas fa-plus-circle"></i> New</a></div>
+    <br>    
+    {#    {{countries}}#}
+    {% set status = "" %}
+    <table id="tableCountry" class="display nowrap dataTable dtr-inline collapsed"> 
+        <thead> 
+            <tr> 
+                <th style="width: 270px">User</th>    
+                <th>Email</th>    
+                <th>Status</th>    
+                <th>Accion</th>                                                                                                    
+            </tr> 
+        </thead> 
+        <tbody> 
+            {% for user in users %}
+                {% if user.enabled == true %}
+                    {% set status = "ACTIVE" %}                
+                {% else %}    
+                    {% set status = "INACTIVE" %}
+                {% endif %}
+                {% if user.enabled == true %}
+                    <tr> 
+                        <td style="width: 270px">{{user.username}}</td>                                 
+                        <td>{{user.email}}</td>                                 
+                        <td>{{status}}</td>  
+                        <td style="width: 110px">
+                            <a title="CHANGE" href="{{ path('change_password_edit', { 'id': user.id }) }}" class="btn btn-info"><i class="fas fa-key"></i></a>
+                            <a title="EDIT" href="{{ path('profile_edit', { 'id': user.id }) }}" class="btn btn-default"  style="background-color: #8080F5; color: black "><i class="fas fa-user-circle"></i></a>
+                            <a title="INACTIVE" href="{{ path('delete_user', { 'id': user.id }) }}" class="btn btn-danger" onclick="return confirm('¿Be sure to eliminate the user?');"><i class="fas fa-user-times"></i></a>
+                        </td> 
+                    </tr>     
+                {% endif %}
+            {% endfor %}
+        </tbody> 
+    </table>    
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            $('#tableCountry')
+                    .addClass('nowrap')
+                    .dataTable();
+        });
+
+    </script>  
+
+{% endblock %}

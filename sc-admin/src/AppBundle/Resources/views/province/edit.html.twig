@@ -1,0 +1,10 @@
+{% extends '@App/base.html.twig' %}
+
+{% block body %}
+    <br>
+    <h2 class="page-header">Update Province</h2>
+    {{ form_start(form) }}
+    {{ form_widget(form) }}
+    <a class="btn btn-primary" style="position: relative; top: -56px; left:85px" href="{{ path('province_list') }}">Return</a>
+    {{ form_end(form) }}
+{% endblock %}

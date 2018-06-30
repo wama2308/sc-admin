@@ -1,0 +1,236 @@
+{% extends '@App/base.html.twig' %}
+
+{% block body %}
+    <br>
+    <h2 class="page-header">Register License</h2>
+    <br>
+    <div class="card-block">
+        <form action="{{ path('license_create') }}" method="post" id="formid">    
+            <div id="ok"></div>
+            <div class="form-group">
+                <label>License</label>
+                <input name="license" id="license" type="text" value="" placeholder="License" class="form-control">
+            </div>   
+            <div class="form-group">       
+                <label>Type of license</label>
+                <div class="selector-country">
+                    <select class="form-control select-typelicense" name="typelicense" id="typelicense">
+                        <option value="">Select...</option>  
+                        {% for ArrayTypeLicense in ArrayTypeLicense %}
+                            <option value="{{loop.index-1}}">{{ArrayTypeLicense}}</option>
+                        {% endfor %}
+
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">       
+                <label>Users Quantity</label>
+                <input name="UsersQuantity" id="UsersQuantity" type="text" value="" placeholder="Users quantity" class="form-control">                
+            </div>
+            <div class="form-group">       
+                <label>Number of Clients</label>
+                <input name="numberClients" id="numberClients" type="text" value="" placeholder="Number Clients" class="form-control">                
+            </div>
+            <div class="form-group">       
+                <label>Number of Exams</label>
+                <input name="numberExams" id="numberExams" type="text" value="" placeholder="Number Exams" class="form-control">                
+            </div>
+            <div class="form-group">       
+                <label>Exams</label>
+                <div class="selector-country">
+                    <select class="form-control select-exams" name="exams[]" id="exams" multiple="">
+                        {#<option value="">Select...</option>  #}
+                        {% for exams in exams %}
+                            <option value="{{exams.id}}">{{exams.name}}</option>
+                        {% endfor %}
+
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">       
+                <label>Modules</label>
+                <div class="selector-country">
+                    <select class="form-control select-modules" name="modules[]" id="modules" multiple="">
+                        {#<option value="">Select...</option>  #}
+                        {% for ArrayModules in ArrayModules %}
+                            <option value="{{loop.index-1}}">{{ArrayModules}}</option>
+                        {% endfor %}
+
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">       
+                <label>Countries</label>
+                <div class="selector-country">
+                    <select class="form-control select-countries" name="countries[]" id="countries" multiple="">
+                        {#<option value="">Select...</option>  #}
+                        {% for countries in countries %}
+                            <option value="{{countries.id}}">{{countries.name}}</option>
+                        {% endfor %}
+
+                    </select>
+                </div>
+            </div>         
+            <div class="form-group">       
+                <label>Duration Time</label>
+                <input name="durationTime" id="durationTime" type="text" placeholder="Duration Time" class="form-control">
+            </div>
+            <div class="form-group">       
+                <label>Notice of Payment</label>                
+                <input name="noticePayment" id="noticePayment" type="text" placeholder="Notice of Payment" class="form-control">                
+            </div>
+            <div class="form-group">       
+                <label>Description</label>
+                <textarea name="description" id="description" type="text" placeholder="Description" class="form-control"></textarea>
+            </div>
+            <div class="form-group">       
+                <label>Amount</label>                
+                <input name="amount" id="amount" type="text" placeholder="Amount" class="form-control">                
+            </div>
+
+            <div class="form-group">       
+                <input type="submit" value="Save" class="btn btn-primary" id="button">&nbsp;&nbsp;&nbsp;
+{#                <input type="button" value="wama" class="btn btn-primary" id="" onclick="wama();">&nbsp;&nbsp;&nbsp;#}
+                <a class="btn btn-primary" href="{{ path('license_list') }}">Return</a>
+            </div>
+        </form>      
+    </div>    
+
+    <style type="text/css"> 
+        .ulPrueba{
+            list-style: none;
+            list-style-type: none;
+            list-style-position: outside;
+            margin: 0;
+            padding: 10px;
+        }
+
+        .liPrueba{
+            line-height: 30px;
+            font-size: 16px;
+            cursor:pointer;
+            margin: auto;
+            padding: auto;            
+        }
+
+        .divPrueba{
+            width:250px;
+            position:absolute;      
+            border:1px solid black;
+            background: white;
+
+            -moz-box-shadow: -10 -10 5px #888;
+            -webkit-box-shadow: 0 0 5px#888;
+            box-shadow: 0 0 5px #888;
+        }
+        li:hover {
+            background-color: silver;
+        }
+    </style> 
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#UsersQuantity').mask("9999999999", {placeholder: " "});
+            $('#numberClients').mask("9999999999", {placeholder: " "});
+            $('#numberExams').mask("9999999999", {placeholder: " "});
+            $('#durationTime').mask("9999999999", {placeholder: " "});
+            $('#noticePayment').mask("9999999999", {placeholder: " "});
+            $('#amount').mask('000000000.00', {reverse: true});
+
+            $(".select-exams").chosen({
+                placeholder_text_multiple: "Select a exam",
+                disable_search_threshold: 10,
+                no_results_text: "There are no results!"
+            });
+            $(".select-modules").chosen({
+                placeholder_text_multiple: "Select a module",
+                disable_search_threshold: 10,
+                no_results_text: "There are no results!"
+            });
+            $(".select-countries").chosen({
+                placeholder_text_multiple: "Select a country",
+                disable_search_threshold: 10,
+                no_results_text: "There are no results!"
+            });
+
+            $(".select-typelicense").chosen({
+                placeholder_text_single: "Select the type of license"
+            });
+
+            var emailreg = /^[a-zA-Z0-9_\.\-]+@[a-zA-Z0-9\-]+\.[a-zA-Z0-9\-\.]+$/;           
+           
+            $("#button").click(function () {
+                var numberExams = $("#numberExams").val();
+                var fields = $("#exams").val();
+                //var fields_split = fields.split(",");
+                var fields_lenght = fields.length;
+
+                $(".error").remove();
+                if ($("#license").val() == "") {
+                        $("#license").focus().after("<span class='error'>Enter the license</span>");
+                        return false;
+                } else if ($("#UsersQuantity").val() == "") {
+                        $("#UsersQuantity").focus().after("<span class='error'>Enter the numbers users</span>");
+                        return false;
+                } else if ($("#numberClients").val() == "") {
+                        $("#numberClients").focus().after("<span class='error'>Enter numbers clients</span>");
+                        return false;
+                } else if ($("#numberExams").val() == "") {
+                        $("#numberExams").focus().after("<span class='error'>Enter numbers exams</span>");
+                        return false;
+                } else if ($("#exams").val() == "") {
+                        $("#exams").focus().after("<span class='error'>select exmas</span>");
+                        return false;
+                } else if ($("#modules").val() == "") {
+                        $("#modules").focus().after("<span class='error'>Select the modules</span>");
+                        return false;
+                } else if ($("#countries").val() == "") {
+                        $("#countries").focus().after("<span class='error'>Select the countries</span>");
+                        return false;
+                }else if ($("#durationTime").val() == "") {
+                        $("#durationTime").focus().after("<span class='error'>Enter the duration of the license</span>");
+                        return false;
+                }else if ($("#noticePayment").val() == "") {
+                        $("#noticePayment").focus().after("<span class='error'>Enter the payment notice</span>");
+                        return false;
+                }else if ($("#description").val() == "") {
+                        $("#description").focus().after("<span class='error'>Enter the description</span>");
+                        return false;
+                }else if ($("#amount").val() == "") {
+                        $("#amount").focus().after("<span class='error'>Enter the amount</span>");
+                        return false;
+                }else if (numberExams != fields_lenght){
+                        $("#exams").focus().after("<span class='error'>The number of exams must be equal to the exams entered</span>");
+                        alert('The number of exams must be equal to the exams entered');
+                        return false;
+                }
+            });
+            $("#license, #UsersQuantity, #numberClients, #numberExams, #exams, #modules, #countries, #durationTime, #noticePayment, #description, #amount").keyup(function () {
+                if ($(this).val() != "") {
+                    $(".error").fadeOut();
+                    return false;
+                }
+            });   
+            
+            });
+
+            function wama()
+            {
+                var numberExams = $("#numberExams").val();
+                var fields = $("#exams").val();
+                //var fields_split = fields.split(",");
+                var fields_lenght = fields.length;
+                if(numberExams != fields_lenght)
+                {
+                    alert('el guevo');
+                }
+                else
+                {
+                    alert('la cuca');
+                }
+                
+            }
+
+            
+    </script>  
+{% endblock %}

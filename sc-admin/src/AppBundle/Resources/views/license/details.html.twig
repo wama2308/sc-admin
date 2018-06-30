@@ -1,0 +1,99 @@
+{% extends '@App/base.html.twig' %}
+
+{% block body %}
+    <br>
+    <div class="panel panel-body">
+        {% if license.active == true %}
+            {% set status = "ACTIVE" %}                
+        {% else %}    
+            {% set status = "INACTIVE" %}
+        {% endif %}
+        {#{% set NameCategoria =  ''%}  
+        {% for license in  license %}
+            {% if license.category == loop.index-1 %}
+                {% set NameCategoria =  ArrayCategoryExams%}  
+            {% endif %}
+        {% endfor %}#}
+        <table id="tableExams" class="table table-bordered" > 
+            <thead> 
+                <tr> 
+                    <td style="width: 0px"><b>License:</b></td><td style="width: 100px">{{ license.license }}</td>
+                <tr>
+                    <td style="width: 0px"><b>Users Quantity:</b></td><td style="width: 100px">{{ license.usersquantity }}</td>
+                </tr>
+                <tr>
+                    <td style="width: 0px"><b>Number of Clients:</b></td><td style="width: 100px">{{ license.numberclients }}</td>
+                </tr>
+                <tr>
+                    <td style="width: 0px"><b>Number of Exams:</b></td><td style="width: 100px">{{ license.numberexams }}</td>
+                </tr>
+                <tr>
+                    <td style="width: 0px"><b>Duration Time:</b></td><td style="width: 100px">{{ license.durationtime }}</td>
+                </tr>
+                <tr>
+                    <td style="width: 0px"><b>Notice of Payment:</b></td><td style="width: 100px">{{ license.noticepayment }}</td>
+                </tr>
+                <tr>
+                    <td style="width: 0px"><b>Description:</b></td><td style="width: 100px">{{ license.description }}</td>
+                </tr>
+                <tr>
+                    <td style="width: 0px"><b>Amount:</b></td><td style="width: 100px">{{ license.amount }}</td>
+                </tr>                
+                <tr>
+                    <td style="width: 0px"><b>Status:</b></td><td style="width: 100px">{{ status }}</td>
+                </tr>                                               
+            </thead> 
+        </table>   
+        <table class="table table-bordered" style="width: 560px">
+            <thead> 
+                <tr><td><b>EXAMS</b></td></tr>
+            </thead>
+            <tbody>
+                {% for examsArray in  license.exams %}
+                    {% set NameExams = '' %}   
+                    {% for exams in  exams %}
+                        {% if examsArray == exams.id %}
+                            {% set NameExams =  exams.name %}  
+                        {% endif %}
+                    {% endfor %}
+                    <tr><td>{{ NameExams }}</td></tr>                    
+                {% endfor %}
+            </tbody>
+        </table>
+        <table class="table table-bordered" style="width: 560px">
+            <thead> 
+                <tr><td><b>MODULES</b></td></tr>
+            </thead>
+            <tbody>
+                {% for modulesArray in  license.modules %}
+                    {% set NameModule = '' %}   
+                    {% for ArrayModules in  ArrayModules %}
+                        {% if modulesArray == loop.index-1 %}
+                            {% set NameModule =  ArrayModules %}  
+                        {% endif %}
+                    {% endfor %}
+                    <tr><td>{{ NameModule }}</td></tr>                    
+                {% endfor %}
+            </tbody>
+        </table>
+        <table class="table table-bordered" style="width: 560px">
+            <thead> 
+                <tr><td><b>COUNTRIES</b></td></tr>
+            </thead>
+            <tbody>
+                {% for countriesArray in  license.countries %}
+                    {% set NameCountry = '' %}   
+                    {% for countries in  countries %}
+                        {% if countriesArray == countries.id %}
+                            {% set NameCountry =  countries.name %}  
+                        {% endif %}
+                    {% endfor %}
+                    <tr><td>{{ NameCountry }}</td></tr>                    
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <a class="btn btn-primary" href="{{ path('license_list') }}">Return</a>
+
+{% endblock %}

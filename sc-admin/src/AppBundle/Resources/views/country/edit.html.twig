@@ -1,0 +1,118 @@
+{% extends '@App/base.html.twig' %}
+
+{% block body %}
+    <br>
+    <h2 class="page-header">Update Country</h2>
+    <br>
+    <div class="card-block">
+        <form action="" method="post" id="formid">    
+            <div id="ok"></div>
+            <div class="form-group">
+                <label>Country</label>
+                <input name="country" id="country" type="text" value="{{country.name}}" placeholder="Country" class="form-control">
+            </div>           
+            <div class="form-group">       
+                <label>Languaje</label>
+                <div class="selector-country">
+                    <select class="form-control" name="languaje" id="languaje">
+                        <option value="">Select...</option>  
+                        {% for ArrayLanguaje in ArrayLanguajes %}
+                            {% if loop.index-1 == country.languaje %}
+                                {% set selected = 'selected' %}                           
+                                <option value="{{loop.index-1}}"  {{ selected }}>{{ArrayLanguaje.name}}</option>
+                            {% else %}
+                                <option value="{{loop.index-1}}">{{ArrayLanguaje.name}}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>                
+                </div>
+            </div>
+            <div class="form-group">       
+                <label>Time Zone</label>
+                <input name="time_zone" id="time_zone" type="text" placeholder="Time Zone" class="form-control" value="{{country.timezone}}">
+            </div>
+            <div class="form-group">
+                <label>Acronym</label>
+                <input name="acronym" id="acronym" type="text" placeholder="Acronym" class="form-control" value="{{country.acronym}}">
+            </div>
+            <div class="form-group">
+                <label>Coin</label>
+                <input name="coin" id="coin" type="text" placeholder="Coin" class="form-control" value="{{country.coin}}">
+            </div>
+            <div class="form-group">
+                <label>Currency Symbol</label>
+                <input name="currency_symbol" id="currency_symbol" type="text" placeholder="Currency Symbol" class="form-control" value="{{country.currencySymbol}}">
+            </div>
+            <div class="form-group">
+                <label>Tax Rate</label>
+                <input name="tax_rate" id="tax_rate" type="text" placeholder="Tax Rate" class="form-control" value="{{country.taxRate}}">
+            </div>
+            <div class="form-group">
+                <label>Telephone Prefix</label>
+                <input name="telefone_prefix" id="telefone_prefix" type="text" placeholder="Telephone Prefix" class="form-control" value="{{country.telephonePrefix}}">
+            </div>
+            <div class="form-group">
+                <label>Issuingbank</label>
+                <input name="issuingbank" id="issuingbank" type="text" value="{{ country.issuingbank|join(',') }}" placeholder="" class="form-control" data-role="tagsinput" >                
+            </div>
+            <div class="form-group">
+                <label>Receivingbank</label>
+                <input name="receivingbank" id="receivingbank" type="text" value="{{ country.receivingbank|join(',') }}" placeholder="" class="form-control" data-role="tagsinput" >                
+            </div>
+            <div class="form-group">
+                <label>Waytopay</label>
+                <input name="waytopay" id="waytopay" type="text" value="{{ country.waytopay|join(',') }}" placeholder="" class="form-control" data-role="tagsinput" >                
+            </div>            
+            <div class="form-group">       
+                <input type="submit" value="Edit" class="btn btn-primary" id="button">&nbsp;&nbsp;&nbsp;
+                <a class="btn btn-primary" href="{{ path('country_list') }}">Return</a>
+            </div>
+        </form>
+    </div>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#tax_rate').mask("99999", {placeholder: " "});
+            $('#telefone_prefix').mask("+999", {placeholder: " "});
+
+
+            var emailreg = /^[a-zA-Z0-9_\.\-]+@[a-zA-Z0-9\-]+\.[a-zA-Z0-9\-\.]+$/;
+
+            $("#button").click(function () {
+                        $(".error").remove();
+                        if ($("#country").val() == "") {
+                                $("#country").focus().after("<span class='error'>Enter the country</span>");
+                                return false;
+                        } else if ($("#languaje").val() == "") {
+                                $("#languaje").focus().after("<span class='error'>Select the language</span>");
+                                return false;
+                        } else if ($("#time_zone").val() == "") {
+                                $("#time_zone").focus().after("<span class='error'>Enter the time use</span>");
+                                return false;
+                        } else if ($("#acronym").val() == "") {
+                                $("#acronym").focus().after("<span class='error'>Enter the initials</span>");
+                                return false;
+                        } else if ($("#coin").val() == "") {
+                                $("#coin").focus().after("<span class='error'>Enter the currency</span>");
+                                return false;
+                        } else if ($("#currency_symbol").val() == "") {
+                                $("#currency_symbol").focus().after("<span class='error'>Enter the currency symbol</span>");
+                                return false;
+                        } else if ($("#tax_rate").val() == "") {
+                                $("#tax_rate").focus().after("<span class='error'>Enter the tax rate</span>");
+                                return false;
+                        } else if ($("#telefone_prefix").val() == "") {
+                                $("#telefone_prefix").focus().after("<span class='error'>Enter the phone number</span>");
+                                return false;
+                        }
+            });
+            $("#country, #languaje, #time_zone, #acronym, #coin, #currency_symbol, #tax_rate, #telefone_prefix").keyup(function () {
+                        if ($(this).val() != "") {
+                                $(".error").fadeOut();
+                                return false;
+                        }
+                });
+
+        });
+    </script>  
+{% endblock %}

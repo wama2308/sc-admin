@@ -1,0 +1,64 @@
+{% extends '@App/base.html.twig' %}
+
+{% block body %}
+    <br>
+    <div><a class="btn btn-primary" href="{{ path('country_create') }}" role="button"><i class="fas fa-plus-circle"></i> New</a></div>
+    <br>    
+    {#    {{countries}}#}
+    <table id="tableCountry" class="display nowrap dataTable dtr-inline collapsed"> 
+        <thead> 
+            <tr> 
+                <th>Country</th>    
+                <th>Acronym</th>    
+                <th>Languaje</th>    
+                <th>Coin</th>    
+                <th>Currency Symbol</th>    
+                <th>Telephone Prefix</th>                     
+                <th>Status</th>                     
+                <th>Accion</th>                                                                                                    
+            </tr> 
+        </thead> 
+        <tbody> 
+            {% for country in countries %}
+                {% if country.active == true %}
+                    {% set status = "ACTIVE" %}                
+                {% else %}    
+                    {% set status = "INACTIVE" %}
+                {% endif %}
+                {% set NameLanguaje = '' %}   
+                {% for ArrayLanguaje in  ArrayLanguajes %}
+                    {% if country.languaje == loop.index-1 %}
+                         {% set NameLanguaje =  ArrayLanguaje.name%}  
+                    {% endif %}
+                {% endfor %}
+                <tr> 
+                    <td>{{country.name}}</td>                                 
+                    <td>{{country.acronym}}</td>                                 
+                    <td>{{NameLanguaje}}</td>         
+                    <td>{{country.coin}}</td>      
+                    <td>{{country.currencySymbol}}</td>      
+                    <td>{{country.telephonePrefix}}</td>      
+                    <td>{{status}}</td>      
+                    <td style="width: 110px">
+                        <a title="VIEW" href="{{ path('country_details', { 'id': country.id }) }}" class="btn btn-info"><i class="fas fa-eye"></i> </a>
+                        <a title="EDIT" href="{{ path('country_edit', { 'id': country.id }) }}" class="btn btn-default"  style="background-color: #a1c9c2; color: black "><i class="fas fa-edit"></i> </a>
+                        <a title="DELETE" href="{{ path('delete_user', { 'id': country.id }) }}" class="btn btn-danger" onclick="return confirm('¿Be sure to eliminate the country?');"><i class="fas fa-minus-circle"></i> </a>
+                    </td> 
+
+                </tr>   
+
+            {% endfor %}
+        </tbody> 
+    </table>    
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            $('#tableCountry')
+                    .addClass('nowrap')
+                    .dataTable();
+        });
+
+    </script>  
+
+{% endblock %}

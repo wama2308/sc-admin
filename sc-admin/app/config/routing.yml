@@ -1,0 +1,25 @@
+fos_user:
+    resource: "@FOSUserBundle/Resources/config/routing/all.xml"
+
+app:
+    resource: '@AppBundle/Controller/'
+    type: annotation
+    prefix:   /
+
+api_rest_country:
+    type:     rest
+    prefix:   /apiCountry
+    resource: "@AppBundle/Controller/ApiRest/ApiRestCountryController.php"
+
+api_rest_users_country:
+    type:     rest
+    prefix:   /apiusersfront
+    resource: "@AppBundle/Controller/ApiRest/ApiRestUsersFrontController.php"
+
+app_bundle_api:
+    type:     rest
+    prefix:   /api
+    resource: "@AppBundle/Resources/config/api-rest-routing.yml"
+    
+    
+
