@@ -1,0 +1,123 @@
+<?php
+
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+namespace AppBundle\Document;
+
+use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+
+/**
+ * @MongoDB\Document 
+ */
+class Pais
+{
+   /**
+     * @MongoDB\Id
+     */
+    protected $id;
+
+    /**
+     * @MongoDB\Field(type="string")
+     */
+    protected $name;
+    
+    /**
+     * @MongoDB\Field(type="boolean")
+     */
+    protected $blnborrado;
+    
+    /**
+     * @MongoDB\Field(type="date")
+     */
+    protected $created_at;    
+   
+    /**
+     * @MongoDB\Field(type="collection")
+     */
+    protected $provincia;    
+    
+    function __construct() 
+    {
+        $this->created_at = new \DateTime();
+    }
+    
+    /**
+     * Get id
+     *
+     * @return id $id
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Set name
+     *
+     * @param string $name
+     * @return $this
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+        return $this;
+    }
+
+    /**
+     * Get name
+     *
+     * @return string $name
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * Set createdAt
+     *
+     * @param date $createdAt
+     * @return $this
+     */
+    public function setCreatedAt($createdAt)
+    {
+        $this->created_at = $createdAt;
+        return $this;
+    }
+
+    /**
+     * Get createdAt
+     *
+     * @return date $createdAt
+     */
+    public function getCreatedAt()
+    {
+        return $this->created_at;
+    }
+
+    /**
+     * Set blnBorrado
+     *
+     * @param boolean $blnBorrado
+     * @return $this
+     */
+    public function setBlnBorrado($blnBorrado)
+    {
+        $this->blnborrado = $blnBorrado;
+        return $this;
+    }
+
+    /**
+     * Get blnBorrado
+     *
+     * @return boolean $blnBorrado
+     */
+    public function getBlnBorrado()
+    {
+        return $this->blnborrado;
+    }
+}

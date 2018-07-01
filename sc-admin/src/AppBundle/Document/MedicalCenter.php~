@@ -1,0 +1,153 @@
+<?php
+
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+// src/AppBundle/Document/MedicalCenter.php
+namespace AppBundle\Document;
+use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+
+/**
+ * @MongoDB\Document 
+*/
+class MedicalCenter {
+    /**
+     * @MongoDB\Id
+     */
+    protected $id;
+    
+    /**
+     * @MongoDB\Field(type="string")
+     */
+    protected $countryid;
+    
+    /**
+     * @MongoDB\Field(type="int")
+     */
+    protected $provinceid;
+    
+    /**
+     * @MongoDB\Field(type="string")
+     */
+    protected $coordinates;
+    
+    /**
+     * @MongoDB\Field(type="string")
+     */
+    protected $coordinates1;
+    
+    /**
+     * @MongoDB\Field(type="string")
+     */
+    protected $name;
+    
+    /**
+     * @MongoDB\Field(type="string")
+     */
+    protected $code;
+    
+    /**
+     * @MongoDB\Field(type="int")
+     */
+    protected $type;
+    
+    /**
+     * @MongoDB\Field(type="int")
+     */
+    protected $sector;
+    
+    /**
+     * @MongoDB\Field(type="string")
+     */
+    protected $address;
+
+    /**
+     * @MongoDB\Field(type="collection")
+     */
+    protected $phone;
+    
+    /**
+     * @MongoDB\Field(type="collection")
+     */
+    protected $master;
+    
+    /**
+     * @MongoDB\Field(type="collection")
+     */
+    protected $social_networks;
+    
+    /**
+     * @MongoDB\Field(type="string")
+     */    
+    protected $contac1;
+    
+    /**
+     * @MongoDB\Field(type="collection")
+     */
+    protected $contac1phone;
+    
+    /**
+     * @MongoDB\Field(type="string")
+     */    
+    protected $contac2;
+    
+    /**
+     * @MongoDB\Field(type="collection")
+     */
+    protected $contac2phone;
+    
+    /**
+     * @MongoDB\Field(type="collection")
+     */
+    protected $branchoffices;
+    
+    /**
+     * @MongoDB\Field(type="collection")
+     */
+    protected $licenses;
+    
+    /**
+     * @MongoDB\Field(type="collection")
+     */
+    protected $payments;
+    
+    /**
+     * @MongoDB\Field(type="string")
+     */    
+    protected $paymentstatus;   
+    
+    /**
+     * @MongoDB\Field(type="boolean")
+     */
+    protected $active;
+
+    /**
+     * @MongoDB\Field(type="date")
+     */
+    protected $created_at;
+
+    /**
+     * @MongoDB\Field(type="string")
+     */
+    protected $created_by;
+
+    /**
+     * @MongoDB\Field(type="date")
+     */
+    protected $updated_at;
+
+    /**
+     * @MongoDB\Field(type="string")
+     */
+    protected $updated_by;
+
+    function __construct() {
+        $this->created_at = new \DateTime();
+        $this->updated_at = new \DateTime();
+    }      
+      
+
+    
+}

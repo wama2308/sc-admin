@@ -1,0 +1,61 @@
+<?php
+
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+// src/AdminBundle/Document/Licencia.php
+namespace AdminBundle\Document;
+use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+
+/**
+ * @MongoDB\Document 
+*/
+class Licencia {
+    /**
+     * @MongoDB\Id
+     */
+    protected $id;
+    
+    /**
+     * @MongoDB\Field(type="int")
+     */
+    protected $CantidadUsuarios;
+    
+    /**
+     * @MongoDB\Field(type="int")
+     */
+    protected $CantidadClientes;
+    
+    /**
+     * @MongoDB\Field(type="int")
+     */
+    protected $CantidadExamanes;
+    
+    /**
+     * @MongoDB\Field(type="date")
+     */
+    protected $created_at;
+
+    /**
+     * @MongoDB\Field(type="string")
+     */
+    protected $created_by;
+
+    /**
+     * @MongoDB\Field(type="date")
+     */
+    protected $updated_at;
+
+    /**
+     * @MongoDB\Field(type="string")
+     */
+    protected $updated_by;
+
+    function __construct() {
+        $this->created_at = new \DateTime();
+        $this->updated_at = new \DateTime();
+    }    
+    
+}
