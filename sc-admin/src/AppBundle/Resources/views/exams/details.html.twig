@@ -1,36 +1,42 @@
 {% extends '@App/base.html.twig' %}
 
 {% block body %}
-    <br>
-    <div class="panel panel-body">
-        {% if exams.active == true %}
-            {% set status = "ACTIVE" %}                
-        {% else %}    
-            {% set status = "INACTIVE" %}
-        {% endif %}
-        {% set NameCategoria =  ''%}  
-        {% for ArrayCategoryExams in  ArrayCategoryExams %}
-            {% if exams.category == loop.index-1 %}
-                {% set NameCategoria =  ArrayCategoryExams%}  
-            {% endif %}
-        {% endfor %}
-        <table id="tableExams" class="table table-bordered" > 
-            <thead> 
-                <tr> 
-                    <td>Exam:</td><td>{{ exams.name }}</td>
-                <tr>
-                    <td>Category:</td><td>{{ NameCategoria }}</td>
-                </tr>
-                <tr>
-                    <td>Fields:</td><td>{{ exams.fields|join(' - ') }}</td>
-                </tr>
-                <tr>
-                    <td>Status:</td><td>{{ status }}</td>                                                                                              
-                </tr> 
-            </thead> 
-        </table>        
+    <div class="card">
+        <div class="card-header">
+            <strong>Details Exam</strong>
+            {#            <small>List</small>#}
+        </div>        
+        <div class="card-body"> 
+            <div class="panel panel-body">
+                {% if exams.active == true %}
+                    {% set status = "ACTIVE" %}                
+                {% else %}    
+                    {% set status = "INACTIVE" %}
+                {% endif %}
+                {% set NameCategoria =  ''%}  
+                {% for ArrayCategoryExams in  ArrayCategoryExams %}
+                    {% if exams.category == loop.index-1 %}
+                        {% set NameCategoria =  ArrayCategoryExams%}  
+                    {% endif %}
+                {% endfor %}
+                <table id="tableExams" class="table table-bordered" > 
+                    <thead> 
+                        <tr> 
+                            <td>Exam:</td><td>{{ exams.name }}</td>
+                        <tr>
+                            <td>Category:</td><td>{{ NameCategoria }}</td>
+                        </tr>
+                        <tr>
+                            <td>Fields:</td><td>{{ exams.fields|join(' - ') }}</td>
+                        </tr>
+                        <tr>
+                            <td>Status:</td><td>{{ status }}</td>                                                                                              
+                        </tr> 
+                    </thead> 
+                </table>        
+            </div>
+
+            <a class="btn btn-primary" href="{{ path('exams_list') }}">Return</a>
+        </div>
     </div>
-
-    <a class="btn btn-primary" href="{{ path('exams_list') }}">Return</a>
-
 {% endblock %}

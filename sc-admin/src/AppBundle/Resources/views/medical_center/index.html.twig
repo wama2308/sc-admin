@@ -1,68 +1,75 @@
 {% extends '@App/base.html.twig' %}
 
 {% block body %}
-    <br>
-    <div><a class="btn btn-primary" href="{{ path('medical_center_create') }}" role="button"><i class="fas fa-plus-circle"></i> New</a></div>
-    <br>    
-    {#    {{countries}}#}
-    <table id="tableMedicalCenter" class="display nowrap dataTable dtr-inline collapsed"> 
-        <thead> 
-            <tr> 
-                <th>Country</th>                
-                <th>Province</th>                
-                <th>Name</th>                
-                <th>Code</th>                
-                <th>Phone</th>                
-                <th>Email</th>                
-                <th>Action</th>                
-            </tr> 
-        </thead> 
-        <tbody> 
-            {% for medicalcenter in medicalcenter %}
+    <div class="card">
+        <div class="card-header">
+            <a class="btn btn-primary" href="{{ path('medical_center_create') }}" role="button"><i class="fas fa-plus-circle"></i> </a>&nbsp;&nbsp;&nbsp;&nbsp;          
+            <strong>List Medical Center</strong>
+            {#            <small>List</small>#}
+        </div>        
+        <div class="card-body">  
+            <div></div>
 
-                {% set country = '' %}   
-                {% set province = '' %}                   
-                {% set phoneMc = '' %}                   
-                {% set emailMc = '' %}                   
+            {#    {{countries}}#}
+            <table id="tableMedicalCenter" class="display nowrap dataTable dtr-inline collapsed"> 
+                <thead> 
+                    <tr> 
+                        <th>Country</th>                
+                        <th>Province</th>                
+                        <th>Name</th>                
+                        <th>Code</th>                
+                        <th>Phone</th>                
+                        <th>Email</th>                
+                        <th>Action</th>                
+                    </tr> 
+                </thead> 
+                <tbody> 
+                    {% for medicalcenter in medicalcenter %}
 
-                {% for countries in  countries %}
-                    {% if countries.id == medicalcenter.countryid %}
-                        {% set country =  countries.name %}  
-                        {% for provinces in  countries.provinces %}
-                            {% if loop.index-1 == medicalcenter.provinceid %}
-                                {% set province =  provinces.name %}  
+                        {% set country = '' %}   
+                        {% set province = '' %}                   
+                        {% set phoneMc = '' %}                   
+                        {% set emailMc = '' %}                   
+
+                        {% for countries in  countries %}
+                            {% if countries.id == medicalcenter.countryid %}
+                                {% set country =  countries.name %}  
+                                {% for provinces in  countries.provinces %}
+                                    {% if loop.index-1 == medicalcenter.provinceid %}
+                                        {% set province =  provinces.name %}  
+                                    {% endif %}
+                                {% endfor %}
                             {% endif %}
                         {% endfor %}
-                    {% endif %}
-                {% endfor %}
 
-                {% for phone in  medicalcenter.phone %}
-                    {% if loop.index-1 == 0 %}
-                        {% set phoneMc =  phone %}  
-                    {% endif %}
-                {% endfor %}
-                
-                {% for email in  medicalcenter.master %}
-                    {% set emailMc =  email.email %}                      
-                {% endfor %}
-                <tr> 
-                    <td>{{country}}</td>                                 
-                    <td>{{province}}</td>    
-                    <td>{{medicalcenter.name}}</td>    
-                    <td>{{medicalcenter.code}}</td>    
-                    <td>{{phoneMc}}</td>    
-                    <td>{{emailMc}}</td>    
-                    <td style="width: 110px">
-{#                        <a title="VIEW" href="/admin/medical_center/details/{{medicalcenter.id}}" class="btn btn-info"><i class="fas fa-eye"></i></a>#}
-                        <a title="EDIT" href="{{ path('medical_center_edit', { 'id': medicalcenter.id }) }}" class="btn btn-default"  style="background-color: #a1c9c2; color: black "><i class="fas fa-edit"></i></a>
-                        <a title="DELETE" href="{{ path('medical_center_delete', { 'id': medicalcenter.id }) }}" class="btn btn-danger" onclick="return confirm('¿Be sure to eliminate the medical center?');"><i class="fas fa-minus-circle"></i></a>
-                    </td> 
+                        {% for phone in  medicalcenter.phone %}
+                            {% if loop.index-1 == 0 %}
+                                {% set phoneMc =  phone %}  
+                            {% endif %}
+                        {% endfor %}
 
-                </tr>  
-            {% endfor %}
-        </tbody> 
-    </table>    
+                        {% for email in  medicalcenter.master %}
+                            {% set emailMc =  email.email %}                      
+                        {% endfor %}
+                        <tr> 
+                            <td>{{country}}</td>                                 
+                            <td>{{province}}</td>    
+                            <td>{{medicalcenter.name}}</td>    
+                            <td>{{medicalcenter.code}}</td>    
+                            <td>{{phoneMc}}</td>    
+                            <td>{{emailMc}}</td>    
+                            <td style="width: 110px">
+                                {#                        <a title="VIEW" href="/admin/medical_center/details/{{medicalcenter.id}}" class="btn btn-info"><i class="fas fa-eye"></i></a>#}
+                                <a title="EDIT" href="{{ path('medical_center_edit', { 'id': medicalcenter.id }) }}" class="btn btn-default"  style="background-color: #a1c9c2; color: black "><i class="fas fa-edit"></i></a>
+                                <a title="DELETE" href="{{ path('medical_center_delete', { 'id': medicalcenter.id }) }}" class="btn btn-danger" onclick="return confirm('¿Be sure to eliminate the medical center?');"><i class="fas fa-minus-circle"></i></a>
+                            </td> 
 
+                        </tr>  
+                    {% endfor %}
+                </tbody> 
+            </table>    
+        </div>
+    </div>
     <script type="text/javascript">
 
         $(document).ready(function () {

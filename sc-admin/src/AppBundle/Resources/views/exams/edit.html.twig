@@ -1,65 +1,69 @@
 {% extends '@App/base.html.twig' %}
 
 {% block body %}
-    <br>
-    <h2 class="page-header">Update Exam</h2>
-    <br>
-    <ul class="nav nav-tabs" id="myTab" role="tablist">
-        <li class="nav-item">
-            <a class="nav-link" data-toggle="tab" href="#data" role="tab" aria-controls="data" onclick="back();">Data</a>
-        </li>        
-        <li class="nav-item">
-            <a id="hformat" class="nav-link" data-toggle="tab" href="#format" role="tab" aria-controls="format" onclick="next();">Format</a>
-        </li>
-    </ul>
-    <form action="" method="post" id="formid">  
-        <div class="tab-content">
-            <div class="tab-pane active" id="data" role="tabpanel">
-                <div id="ok"></div>
-                <div class="form-group">       
-                    <label>Category</label>
-                    <div class="selector-exam">
-                        <select class="form-control" name="category" id="category">
-                            <option value="">Select...</option>  
-                            {% for ArrayCategoryExams in ArrayCategoryExams %}
-                                {% if loop.index-1 == exam.category %}
-                                    {% set selected = 'selected' %}                           
-                                    <option value="{{loop.index-1}}"  {{ selected }}>{{ArrayCategoryExams}}</option>
-                                {% else %}
-                                    <option value="{{loop.index-1}}">{{ArrayCategoryExams}}</option>
-                                {% endif %}
-                            {% endfor %}
-                        </select>
+    <div class="card">
+        <div class="card-header">
+            <strong>Update Exam</strong>
+            {#            <small>List</small>#}
+        </div>
+        <div class="card-body">
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#data" role="tab" aria-controls="data" onclick="back();">Data</a>
+                </li>        
+                <li class="nav-item">
+                    <a id="hformat" class="nav-link" data-toggle="tab" href="#format" role="tab" aria-controls="format" onclick="next();">Format</a>
+                </li>
+            </ul>
+            <form action="" method="post" id="formid">  
+                <div class="tab-content">
+                    <div class="tab-pane active" id="data" role="tabpanel">
+                        <div id="ok"></div>
+                        <div class="form-group">       
+                            <label>Category</label>
+                            <div class="selector-exam">
+                                <select class="form-control select-category" name="category" id="category">
+                                    <option value="">Select...</option>  
+                                    {% for ArrayCategoryExams in ArrayCategoryExams %}
+                                        {% if loop.index-1 == exam.category %}
+                                            {% set selected = 'selected' %}                           
+                                            <option value="{{loop.index-1}}"  {{ selected }}>{{ArrayCategoryExams}}</option>
+                                        {% else %}
+                                            <option value="{{loop.index-1}}">{{ArrayCategoryExams}}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Exam</label>
+                            <input name="exam" id="exam" type="text" value="{{exam.name}}" placeholder="Exam" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Fields</label>
+                            <input name="fields" id="fields" type="text" value="{{ exam.fields|join(',') }}" placeholder="" class="form-control" data-role="tagsinput" >                    
+                        </div>
+
+                        <div class="form-group">       
+                            <input type="button" value="Next" class="btn btn-primary" id="buttonnext" onclick="next();">&nbsp;&nbsp;&nbsp;
+                            <a class="btn btn-primary" style="color: #ffffff" href="{{ path('exams_list') }}">Return</a>
+                        </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label>Exam</label>
-                    <input name="exam" id="exam" type="text" value="{{exam.name}}" placeholder="Exam" class="form-control">
-                </div>
-                <div class="form-group">
-                    <label>Fields</label>
-                    <input name="fields" id="fields" type="text" value="{{ exam.fields|join(',') }}" placeholder="" class="form-control" data-role="tagsinput" >                    
-                </div>
-
-                <div class="form-group">       
-                    <input type="button" value="Next" class="btn btn-primary" id="buttonnext" onclick="next();">&nbsp;&nbsp;&nbsp;
-                    <a class="btn btn-primary" style="color: #ffffff" href="{{ path('exams_list') }}">Return</a>
-                </div>
-            </div>
-            <div class="tab-pane" id="format" role="tabpanel">
-                <div class="form-group">       
-                    <label>Format</label>
-                    <textarea name="format" id="format" type="text" class="form-control">{{exam.format}}</textarea>
-                </div>
-                <div class="form-group">       
-                    <input type="button" value="Back" class="btn btn-primary" id="buttonback" onclick="back();">&nbsp;&nbsp;&nbsp;
-                    <input type="submit" value="Edit" class="btn btn-primary" id="button">&nbsp;&nbsp;&nbsp;
-                    <a class="btn btn-primary" style="color: #ffffff" href="{{ path('exams_list') }}">Return</a>
-                </div>
-            </div>
-        </div>    
-    </form>
-
+                    <div class="tab-pane" id="format" role="tabpanel">
+                        <div class="form-group">       
+                            <label>Format</label>
+                            <textarea name="format" id="format" type="text" class="form-control">{{exam.format}}</textarea>
+                        </div>
+                        <div class="form-group">       
+                            <input type="button" value="Back" class="btn btn-primary" id="buttonback" onclick="back();">&nbsp;&nbsp;&nbsp;
+                            <input type="submit" value="Edit" class="btn btn-primary" id="button">&nbsp;&nbsp;&nbsp;
+                            <a class="btn btn-primary" style="color: #ffffff" href="{{ path('exams_list') }}">Return</a>
+                        </div>
+                    </div>
+                </div>    
+            </form>
+        </div>
+    </div>
     <div id="menu" class="divPrueba">
         <ul class="ulPrueba">
             <li id="copiar" class="liPrueba otra" onclick="poner_mo('teresa');" value="10">Copiar</li>
@@ -102,6 +106,10 @@
 
     <script type="text/javascript">
         $(document).ready(function () {
+            $(".select-category").chosen({
+                placeholder_text_single: "Select the category"
+            });
+
             $('#myTab a[href="#data"]').tab('show');
             $("#adicionados").val(0);
             //cargarTinyMice();
@@ -139,14 +147,14 @@
         function next() {
             $(".error").remove();
                     if ($("#category").val() == "") {
-                            $("#category").focus().after("<span class='error'>Select the category</span>");
+                            $("#category").focus().after("<span class='error' style='color:#FF0000;'>Select the category</span>");
                             return false;
                     } else if ($("#exam").val() == "") {
-                            $("#exam").focus().after("<span class='error'>Enter exams</span>");
+                            $("#exam").focus().after("<span class='error' style='color:#FF0000;'>Enter exams</span>");
                             return false;
         
                     } else if ($("#fields").val() == "") {
-                            $("#fields").focus().after("<span class='error'>Enter the fields</span>");
+                            $("#fields").focus().after("<span class='error' style='color:#FF0000;'>Enter the fields</span>");
                 $("#tabs").tabs("disable", 1);
                             return false;                
                     } else

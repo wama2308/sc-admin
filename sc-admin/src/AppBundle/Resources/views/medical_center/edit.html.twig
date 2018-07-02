@@ -1,329 +1,355 @@
 {% extends '@App/base.html.twig' %}
 
 {% block body %}
-    <br>
-    <h2 class="page-header">Register Medical Center</h2>
-    <br>
-
-    <ul class="nav nav-tabs" id="myTab" role="tablist">
-        <li class="nav-item">
-            <a class="nav-link" data-toggle="tab" href="#medicalCenter" role="tab" aria-controls="medicalCenter" onclick="">Medical Center</a>
-        </li>        
-        <li class="nav-item">
-            <a id="hlicense" class="nav-link " data-toggle="tab" href="#licenseLi" role="tab" aria-controls="licenseLi" onclick="">Licenses / Payments</a>
-        </li>
-    </ul>
-    <form action="" method="post" id="formid" enctype="multipart/form-data">  
-        <input name="inputMedicalCenterId" id="inputMedicalCenterId" type="hidden" value="{{ medicalcenter.id }}">
-        <div class="tab-content">
-            <div class="tab-pane in active" id="medicalCenter" role="tabpanel">           
-                <div class="form-group">       
-                    <label>Country</label>
-                    <div class="selector-exam">
-                        <select class="form-control select-country" style="width: 100%" name="country" id="country" onchange="loadAjax('country', 'div-province', 1);
-                                loadAjax('country', 'divWayToPay', 5);
-                                loadAjax('country', 'divIssuingBank', 6);
-                                loadAjax('country', 'divReceivingBank', 7);
-                                loadAjax2('country', 'div-licenses', 3);">
-                            <option value="">Select...</option>  
-                            {% for countries in countries %}
-                                {% if countries.id == medicalcenter.countryid %}
-                                    {% set selected = 'selected' %}
-                                    <option value="{{countries.id}}" {{ selected }}>{{countries.name}}</option>
-                                {% else %}   
-                                    <option value="{{countries.id}}">{{countries.name}}</option>
-                                {% endif %}
-                            {% endfor %}
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">       
-                    <label>Province</label>
-                    <div id="div-province">
-                        <select class="form-control select-province" style="width: 100%" name="province" id="province">
-                            <option value="">Select...</option>                                                    
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Name</label>
-                    <input name="name" id="name" type="text" value="{{ medicalcenter.name }}" placeholder="Name" class="form-control">
-                </div>
-                <div class="form-group">
-                    <label>Code</label>
-                    <input name="code" id="code" type="text" value="{{ medicalcenter.code }}" placeholder="Code" class="form-control">
-                </div>
-                <div class="form-group">       
-                    <label>Type</label>
-                    <div class="selector-exam">
-                        <select class="form-control select-type" style="width: 95%" name="typemedicalcenter" id="typemedicalcenter">
-                            <option value="">Select...</option>  
-                            {% for ArrayTypeMedicalCenter in ArrayTypeMedicalCenter %}
-                                {% if loop.index-1 == medicalcenter.type %}
-                                    {% set selected = 'selected' %}
-                                    <option value="{{loop.index-1}}" {{ selected }}>{{ArrayTypeMedicalCenter}}</option>
-                                {% else %}
-                                    <option value="{{loop.index-1}}">{{ArrayTypeMedicalCenter}}</option>    
-                                {% endif %}    
-                            {% endfor %}
-                        </select>
-                    </div>
-                </div>                
-                <div class="form-group">       
-                    <label>Address</label>
-                    <textarea name="address" id="address" type="text" class="form-control">{{ medicalcenter.address }}</textarea>
-                </div>
-                <div class="form-group">
-                    <label>Phone</label>
-                    <input name="phone" id="phone" type="text" value="{{ medicalcenter.phone|join(',') }}" placeholder="Phone" class="form-control" data-role="tagsinput" >                    
-                </div>
-                {% set emailMc =  "" %}       
-                {% for email in  medicalcenter.master %}
-                    {% set emailMc =  email.email %}                      
-                {% endfor %}
-                <div class="form-group">
-                    <label>Master</label>
-                    <input name="master" id="master" type="text" value="{{ emailMc }}" placeholder="Email" class="form-control" >                    
-                </div>                
-                <div class="form-group">
-                    <label>Contac 1</label>
-                    <input name="contac1" id="contac1" type="text" value="{{ medicalcenter.contac1 }}" placeholder="Contac 1" class="form-control">                    
-                </div>
-                <div class="form-group">
-                    <label>Telephone contact 1</label>
-                    <input name="telephonecontact1" id="telephonecontact1" type="text" value="{{ medicalcenter.contac1phone|join(',') }}" placeholder="Telephone contact 1" class="form-control" data-role="tagsinput" >                    
-                </div>
-                <div class="form-group">      
-                    <input type="button" value="Next" class="btn btn-primary" id="buttonnext" onclick="next();" style="">&nbsp;&nbsp;&nbsp;                    
-                    <a class="btn btn-primary" style="color: #ffffff" href="{{ path('medical_center_list') }}">Return</a>
-                </div>
-            </div>
-            {#////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////#}   
-            <div class="tab-pane" id="licenseLi" role="tabpanel">
-                <div class="form-group">       
-                    <label>Licenses</label>
-                    <div id="div-licenses">
-                        <select class="form-control select-licenses" style="width: 95%" name="license" id="license" onchange="loadAjax('license', 'divLicenses', 4);
-                                loadInfoLicense();">
-                            <option value="">Select...</option>                                                    
-                        </select>
-                    </div>
-                </div>               
-                <div class="form-group">    
-                    <br>
-                    <div align="center" id="labelLicense" style="display: block"><h2 style="background-color: silver; align-items: center">Licenses</h2></div>
-                    <input name="countLicenses" id="countLicenses" type="hidden" value="{{countLicensesMc}}">
-                    <table id="tablelicenses" class="table table-bordered table-hover" style="display: table; width: 100%">
-                        <tr align="center" style="background-color: silver;">
-                            <th align="center">License</th>                            
-                            <th align="center">Users Quantity</th>                            
-                            <th align="center">Number of Clients</th>                            
-                            <th align="center">Number of Exams</th>                            
-                            <th align="center">Duration Time</th>                            
-                            <th align="center">Amount</th>   
-                            <th align="center">Action</th>
-                        </tr>
-                        {% set acumAmount = 0 %}      
-                        {% for licensesMC in medicalcenter.licenses %}
-                            {% set license = '' %}   
-                            {% set usersquantity = '' %}   
-                            {% set numberclients = '' %}                   
-                            {% set numberexams = '' %}                   
-                            {% set durationtime = '' %}         
-                            {% set amount = '' %}         
-                            {% set statusRegister = '' %}         
-
-                            {% for licenses in licenses %}
-                                {% if licensesMC.license_id == licenses.id %}
-                                    {% set license = licenses.license %}   
-                                    {% set usersquantity = licenses.usersquantity %}   
-                                    {% set numberclients = licenses.numberclients %}                   
-                                    {% set numberexams = licenses.numberexams %}                   
-                                    {% set durationtime = licenses.durationtime %}         
-                                    {% set amount = licenses.amount %}  
-                                    {% if licensesMC.status == "Active" %}
-                                        {% set acumAmount = acumAmount + amount %} 
-                                    {% endif %}        
-                                {% endif %}
-                            {% endfor %}
-                            {% if licensesMC.status == "Active" %}
-                                {% set statusRegister = '1' %}         
-                                <tr align="center" id="trlicense_{{ loop.index-1 }}">
-                                {% else %}
-                                    {% set statusRegister = '2' %}         
-                                <tr align="center" id="trlicense_{{ loop.index-1 }}" style="display: none">
-                                {% endif %}        
-                                <td align="center">{{ license }}
-                                    <input type="hidden" id="licenseId_{{loop.index-1}}" name="licenseId_{{loop.index-1}}"  value="{{licensesMC.license_id}}" />
-                                    <input type="hidden" id="durationTime_{{loop.index-1}}" name="durationTime_{{loop.index-1}}"  value="{{durationtime}}" />
-                                    <input type="hidden" id="statusRegisterLicense_{{loop.index-1}}" name="statusRegisterLicense_{{loop.index-1}}"  value="{{statusRegister}}" />
-                                </td>                            
-                                <td align="center">{{ usersquantity }}</td>                            
-                                <td align="center">{{ numberclients }}</td>                            
-                                <td align="center">{{ numberexams }}</td>                            
-                                <td align="center">{{ durationtime }}</td>                            
-                                <td align="center">{{ amount }}</td>                            
-                                <td align="center"><button type="button" name="remove" id="" onclick="deleteLicense('{{ medicalcenter.id }}',{{ loop.index-1 }} ); restaLicensesEdit({{ amount }});" class="btn btn-danger" style=""><i class="fas fa-minus-circle"></i></button></td>                            
-                            </tr>                            
-                        {% endfor %}
-                    </table>
-                    <div id="divAmount" align="right" style="display: block"><b>Total to pay:</b>&nbsp;&nbsp;<input readonly="" name="amountTotal" id="amountTotal" type="text" value="{{ acumAmount }}" placeholder="" class="" style=" width: 15%;padding: 1px 45px;margin: 5px 0;box-sizing: border-box;border: none;border-bottom: 2px solid black;"><label id="labelAmountCurrentSymbol"><b></b></label></div>                    
-                </div>
-                <div align="center" id="labelPayments" style="display: block"><h2 style="background-color: silver; align-items: center">Payments</h2></div>
-                <div id="payment" style="display: block">
-                    <div class="form-group">       
-                        <label>Way to pay</label>
-                        <div id="divWayToPay">
-                            <select class="form-control select-waytopay" style="width: 95%" name="waytopay" id="waytopay" onchange="wayToPayOperation();">
-                                <option value="">Select...</option>                                  
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">       
-                        <label>Payment type</label>
-                        <div id="divWayToPay">
-                            <select class="form-control select-paymenttype" style="width: 95%" name="paymenttype" id="paymenttype" onchange="paymentType();">
-                                <option value="">Select...</option>                                  
-                                <option value="full">Full</option>                                  
-                                <option value="partial">Partial</option>                                  
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group" id="divDaystopay" style="display: none">       
-                        <label id="labelDaystopay">Days to pay</label>
-                        <input name="daystopay" id="daystopay" type="text" value="0" placeholder="Days to pay" class="form-control" onkeypress="">                    
-                    </div>
-                    <div class="form-group">
-                        <label>Amount</label>
-                        <input name="amount" id="amount" type="text" value="" placeholder="Amount" class="form-control" onkeypress="">                    
-                    </div>
-                    <div class="form-group">       
-                        <label>Issuing bank</label>
-                        <div id="divIssuingBank">
-                            <select class="form-control select-issuingbank" style="width: 95%" name="issuingbank" id="issuingbank" onchange="">
-                                <option value="">Select...</option>                                  
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">       
-                        <label>Receiving bank</label>
-                        <div id="divReceivingBank">
-                            <select class="form-control select-receivingbank" style="width: 95%" name="receivingbank" id="receivingbank" onchange="">
-                                <option value="">Select...</option>                                  
-                            </select>
-                        </div>
-                    </div>
-                    <div id="divInfoTarjetas" style="display: none">
-                        <div class="form-group">  
-                            <label>Card holder</label>
-                            <input name="cardholder" id="cardholder" type="text" value="" placeholder="Cardholder" class="form-control">    
-                        </div>
-                        <div class="form-group">  
-                            <label>Card number</label>
-                            <input name="cardnumber" id="cardnumber" type="text" value="" placeholder="Card number" class="form-control">    
-                        </div>
-                        <div class="form-group">  
-                            <label>Expiration</label>
-                            <input name="expiration" id="expiration" type="text" value="" placeholder="Expiration" class="form-control">    
-                        </div>
-                        <div class="form-group">  
-                            <label>CVV</label>
-                            <input name="cvv" id="cvv" type="text" value="" placeholder="CVV" class="form-control">    
-                        </div>
-                    </div>
-                    <div class="form-group" id="divNumCheck" style="display: none">
-                        <label>Check number</label>
-                        <input name="operationnumber" id="operationnumber" type="text" value="" placeholder="Check Number" class="form-control" disabled="">                    
-                    </div>
-                    <div class="form-group" id="divProofTransfer"  style="display: none">
-                        <label>Proof transfer</label>
-                        <input type="file" id="files4" name="files4" onchange="base64File4(this);"/>
-                        <input name="inputFile4Base64" id="inputFile4Base64" type="hidden" value="">
-                        <br>
-                        <output id="list4"></output>
-                    </div>
-                    <div class="form-group">
-                        <input type="button" value="Add" class="btn btn-primary" id="addButtonPayments" onclick="addPayments();">&nbsp;&nbsp;&nbsp;                                                                                                                                             
-                    </div>  
-                    <div class="form-group">    
-                        <br>
-                        <input name="countPayments" id="countPayments" type="hidden" value="0">
-                        <table id="tablePayments" class="table table-bordered table-hover" style="display: table; width: 100%">
-                            <tr align="center" style="background-color: silver;">
-                                <th align="center">Way to pay</th>                            
-                                <th align="center">Amount</th>                            
-                                <th align="center">Issuing bank</th>                            
-                                <th align="center">Receiving bank</th>                            
-                                <th align="center">Operation number</th>                            
-                                <th align="center">Action</th>
-                            </tr>
-                            {% set acumAmountPayments = 0 %}    
-                            {% set statusRegister = "" %} 
-                            {% for paymentsMc in medicalcenter.payments %}
-
-                                {% if paymentsMc.status == 1 %}
-                                    {% set acumAmountPayments = acumAmountPayments + paymentsMc.amount %}   
-                                    {% set statusRegister = '1' %} 
-                                    <tr align="center" id="trPayments_{{ loop.index-1 }}">
-                                    {% else %}
-                                    <tr align="center" id="trPayments_{{ loop.index-1 }}" style="display: none">
-                                        {% set statusRegister = '2' %} 
-                                    {% endif %}
-                                    <td align="center">{{ paymentsMc.waytopay }}
-                                        <input type="hidden" id="waytopay_{{loop.index-1}}" name="waytopay_{{loop.index-1}}"  value="{{paymentsMc.waytopay}}" />
-                                        <input type="hidden" id="daystopay_{{loop.index-1}}" name="daystopay_{{loop.index-1}}"  value="{{paymentsMc.daystopay}}" />
-                                        <input type="hidden" id="amount_{{loop.index-1}}" name="amount_{{loop.index-1}}"  value="{{paymentsMc.amount}}" />
-                                        <input type="hidden" id="issuingbank_{{loop.index-1}}" name="issuingbank_{{loop.index-1}}"  value="{{paymentsMc.issuingbank}}" />
-                                        <input type="hidden" id="receivingbank_{{loop.index-1}}" name="receivingbank_{{loop.index-1}}"  value="{{paymentsMc.receivingbank}}" />
-                                        <input type="hidden" id="cardholder_{{loop.index-1}}" name="cardholder_{{loop.index-1}}"  value="{{paymentsMc.cardholder}}" />
-                                        <input type="hidden" id="cardnumber_{{loop.index-1}}" name="cardnumber_{{loop.index-1}}"  value="{{paymentsMc.cardnumber}}" />
-                                        <input type="hidden" id="expiration_{{loop.index-1}}" name="expiration_{{loop.index-1}}"  value="{{paymentsMc.expiration}}" />
-                                        <input type="hidden" id="cvv_{{loop.index-1}}" name="cvv_{{loop.index-1}}"  value="{{paymentsMc.cvv}}" />
-                                        <input type="hidden" id="operationnumber_{{loop.index-1}}" name="operationnumber_{{loop.index-1}}"  value="{{paymentsMc.operationnumber}}" />
-                                        <input type="hidden"  id="files4_{{loop.index-1}}" name="files4_{{loop.index-1}}"  value="{{paymentsMc.files4}}" />
-                                        <input type="hidden"  id="statusRegisterPayment_{{loop.index-1}}" name="statusRegisterPayment_{{loop.index-1}}"  value="{{statusRegister}}" />
-                                    </td>                            
-                                    <td align="center">{{ paymentsMc.amount }}</td>
-                                    <td align="center">{{ paymentsMc.issuingbank }}</td>
-                                    <td align="center">{{ paymentsMc.receivingbank }}</td>
-                                    <td align="center">{{ paymentsMc.operationnumber }}</td>
-                                    <td align="center"><button type="button" name="remove" id="{{loop.index-1}}" onclick="deletePayments('{{ medicalcenter.id }}',{{ loop.index-1 }} , {{paymentsMc.amount}});" class="btn btn-danger" style=""><i class="fas fa-minus-circle"></i></button></td>
-                                </tr>                                
-                            {% endfor %}
-                        </table>                        
-                    </div>
-                    <div class="form-group">
-                        <label>Remaining</label>
-                        <input name="remaining" id="remaining" type="text" value="0" placeholder="Remaining" class="form-control" readonly="">                    
-                    </div>
-                    <div class="form-group">
-                        <label>Total</label>
-                        <input name="total" id="total" type="text" value="{{acumAmountPayments}}" placeholder="Total" class="form-control" readonly="">                    
-                    </div>
-                </div>
-                <br>
-                <div class="form-group">       
-                    <input type="button" value="Back" class="btn btn-primary" id="buttonback1" onclick="back1();">&nbsp;&nbsp;&nbsp;                       
-                    <input type="submit" value="Save" class="btn btn-primary" id="saveone" onclick="">&nbsp;&nbsp;&nbsp;
-                    <a class="btn btn-primary" style="color: #ffffff" href="{{ path('medical_center_list') }}">Return</a>
-                </div>
-            </div>    
-            {#/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////#}
-            <div id="myModalLicense" class="modal_" style="">
-                <div class="modal-content-2" style="">
-                    <div class="form-group" style="" id="divLicenses">     
-                        <span class="close">&times;</span>
-                    </div>
-                    <div class="form-group">
-                        <input type="button" value="Add" class="btn btn-primary" id="addButtonLicenses" onclick="agregarLicenses();">&nbsp;&nbsp;&nbsp;                                                        
-                    </div>   
-                </div>
-            </div>
-
-            {#////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////#}   
+    <div class="card">
+        <div class="card-header">
+            <strong>Update Medical Center</strong>
+            {#            <small>List</small>#}
         </div>
-    </form>    
+        <div class="card-body">
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#medicalCenter" role="tab" aria-controls="medicalCenter" onclick="">Medical Center</a>
+                </li>        
+                <li class="nav-item">
+                    <a id="hlicense" class="nav-link " data-toggle="tab" href="#licenseLi" role="tab" aria-controls="licenseLi" onclick="">Licenses / Payments</a>
+                </li>
+            </ul>
+            <form action="" method="post" id="formid" enctype="multipart/form-data">  
+                <input name="inputMedicalCenterId" id="inputMedicalCenterId" type="hidden" value="{{ medicalcenter.id }}">
+                <div class="tab-content">
+                    <div class="tab-pane in active" id="medicalCenter" role="tabpanel">   
+                        <div class="row">
+                            <div class="form-group col-sm-6">  
+                                <label>Country</label>
+                                <div class="selector-exam">
+                                    <select class="form-control select-country" style="width: 100%" name="country" id="country" onchange="loadAjax('country', 'div-province', 1);
+                                            loadAjax('country', 'divWayToPay', 5);
+                                            loadAjax('country', 'divIssuingBank', 6);
+                                            loadAjax('country', 'divReceivingBank', 7);
+                                            loadAjax2('country', 'div-licenses', 3);">
+                                        <option value="">Select...</option>  
+                                        {% for countries in countries %}
+                                            {% if countries.id == medicalcenter.countryid %}
+                                                {% set selected = 'selected' %}
+                                                <option value="{{countries.id}}" {{ selected }}>{{countries.name}}</option>
+                                            {% else %}   
+                                                <option value="{{countries.id}}">{{countries.name}}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group col-sm-6">   
+                                <label>Province</label>
+                                <div id="div-province">
+                                    <select class="form-control select-province" style="width: 100%" name="province" id="province">
+                                        <option value="">Select...</option>                                                    
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-sm-6">  
+                                <label>Name</label>
+                                <input name="name" id="name" type="text" value="{{ medicalcenter.name }}" placeholder="Name" class="form-control">
+                            </div>
+                            <div class="form-group col-sm-6">  
+                                <label>Code</label>
+                                <input name="code" id="code" type="text" value="{{ medicalcenter.code }}" placeholder="Code" class="form-control">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-sm-6">  
+                                <label>Type</label>
+                                <div class="selector-exam">
+                                    <select class="form-control select-type" style="width: 100%" name="typemedicalcenter" id="typemedicalcenter">
+                                        <option value="">Select...</option>  
+                                        {% for ArrayTypeMedicalCenter in ArrayTypeMedicalCenter %}
+                                            {% if loop.index-1 == medicalcenter.type %}
+                                                {% set selected = 'selected' %}
+                                                <option value="{{loop.index-1}}" {{ selected }}>{{ArrayTypeMedicalCenter}}</option>
+                                            {% else %}
+                                                <option value="{{loop.index-1}}">{{ArrayTypeMedicalCenter}}</option>    
+                                            {% endif %}    
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>                
+                            <div class="form-group col-sm-6">     
+                                <label>Address</label>
+                                <textarea name="address" id="address" type="text" class="form-control">{{ medicalcenter.address }}</textarea>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-sm-6">  
+                                <label>Phone</label>
+                                <input name="phone" id="phone" type="text" value="{{ medicalcenter.phone|join(',') }}" placeholder="Phone" class="form-control" data-role="tagsinput" >                    
+                            </div>
+                            {% set emailMc =  "" %}       
+                            {% for email in  medicalcenter.master %}
+                                {% set emailMc =  email.email %}                      
+                            {% endfor %}
+                            <div class="form-group col-sm-6">  
+                                <label>Master</label>
+                                <input name="master" id="master" type="text" value="{{ emailMc }}" placeholder="Email" class="form-control" >                    
+                            </div>                
+                        </div>                
+                        <div class="row">
+                            <div class="form-group col-sm-6">  
+                                <label>Contac 1</label>
+                                <input name="contac1" id="contac1" type="text" value="{{ medicalcenter.contac1 }}" placeholder="Contac 1" class="form-control">                    
+                            </div>
+                            <div class="form-group col-sm-6">  
+                                <label>Telephone contact 1</label>
+                                <input name="telephonecontact1" id="telephonecontact1" type="text" value="{{ medicalcenter.contac1phone|join(',') }}" placeholder="Telephone contact 1" class="form-control" data-role="tagsinput" >                    
+                            </div>
+                        </div>
+                        <div class="form-group">      
+                            <input type="button" value="Next" class="btn btn-primary" id="buttonnext" onclick="next();" style="">&nbsp;&nbsp;&nbsp;                    
+                            <a class="btn btn-primary" style="color: #ffffff" href="{{ path('medical_center_list') }}">Return</a>
+                        </div>
+                    </div>
+                    {#////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////#}   
+                    <div class="tab-pane" id="licenseLi" role="tabpanel">
+                        <div class="form-group">       
+                            <label>Licenses</label>
+                            <div id="div-licenses">
+                                <select class="form-control select-licenses" style="width: 100%" name="license" id="license" onchange="loadAjax('license', 'divLicenses', 4);
+                                        loadInfoLicense();">
+                                    <option value="">Select...</option>                                                    
+                                </select>
+                            </div>
+                        </div>               
+                        <div class="form-group">    
+                            <br>
+                            <div align="center" id="labelLicense" style="display: block"><h2 style="background-color: silver; align-items: center">Licenses</h2></div>
+                            <input name="countLicenses" id="countLicenses" type="hidden" value="{{countLicensesMc}}">
+                            <table id="tablelicenses" class="table table-bordered table-hover" style="display: table; width: 100%">
+                                <tr align="center" style="background-color: silver;">
+                                    <th align="center">License</th>                            
+                                    <th align="center">Users Quantity</th>                            
+                                    <th align="center">Number of Clients</th>                            
+                                    <th align="center">Number of Exams</th>                            
+                                    <th align="center">Duration Time</th>                            
+                                    <th align="center">Amount</th>   
+                                    <th align="center">Action</th>
+                                </tr>
+                                {% set acumAmount = 0 %}      
+                                {% for licensesMC in medicalcenter.licenses %}
+                                    {% set license = '' %}   
+                                    {% set usersquantity = '' %}   
+                                    {% set numberclients = '' %}                   
+                                    {% set numberexams = '' %}                   
+                                    {% set durationtime = '' %}         
+                                    {% set amount = '' %}         
+                                    {% set statusRegister = '' %}         
 
+                                    {% for licenses in licenses %}
+                                        {% if licensesMC.license_id == licenses.id %}
+                                            {% set license = licenses.license %}   
+                                            {% set usersquantity = licenses.usersquantity %}   
+                                            {% set numberclients = licenses.numberclients %}                   
+                                            {% set numberexams = licenses.numberexams %}                   
+                                            {% set durationtime = licenses.durationtime %}         
+                                            {% set amount = licenses.amount %}  
+                                            {% if licensesMC.status == "Active" %}
+                                                {% set acumAmount = acumAmount + amount %} 
+                                            {% endif %}        
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% if licensesMC.status == "Active" %}
+                                        {% set statusRegister = '1' %}         
+                                        <tr align="center" id="trlicense_{{ loop.index-1 }}">
+                                        {% else %}
+                                            {% set statusRegister = '2' %}         
+                                        <tr align="center" id="trlicense_{{ loop.index-1 }}" style="display: none">
+                                        {% endif %}        
+                                        <td align="center">{{ license }}
+                                            <input type="hidden" id="licenseId_{{loop.index-1}}" name="licenseId_{{loop.index-1}}"  value="{{licensesMC.license_id}}" />
+                                            <input type="hidden" id="durationTime_{{loop.index-1}}" name="durationTime_{{loop.index-1}}"  value="{{durationtime}}" />
+                                            <input type="hidden" id="statusRegisterLicense_{{loop.index-1}}" name="statusRegisterLicense_{{loop.index-1}}"  value="{{statusRegister}}" />
+                                        </td>                            
+                                        <td align="center">{{ usersquantity }}</td>                            
+                                        <td align="center">{{ numberclients }}</td>                            
+                                        <td align="center">{{ numberexams }}</td>                            
+                                        <td align="center">{{ durationtime }}</td>                            
+                                        <td align="center">{{ amount }}</td>                            
+                                        <td align="center"><button type="button" name="remove" id="" onclick="deleteLicense('{{ medicalcenter.id }}',{{ loop.index-1 }} ); restaLicensesEdit({{ amount }});" class="btn btn-danger" style=""><i class="fas fa-minus-circle"></i></button></td>                            
+                                    </tr>                            
+                                {% endfor %}
+                            </table>
+                            <div id="divAmount" align="right" style="display: block"><b>Total to pay:</b>&nbsp;&nbsp;<input readonly="" name="amountTotal" id="amountTotal" type="text" value="{{ acumAmount }}" placeholder="" class="" style=" width: 15%;padding: 1px 45px;margin: 5px 0;box-sizing: border-box;border: none;border-bottom: 2px solid black;"><label id="labelAmountCurrentSymbol"><b></b></label></div>                    
+                        </div>
+                        <div align="center" id="labelPayments" style="display: block"><h2 style="background-color: silver; align-items: center">Payments</h2></div>
+                        <div id="payment" style="display: block">
+                            <div class="row">
+                                <div class="form-group col-sm-6">    
+                                    <label>Way to pay</label>
+                                    <div id="divWayToPay">
+                                        <select class="form-control select-waytopay" style="width: 100%" name="waytopay" id="waytopay" onchange="wayToPayOperation();">
+                                            <option value="">Select...</option>                                  
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group col-sm-6">         
+                                    <label>Payment type</label>
+                                    <div id="divWayToPay">
+                                        <select class="form-control select-paymenttype" style="width: 100%" name="paymenttype" id="paymenttype" onchange="paymentType();">
+                                            <option value="">Select...</option>                                  
+                                            <option value="full">Full</option>                                  
+                                            <option value="partial">Partial</option>                                  
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-6" id="divDaystopay" style="display: none">       
+                                    <label id="labelDaystopay">Days to pay</label>
+                                    <input name="daystopay" id="daystopay" type="text" value="0" placeholder="Days to pay" class="form-control" onkeypress="">                    
+                                </div>
+                                <div class="form-group col-sm-6">    
+                                    <label>Amount</label>
+                                    <input name="amount" id="amount" type="text" value="" placeholder="Amount" class="form-control" onkeypress="">                    
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-6">      
+                                    <label>Issuing bank</label>
+                                    <div id="divIssuingBank">
+                                        <select class="form-control select-issuingbank" style="width: 100%" name="issuingbank" id="issuingbank" onchange="">
+                                            <option value="">Select...</option>                                  
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group col-sm-6">     
+                                    <label>Receiving bank</label>
+                                    <div id="divReceivingBank">
+                                        <select class="form-control select-receivingbank" style="width: 100%" name="receivingbank" id="receivingbank" onchange="">
+                                            <option value="">Select...</option>                                  
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="divInfoTarjetas" style="display: none">
+                                <div class="row">
+                                    <div class="form-group col-sm-6">    
+                                        <label>Card holder</label>
+                                        <input name="cardholder" id="cardholder" type="text" value="" placeholder="Cardholder" class="form-control">    
+                                    </div>
+                                    <div class="form-group col-sm-6">    
+                                        <label>Card number</label>
+                                        <input name="cardnumber" id="cardnumber" type="text" value="" placeholder="Card number" class="form-control">    
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group col-sm-6">    
+                                        <label>Expiration</label>
+                                        <input name="expiration" id="expiration" type="text" value="" placeholder="Expiration" class="form-control">    
+                                    </div>
+                                    <div class="form-group col-sm-6">    
+                                        <label>CVV</label>
+                                        <input name="cvv" id="cvv" type="text" value="" placeholder="CVV" class="form-control">    
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-6" id="divNumCheck" style="display: none">
+                                    <label>Check number</label>
+                                    <input name="operationnumber" id="operationnumber" type="text" value="" placeholder="Check Number" class="form-control" disabled="">                    
+                                </div>
+                                <div class="form-group col-sm-6" id="divProofTransfer"  style="display: none">
+                                    <label>Proof transfer</label>
+                                    <input type="file" id="files4" name="files4" onchange="base64File4(this);"/>
+                                    <input name="inputFile4Base64" id="inputFile4Base64" type="hidden" value="">
+                                    <br>
+                                    <output id="list4"></output>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <input type="button" value="Add" class="btn btn-primary" id="addButtonPayments" onclick="addPayments();">&nbsp;&nbsp;&nbsp;                                                                                                                                             
+                            </div>  
+                            <div class="form-group">    
+                                <br>
+                                <input name="countPayments" id="countPayments" type="hidden" value="0">
+                                <table id="tablePayments" class="table table-bordered table-hover" style="display: table; width: 100%">
+                                    <tr align="center" style="background-color: silver;">
+                                        <th align="center">Way to pay</th>                            
+                                        <th align="center">Amount</th>                            
+                                        <th align="center">Issuing bank</th>                            
+                                        <th align="center">Receiving bank</th>                            
+                                        <th align="center">Operation number</th>                            
+                                        <th align="center">Action</th>
+                                    </tr>
+                                    {% set acumAmountPayments = 0 %}    
+                                    {% set statusRegister = "" %} 
+                                    {% for paymentsMc in medicalcenter.payments %}
+
+                                        {% if paymentsMc.status == 1 %}
+                                            {% set acumAmountPayments = acumAmountPayments + paymentsMc.amount %}   
+                                            {% set statusRegister = '1' %} 
+                                            <tr align="center" id="trPayments_{{ loop.index-1 }}">
+                                            {% else %}
+                                            <tr align="center" id="trPayments_{{ loop.index-1 }}" style="display: none">
+                                                {% set statusRegister = '2' %} 
+                                            {% endif %}
+                                            <td align="center">{{ paymentsMc.waytopay }}
+                                                <input type="hidden" id="waytopay_{{loop.index-1}}" name="waytopay_{{loop.index-1}}"  value="{{paymentsMc.waytopay}}" />
+                                                <input type="hidden" id="daystopay_{{loop.index-1}}" name="daystopay_{{loop.index-1}}"  value="{{paymentsMc.daystopay}}" />
+                                                <input type="hidden" id="amount_{{loop.index-1}}" name="amount_{{loop.index-1}}"  value="{{paymentsMc.amount}}" />
+                                                <input type="hidden" id="issuingbank_{{loop.index-1}}" name="issuingbank_{{loop.index-1}}"  value="{{paymentsMc.issuingbank}}" />
+                                                <input type="hidden" id="receivingbank_{{loop.index-1}}" name="receivingbank_{{loop.index-1}}"  value="{{paymentsMc.receivingbank}}" />
+                                                <input type="hidden" id="cardholder_{{loop.index-1}}" name="cardholder_{{loop.index-1}}"  value="{{paymentsMc.cardholder}}" />
+                                                <input type="hidden" id="cardnumber_{{loop.index-1}}" name="cardnumber_{{loop.index-1}}"  value="{{paymentsMc.cardnumber}}" />
+                                                <input type="hidden" id="expiration_{{loop.index-1}}" name="expiration_{{loop.index-1}}"  value="{{paymentsMc.expiration}}" />
+                                                <input type="hidden" id="cvv_{{loop.index-1}}" name="cvv_{{loop.index-1}}"  value="{{paymentsMc.cvv}}" />
+                                                <input type="hidden" id="operationnumber_{{loop.index-1}}" name="operationnumber_{{loop.index-1}}"  value="{{paymentsMc.operationnumber}}" />
+                                                <input type="hidden"  id="files4_{{loop.index-1}}" name="files4_{{loop.index-1}}"  value="{{paymentsMc.files4}}" />
+                                                <input type="hidden"  id="statusRegisterPayment_{{loop.index-1}}" name="statusRegisterPayment_{{loop.index-1}}"  value="{{statusRegister}}" />
+                                            </td>                            
+                                            <td align="center">{{ paymentsMc.amount }}</td>
+                                            <td align="center">{{ paymentsMc.issuingbank }}</td>
+                                            <td align="center">{{ paymentsMc.receivingbank }}</td>
+                                            <td align="center">{{ paymentsMc.operationnumber }}</td>
+                                            <td align="center"><button type="button" name="remove" id="{{loop.index-1}}" onclick="deletePayments('{{ medicalcenter.id }}',{{ loop.index-1 }} , {{paymentsMc.amount}});" class="btn btn-danger" style=""><i class="fas fa-minus-circle"></i></button></td>
+                                        </tr>                                
+                                    {% endfor %}
+                                </table>                        
+                            </div>
+                            <div class="form-group">
+                                <label>Remaining</label>
+                                <input name="remaining" id="remaining" type="text" value="0" placeholder="Remaining" class="form-control" readonly="">                    
+                            </div>
+                            <div class="form-group">
+                                <label>Total</label>
+                                <input name="total" id="total" type="text" value="{{acumAmountPayments}}" placeholder="Total" class="form-control" readonly="">                    
+                            </div>
+                        </div>
+                        <br>
+                        <div class="form-group">       
+                            <input type="button" value="Back" class="btn btn-primary" id="buttonback1" onclick="back1();">&nbsp;&nbsp;&nbsp;                       
+                            <input type="submit" value="Save" class="btn btn-primary" id="saveone" onclick="">&nbsp;&nbsp;&nbsp;
+                            <a class="btn btn-primary" style="color: #ffffff" href="{{ path('medical_center_list') }}">Return</a>
+                        </div>
+                    </div>    
+                    {#/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////#}
+                    <div id="myModalLicense" class="modal_" style="">
+                        <div class="modal-content-2" style="">
+                            <div class="form-group" style="" id="divLicenses">     
+                                <span class="close">&times;</span>
+                            </div>
+                            <div class="form-group">
+                                <input type="button" value="Add" class="btn btn-primary" id="addButtonLicenses" onclick="agregarLicenses();">&nbsp;&nbsp;&nbsp;                                                        
+                            </div>   
+                        </div>
+                    </div>
+
+                    {#////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////#}   
+                </div>
+
+            </form>    
+        </div>
+    </div>
 
     <style type="text/css">      
 
@@ -533,43 +559,43 @@
                 var regex = /[\w-\.]{2,}@([\w-]{2,}\.)*([\w-]{2,}\.)[\w-]{2,4}/;
 
                 if ($("#country").val() === "") {
-                                $("#country").focus().after("<span class='error'>Select the country</span>");
+                                $("#country").focus().after("<span class='error' style='color:#FF0000;'>Select the country</span>");
                                 return false;
                         } else if ($("#province").val() === "") {
-                                $("#province").focus().after("<span class='error'>Select the province</span>");
+                                $("#province").focus().after("<span class='error' style='color:#FF0000;'>Select the province</span>");
                                 return false;            
                         } else if ($("#name").val() === "") {
-                                $("#name").focus().after("<span class='error'>Enter the name</span>");
+                                $("#name").focus().after("<span class='error' style='color:#FF0000;'>Enter the name</span>");
                                 return false;                
                         } else if ($("#code").val() === "") {
-                                $("#code").focus().after("<span class='error'>Enter the code</span>");
+                                $("#code").focus().after("<span class='error' style='color:#FF0000;'>Enter the code</span>");
                                 return false;                
                         } else if ($("#typemedicalcenter").val() === "") {
-                                $("#typemedicalcenter").focus().after("<span class='error'>Select the type medical center</span>");
+                                $("#typemedicalcenter").focus().after("<span class='error' style='color:#FF0000;'>Select the type medical center</span>");
                                 return false;                
                         } else if ($("#address").val() === "") {
-                                $("#address").focus().after("<span class='error'>Enter the address</span>");
+                                $("#address").focus().after("<span class='error' style='color:#FF0000;'>Enter the address</span>");
                                 return false;                
                         } else if ($("#phone").val() === "") {
-                                $("#phone").focus().after("<span class='error'>Enter the phone</span>");
+                                $("#phone").focus().after("<span class='error' style='color:#FF0000;'>Enter the phone</span>");
                                 return false;                
                         } else if ($("#master").val() === "") {
-                                $("#master").focus().after("<span class='error'>Enter the master email</span>");
+                                $("#master").focus().after("<span class='error' style='color:#FF0000;'>Enter the master email</span>");
                                 return false;                
                         } else if (!regex.test($('#master').val().trim())) {
-                                $("#master").focus().after("<span class='error'>Wrong email format</span>");
+                                $("#master").focus().after("<span class='error' style='color:#FF0000;'>Wrong email format</span>");
                                 return false;                
                 } else if ($("#contac1").val() === "") {
-                                $("#contac1").focus().after("<span class='error'>Enter the contac1</span>");
+                                $("#contac1").focus().after("<span class='error' style='color:#FF0000;'>Enter the contac1</span>");
                                 return false;                
                         } else if ($("#telephonecontact1").val() === "") {
-                                $("#telephonecontact1").focus().after("<span class='error'>Enter the telephone contact 1</span>");
+                                $("#telephonecontact1").focus().after("<span class='error' style='color:#FF0000;'>Enter the telephone contact 1</span>");
                                 return false;                
                         } else if (failphone === true) {
-                    $("#phone").focus().after("<span class='error'>Wrong phone format</span>");
+                    $("#phone").focus().after("<span class='error' style='color:#FF0000;'>Wrong phone format</span>");
                     return false;
                 } else if (failphonecontac1 === true) {
-                    $("#telephonecontact1").focus().after("<span class='error'>Wrong phone contac 1 format</span>");
+                    $("#telephonecontact1").focus().after("<span class='error' style='color:#FF0000;'>Wrong phone contac 1 format</span>");
                     return false;
                 } else if ($("#countLicenses").val() === "0") {
                     alert("You must enter the license");
@@ -621,43 +647,43 @@
             var regex = /[\w-\.]{2,}@([\w-]{2,}\.)*([\w-]{2,}\.)[\w-]{2,4}/;
 
             if ($("#country").val() === "") {
-                            $("#country").focus().after("<span class='error'>Select the country</span>");
+                            $("#country").focus().after("<span class='error' style='color:#FF0000;'>Select the country</span>");
                             return false;
                     } else if ($("#province").val() === "") {
-                            $("#province").focus().after("<span class='error'>Select the province</span>");
+                            $("#province").focus().after("<span class='error' style='color:#FF0000;'>Select the province</span>");
                             return false;            
                     } else if ($("#name").val() === "") {
-                            $("#name").focus().after("<span class='error'>Enter the name</span>");
+                            $("#name").focus().after("<span class='error' style='color:#FF0000;'>Enter the name</span>");
                             return false;                
                     } else if ($("#code").val() === "") {
-                            $("#code").focus().after("<span class='error'>Enter the code</span>");
+                            $("#code").focus().after("<span class='error' style='color:#FF0000;'>Enter the code</span>");
                             return false;                
                     } else if ($("#typemedicalcenter").val() === "") {
-                            $("#typemedicalcenter").focus().after("<span class='error'>Select the type medical center</span>");
+                            $("#typemedicalcenter").focus().after("<span class='error' style='color:#FF0000;'>Select the type medical center</span>");
                             return false;                
                     } else if ($("#address").val() === "") {
-                            $("#address").focus().after("<span class='error'>Enter the address</span>");
+                            $("#address").focus().after("<span class='error' style='color:#FF0000;'>Enter the address</span>");
                             return false;                
                     } else if ($("#phone").val() === "") {
-                            $("#phone").focus().after("<span class='error'>Enter the phone</span>");
+                            $("#phone").focus().after("<span class='error' style='color:#FF0000;'>Enter the phone</span>");
                             return false;                
                     } else if ($("#master").val() === "") {
-                            $("#master").focus().after("<span class='error'>Enter the master email</span>");
+                            $("#master").focus().after("<span class='error' style='color:#FF0000;'>Enter the master email</span>");
                             return false;                
                     } else if (!regex.test($('#master').val().trim())) {
-                            $("#master").focus().after("<span class='error'>Wrong email format</span>");
+                            $("#master").focus().after("<span class='error' style='color:#FF0000;'>Wrong email format</span>");
                             return false;                
             } else if ($("#contac1").val() === "") {
-                            $("#contac1").focus().after("<span class='error'>Enter the contac1</span>");
+                            $("#contac1").focus().after("<span class='error' style='color:#FF0000;'>Enter the contac1</span>");
                             return false;                
                     } else if ($("#telephonecontact1").val() === "") {
-                            $("#telephonecontact1").focus().after("<span class='error'>Enter the telephone contact 1</span>");
+                            $("#telephonecontact1").focus().after("<span class='error' style='color:#FF0000;'>Enter the telephone contact 1</span>");
                             return false;                
                     } else if (failphone === true) {
-                $("#phone").focus().after("<span class='error'>Wrong phone format</span>");
+                $("#phone").focus().after("<span class='error' style='color:#FF0000;'>Wrong phone format</span>");
                 return false;
             } else if (failphonecontac1 === true) {
-                $("#telephonecontact1").focus().after("<span class='error'>Wrong phone contac 1 format</span>");
+                $("#telephonecontact1").focus().after("<span class='error' style='color:#FF0000;'>Wrong phone contac 1 format</span>");
                 return false;
             }
 
@@ -673,7 +699,7 @@
 
 
         function back() {
-             $('#myTab a[href="#medicalCenter"]').tab('show');
+            $('#myTab a[href="#medicalCenter"]').tab('show');
         }
 
         function validarTagsEmails() {

@@ -1,119 +1,134 @@
 {% extends '@App/base.html.twig' %}
 
 {% block body %}
-    <br>
-    <h2 class="page-header">Update License</h2>
-    <br>
-    <div class="card-block">
-        <form action="" method="post" id="formid">    
-            <div id="ok"></div>
-            <div class="form-group">
-                <label>License</label>
-                <input name="license" id="license" type="text" value="{{ license.license }}" placeholder="License" class="form-control">
-            </div>      
-            <div class="form-group">       
-                <label>Type of license</label>
-                <div class="selector-country">
-                    <select class="form-control select-typelicense" name="typelicense" id="typelicense">
-                        <option value="">Select...</option>  
-                        {% for ArrayTypeLicense in ArrayTypeLicense %}
-                            {% if loop.index-1 == license.typelicense %}
-                                {% set selected = 'selected' %}                           
-                                <option value="{{loop.index-1}}"  {{ selected }}>{{ArrayTypeLicense}}</option>
-                            {% else %}
-                                <option value="{{loop.index-1}}">{{ArrayTypeLicense}}</option>
-                            {% endif %}
-                        {% endfor %}
-                    </select>
-                </div>
-            </div>
-            <div class="form-group">       
-                <label>Users Quantity</label>
-                <input name="UsersQuantity" id="UsersQuantity" type="text" value="{{ license.usersquantity }}" placeholder="Users quantity" class="form-control">                
-            </div>
-            <div class="form-group">       
-                <label>Number of Clients</label>
-                <input name="numberClients" id="numberClients" type="text" value="{{ license.numberclients }}" placeholder="Number Clients" class="form-control">                
-            </div>
-            <div class="form-group">       
-                <label>Number of Exams</label>
-                <input name="numberExams" id="numberExams" type="text" value="{{ license.numberexams }}" placeholder="Number Exams" class="form-control">                
-            </div>
-            <div class="form-group">       
-                <label>Exams</label>
-                <div class="selector-country">
-                    <select class="form-control select-exams" name="exams[]" id="exams" multiple="">
-                        {#<option value="">Select...</option>  #}
-                        {% for exams in exams %}
-                            {% set selected = 'selected' %}    
-                            {% if exams.id in license.exams %}
-                                <option value="{{exams.id}}" {{ selected }}>{{exams.name}}</option>  
-                            {% else %}  
-                                <option value="{{exams.id}}">{{exams.name}}</option>  
-                            {% endif %}  
-                        {% endfor %}
-                    </select>                    
-                </div>
-            </div>
-            <div class="form-group">       
-                <label>Modules</label>                
-                <div class="selector-country">
-                    <select class="form-control select-modules" name="modules[]" id="modules" multiple="">
-                        {#<option value="">Select...</option>  #}
-                        {% for ArrayModules in ArrayModules %}
-                            {% set selected = 'selected' %}    
-                            {% if loop.index-1 in license.modules %}
-                                <option value="{{loop.index-1}}" {{ selected }}>{{ArrayModules}}</option>
-                            {% else %}  
-                                <option value="{{loop.index-1}}">{{ArrayModules}}</option>
-                            {% endif %}  
-                        {% endfor %}
+    <div class="card">
+        <div class="card-header">
+            <strong>Update License</strong>
+            {#            <small>List</small>#}
+        </div>
+        <div class="card-body">
+            <div class="card-block">
+                <form action="" method="post" id="formid">    
+                    <div id="ok"></div>
+                    <div class="row">
+                        <div class="form-group col-sm-6">
+                            <label>License</label>
+                            <input name="license" id="license" type="text" value="{{ license.license }}" placeholder="License" class="form-control">
+                        </div>      
+                        <div class="form-group col-sm-6">       
+                            <label>Type of license</label>
+                            <div class="selector-country">
+                                <select class="form-control select-typelicense" name="typelicense" id="typelicense">
+                                    <option value="">Select...</option>  
+                                    {% for ArrayTypeLicense in ArrayTypeLicense %}
+                                        {% if loop.index-1 == license.typelicense %}
+                                            {% set selected = 'selected' %}                           
+                                            <option value="{{loop.index-1}}"  {{ selected }}>{{ArrayTypeLicense}}</option>
+                                        {% else %}
+                                            <option value="{{loop.index-1}}">{{ArrayTypeLicense}}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-sm-6">       
+                            <label>Users Quantity</label>
+                            <input name="UsersQuantity" id="UsersQuantity" type="text" value="{{ license.usersquantity }}" placeholder="Users quantity" class="form-control">                
+                        </div>
+                        <div class="form-group col-sm-6">       
+                            <label>Number of Clients</label>
+                            <input name="numberClients" id="numberClients" type="text" value="{{ license.numberclients }}" placeholder="Number Clients" class="form-control">                
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-sm-6">       
+                            <label>Number of Exams</label>
+                            <input name="numberExams" id="numberExams" type="text" value="{{ license.numberexams }}" placeholder="Number Exams" class="form-control">                
+                        </div>
+                        <div class="form-group col-sm-6">       
+                            <label>Exams</label>
+                            <div class="selector-country">
+                                <select class="form-control select-exams" name="exams[]" id="exams" multiple="">
+                                    {#<option value="">Select...</option>  #}
+                                    {% for exams in exams %}
+                                        {% set selected = 'selected' %}    
+                                        {% if exams.id in license.exams %}
+                                            <option value="{{exams.id}}" {{ selected }}>{{exams.name}}</option>  
+                                        {% else %}  
+                                            <option value="{{exams.id}}">{{exams.name}}</option>  
+                                        {% endif %}  
+                                    {% endfor %}
+                                </select>                    
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-sm-6">       
+                            <label>Modules</label>                
+                            <div class="selector-country">
+                                <select class="form-control select-modules" name="modules[]" id="modules" multiple="">
+                                    {#<option value="">Select...</option>  #}
+                                    {% for ArrayModules in ArrayModules %}
+                                        {% set selected = 'selected' %}    
+                                        {% if loop.index-1 in license.modules %}
+                                            <option value="{{loop.index-1}}" {{ selected }}>{{ArrayModules}}</option>
+                                        {% else %}  
+                                            <option value="{{loop.index-1}}">{{ArrayModules}}</option>
+                                        {% endif %}  
+                                    {% endfor %}
 
-                    </select>
-                </div>
-            </div>
-            <div class="form-group">       
-                <label>Countries</label>
-                <div class="selector-country">
-                    <select class="form-control select-countries" name="countries[]" id="countries" multiple="">
-                        {#<option value="">Select...</option>  #}
-                        {% for countries in countries %}
-                            {% set selected = 'selected' %}    
-                            {% if countries.id in license.countries %}
-                                <option value="{{countries.id}}" {{ selected }}>{{countries.name}}</option>
-                            {% else %}  
-                                <option value="{{countries.id}}">{{countries.name}}</option>
-                            {% endif %}  
-                        {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group col-sm-6">       
+                            <label>Countries</label>
+                            <div class="selector-country">
+                                <select class="form-control select-countries" name="countries[]" id="countries" multiple="">
+                                    {#<option value="">Select...</option>  #}
+                                    {% for countries in countries %}
+                                        {% set selected = 'selected' %}    
+                                        {% if countries.id in license.countries %}
+                                            <option value="{{countries.id}}" {{ selected }}>{{countries.name}}</option>
+                                        {% else %}  
+                                            <option value="{{countries.id}}">{{countries.name}}</option>
+                                        {% endif %}  
+                                    {% endfor %}
 
-                    </select>
-                </div>
-            </div>         
-            <div class="form-group">       
-                <label>Duration Time</label>
-                <input name="durationTime" id="durationTime" type="text" value="{{ license.durationtime }}" placeholder="Duration Time" class="form-control">
-            </div>
-            <div class="form-group">       
-                <label>Notice of Payment</label>                
-                <input name="noticePayment" id="noticePayment" type="text" value="{{ license.noticepayment }}" placeholder="Notice of Payment" class="form-control">                
-            </div>
-            <div class="form-group">       
-                <label>Description</label>
-                <textarea name="description" id="description" type="text" placeholder="Description" class="form-control">{{ license.description }}</textarea>
-            </div>
-            <div class="form-group">       
-                <label>Amount</label>                
-                <input name="amount" id="amount" type="text" value="{{ license.amount }}" placeholder="Amount" class="form-control">                
-            </div>
-
-            <div class="form-group">       
-                <input type="submit" value="Edit" class="btn btn-primary" id="button">&nbsp;&nbsp;&nbsp;
-                {#                <input type="button" value="wama" class="btn btn-primary" id="" onclick="wama();">&nbsp;&nbsp;&nbsp;#}
-                <a class="btn btn-primary" href="{{ path('license_list') }}">Return</a>
-            </div>
-        </form>      
-    </div>    
-
+                                </select>
+                            </div>
+                        </div>         
+                    </div>         
+                    <div class="row">
+                        <div class="form-group col-sm-6">       
+                            <label>Duration Time</label>
+                            <input name="durationTime" id="durationTime" type="text" value="{{ license.durationtime }}" placeholder="Duration Time" class="form-control">
+                        </div>
+                        <div class="form-group col-sm-6">       
+                            <label>Notice of Payment</label>                
+                            <input name="noticePayment" id="noticePayment" type="text" value="{{ license.noticepayment }}" placeholder="Notice of Payment" class="form-control">                
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-sm-6">       
+                            <label>Description</label>
+                            <textarea name="description" id="description" type="text" placeholder="Description" class="form-control">{{ license.description }}</textarea>
+                        </div>
+                        <div class="form-group col-sm-6">       
+                            <label>Amount</label>                
+                            <input name="amount" id="amount" type="text" value="{{ license.amount }}" placeholder="Amount" class="form-control">                
+                        </div>
+                    </div>
+                    <div class="form-group">       
+                        <input type="submit" value="Edit" class="btn btn-primary" id="button">&nbsp;&nbsp;&nbsp;
+                        {#                <input type="button" value="wama" class="btn btn-primary" id="" onclick="wama();">&nbsp;&nbsp;&nbsp;#}
+                        <a class="btn btn-primary" href="{{ path('license_list') }}">Return</a>
+                    </div>
+                </form>      
+            </div>    
+        </div>
+    </div>
     <style type="text/css"> 
         .ulPrueba{
             list-style: none;
@@ -185,40 +200,40 @@
 
                         $(".error").remove();
                         if ($("#license").val() == "") {
-                                $("#license").focus().after("<span class='error'>Enter the license</span>");
+                                $("#license").focus().after("<span class='error' style='color:#FF0000;'>Enter the license</span>");
                                 return false;
                         } else if ($("#UsersQuantity").val() == "") {
-                                $("#UsersQuantity").focus().after("<span class='error'>Enter the numbers users</span>");
+                                $("#UsersQuantity").focus().after("<span class='error' style='color:#FF0000;'>Enter the numbers users</span>");
                                 return false;
                         } else if ($("#numberClients").val() == "") {
-                                $("#numberClients").focus().after("<span class='error'>Enter numbers clients</span>");
+                                $("#numberClients").focus().after("<span class='error' style='color:#FF0000;'>Enter numbers clients</span>");
                                 return false;
                         } else if ($("#numberExams").val() == "") {
-                                $("#numberExams").focus().after("<span class='error'>Enter numbers exams</span>");
+                                $("#numberExams").focus().after("<span class='error' style='color:#FF0000;'>Enter numbers exams</span>");
                                 return false;
                         } else if ($("#exams").val() == "") {
-                                $("#exams").focus().after("<span class='error'>select exmas</span>");
+                                $("#exams").focus().after("<span class='error' style='color:#FF0000;'>select exmas</span>");
                                 return false;
                         } else if ($("#modules").val() == "") {
-                                $("#modules").focus().after("<span class='error'>Select the modules</span>");
+                                $("#modules").focus().after("<span class='error' style='color:#FF0000;'>Select the modules</span>");
                                 return false;
                         } else if ($("#countries").val() == "") {
-                                $("#countries").focus().after("<span class='error'>Select the countries</span>");
+                                $("#countries").focus().after("<span class='error' style='color:#FF0000;'>Select the countries</span>");
                                 return false;
                         } else if ($("#durationTime").val() == "") {
-                                $("#durationTime").focus().after("<span class='error'>Enter the duration of the license</span>");
+                                $("#durationTime").focus().after("<span class='error' style='color:#FF0000;'>Enter the duration of the license</span>");
                                 return false;
                         } else if ($("#noticePayment").val() == "") {
-                                $("#noticePayment").focus().after("<span class='error'>Enter the payment notice</span>");
+                                $("#noticePayment").focus().after("<span class='error' style='color:#FF0000;'>Enter the payment notice</span>");
                                 return false;
                         } else if ($("#description").val() == "") {
-                                $("#description").focus().after("<span class='error'>Enter the description</span>");
+                                $("#description").focus().after("<span class='error' style='color:#FF0000;'>Enter the description</span>");
                                 return false;
                         } else if ($("#amount").val() == "") {
-                                $("#amount").focus().after("<span class='error'>Enter the amount</span>");
+                                $("#amount").focus().after("<span class='error' style='color:#FF0000;'>Enter the amount</span>");
                                 return false;
                         } else if (numberExams != fields_lenght) {
-                                $("#exams").focus().after("<span class='error'>The number of exams must be equal to the exams entered</span>");
+                                $("#exams").focus().after("<span class='error' style='color:#FF0000;'>The number of exams must be equal to the exams entered</span>");
                     alert('The number of exams must be equal to the exams entered');
                                 return false;
                         }

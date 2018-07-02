@@ -1,13 +1,19 @@
 {% extends '@App/base.html.twig' %}
 
 {% block body %}
-    <br>
-    <div class="panel panel-body">
-        <h3>Country: {{ country }}</h3>
-        <h3>Province: {{ province }}</h3>
-    </div>
+    <div class="card">
+        <div class="card-header">
+            <strong>Datails Province</strong>
+            {#            <small>List</small>#}
+        </div>      
+        <div class="card-body">    
+            <h5>Country: {{ country }}</h5>
+            <h5>Province: {{ province }}</h5>
+            <hr>
+            <a class="btn btn-primary" href="{{ path('province_list') }}">Return</a>
+        </div>
 
-    <hr>
-    <a class="btn btn-primary" href="{{ path('province_list') }}">Return</a>
+    </div>    
+
 
 {% endblock %}

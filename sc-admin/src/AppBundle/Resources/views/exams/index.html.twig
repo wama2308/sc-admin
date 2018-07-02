@@ -1,47 +1,54 @@
 {% extends '@App/base.html.twig' %}
 
 {% block body %}
-    <br>
-    <div><a class="btn btn-primary" href="{{ path('exams_create') }}" role="button"><i class="fas fa-plus-circle"></i> New</a></div>
-    <br>    
-    {#    {{countries}}#}
-    <table id="tableExams" class="display nowrap dataTable dtr-inline collapsed"> 
-        <thead> 
-            <tr> 
-                <th>Exam</th>    
-                <th>Category</th>    
-                <th>Status</th>    
-                <th>Accion</th>                                                                                                    
-            </tr> 
-        </thead> 
-        <tbody> 
-            {% for exams in exams %}
-                {% if exams.active == true %}
-                    {% set status = "ACTIVE" %}                
-                {% else %}    
-                    {% set status = "INACTIVE" %}
-                {% endif %}
-                {% set NameCategoria = '' %}   
-                {% for ArrayCategoryExams in  ArrayCategoryExams %}
-                    {% if exams.category == loop.index-1 %}
-                        {% set NameCategoria =  ArrayCategoryExams%}  
-                    {% endif %}
-                {% endfor %}
-                <tr> 
-                    <td>{{exams.name}}</td>                                 
-                    <td>{{NameCategoria}}</td>    
-                    <td>{{status}}</td>    
-                    <td style="width: 110px">
-                        <a title="VIEW" href="{{ path('exams_details', { 'id': exams.id }) }}" class="btn btn-info"><i class="fas fa-eye"></i></a>
-                        <a title="EDIT" href="{{ path('exams_edit', { 'id': exams.id }) }}" class="btn btn-default"  style="background-color: #a1c9c2; color: black "><i class="fas fa-edit"></i></a>
-                        <a title="DELETE" href="{{ path('exams_delete', { 'id': exams.id }) }}" class="btn btn-danger" onclick="return confirm('¿Be sure to eliminate the exam?');"><i class="fas fa-minus-circle"></i></a>
-                    </td> 
+    <div class="card">
+        <div class="card-header">
+            <a class="btn btn-primary" href="{{ path('exams_create') }}" role="button"><i class="fas fa-plus-circle"></i> </a>&nbsp;&nbsp;&nbsp;&nbsp;          
+            <strong>List Exams</strong>
+            {#            <small>List</small>#}
+        </div>        
+        <div class="card-body">            
+            <div></div>
 
-                </tr>  
-            {% endfor %}
-        </tbody> 
-    </table>    
+            {#    {{countries}}#}
+            <table id="tableExams" class="display nowrap dataTable dtr-inline collapsed"> 
+                <thead> 
+                    <tr> 
+                        <th>Exam</th>    
+                        <th>Category</th>    
+                        <th>Status</th>    
+                        <th>Accion</th>                                                                                                    
+                    </tr> 
+                </thead> 
+                <tbody> 
+                    {% for exams in exams %}
+                        {% if exams.active == true %}
+                            {% set status = "ACTIVE" %}                
+                        {% else %}    
+                            {% set status = "INACTIVE" %}
+                        {% endif %}
+                        {% set NameCategoria = '' %}   
+                        {% for ArrayCategoryExams in  ArrayCategoryExams %}
+                            {% if exams.category == loop.index-1 %}
+                                {% set NameCategoria =  ArrayCategoryExams%}  
+                            {% endif %}
+                        {% endfor %}
+                        <tr> 
+                            <td>{{exams.name}}</td>                                 
+                            <td>{{NameCategoria}}</td>    
+                            <td>{{status}}</td>    
+                            <td style="width: 110px">
+                                <a title="VIEW" href="{{ path('exams_details', { 'id': exams.id }) }}" class="btn btn-info"><i class="fas fa-eye"></i></a>
+                                <a title="EDIT" href="{{ path('exams_edit', { 'id': exams.id }) }}" class="btn btn-default"  style="background-color: #a1c9c2; color: black "><i class="fas fa-edit"></i></a>
+                                <a title="DELETE" href="{{ path('exams_delete', { 'id': exams.id }) }}" class="btn btn-danger" onclick="return confirm('¿Be sure to eliminate the exam?');"><i class="fas fa-minus-circle"></i></a>
+                            </td> 
 
+                        </tr>  
+                    {% endfor %}
+                </tbody> 
+            </table>    
+        </div>
+    </div>
     <script type="text/javascript">
 
         $(document).ready(function () {

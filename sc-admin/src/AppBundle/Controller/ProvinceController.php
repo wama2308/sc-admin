@@ -43,7 +43,7 @@ class ProvinceController extends Controller {
 
         $form = $this->createFormBuilder($province)
                 ->add('name', DocumentType::class, array('class' => 'AppBundle:Country', 'label' => 'Country', 'placeholder' => 'Select...',
-                    'attr' => array('class' => 'form-control', 'style' => 'margin-bottom:15px')))
+                    'attr' => array('class' => 'form-control select-country', 'style' => 'margin-bottom:15px')))
                 ->add('provinces', TextType::class, array('label' => 'Province/City', 'attr' => array('class' => 'form-control',
                         'style' => 'margin-bottom:15px')))
                 ->add('save', SubmitType::class, array('label' => 'Save', 'attr' => array('class' => 'btn btn-primary', 'style' => 'margin-bottom:15px')))
@@ -111,7 +111,7 @@ class ProvinceController extends Controller {
                     'mapped' => false,
                     'placeholder' => 'Select...',
                     'data' => $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->find($id),
-                    'attr' => array('class' => 'form-control', 'style' => 'margin-bottom:15px')))
+                    'attr' => array('class' => 'form-control  select-country', 'style' => 'margin-bottom:15px')))
                 ->add('nombreProvince', TextType::class, array('label' => 'Province', 'mapped' => false, 'data' => $nombreProvincia, 'attr' => array('class' => 'form-control', 'style' => 'margin-bottom:15px')))
                 ->add('save', SubmitType::class, array('label' => 'Editar', 'attr' => array('class' => 'btn btn-primary', 'style' => 'margin-bottom:15px')))
                 ->getForm();

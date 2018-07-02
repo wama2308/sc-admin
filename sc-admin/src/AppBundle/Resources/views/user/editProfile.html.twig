@@ -1,10 +1,16 @@
 {% extends '@App/base.html.twig' %}
 {% block body %}
-    <br>
-    <h2 class="page-header">Update Profile</h2>
-    {{ form_start(form) }}
-    {{ form_widget(form) }}
-    <a class="btn btn-primary" style="position: relative; top: -56px; left:75px" href="{{ path('users_list') }}">Return</a>
-    {{ form_end(form) }}
-
+    <div class="card">
+        <div class="card-header">
+            <strong>Update Profile</strong>
+            {#            <small>List</small>#}
+        </div>
+        <br>
+        <div class="card-body">
+            {{ form_start(form) }}
+            {{ form_widget(form) }}
+            <a class="btn btn-primary" style="position: relative; top: -50px; left:85px" href="{{ path('users_list') }}">Return</a>
+            {{ form_end(form) }}
+        </div>
+    </div>
 {% endblock %}

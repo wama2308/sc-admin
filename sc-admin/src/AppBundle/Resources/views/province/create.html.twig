@@ -1,11 +1,23 @@
 {% extends '@App/base.html.twig' %}
 
 {% block body %}
-    <br>
-    <h2 class="page-header">Register Province/City</h2>
-    {{ form_start(form) }}
-    {{ form_widget(form) }}
-    <a class="btn btn-primary" style="position: relative; top: -56px; left:75px" href="{{ path('province_list') }}">Return</a>
-    {{ form_end(form) }}
-
+    <div class="card">
+        <div class="card-header">
+            <strong>Register Province</strong>
+            {#            <small>List</small>#}
+        </div>        
+        <div class="card-body">            
+            {{ form_start(form) }}
+            {{ form_widget(form) }}
+            <a class="btn btn-primary" style="position: relative; top: -50px; left:75px" href="{{ path('province_list') }}">Return</a>
+            {{ form_end(form) }}
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(".select-country").chosen({
+                placeholder_text_single: "Select the country"
+            });
+        });
+    </script>      
 {% endblock %}

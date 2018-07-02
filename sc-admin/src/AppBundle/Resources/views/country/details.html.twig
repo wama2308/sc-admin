@@ -1,11 +1,17 @@
 {% extends '@App/base.html.twig' %}
 
 {% block body %}
-    <br>
-    <div class="panel panel-body">
-        <h3>Country: {{ country.name }}</h3>
+    <div class="card">
+        <div class="card-header">
+            <strong>Details Country</strong>
+            {#            <small>List</small>#}
+        </div>        
+        <div class="card-body">
+            <div class="panel panel-body">
+                <h5>Country: {{ country.name }}</h5>
+            </div>
+            <hr>
+            <a class="btn btn-primary" href="{{ path('country_list') }}">Return</a>
+        </div>
     </div>
-    <hr>
-    <a class="btn btn-primary" href="{{ path('country_list') }}">Return</a>
-
 {% endblock %}
