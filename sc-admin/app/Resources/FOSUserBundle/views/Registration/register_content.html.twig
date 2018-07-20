@@ -7,10 +7,64 @@
     <div class="card-body">        
         {{ form_start(form, {'method': 'post', 'action': path('fos_user_registration_register'), 'attr': {'class': 'fos_user_registration_register'}}) }}
         {{ form_widget(form) }}
-        <div>
+        <div class="form-group">
+            <label>Image</label>
+            <input type="file" id="imageuser" name="imageuser" onchange="base64FileImageUser(this);"/>
+            {#            <input id="fos_user_registration_form_image" name="fos_user_registration_form[image]" required="required" maxlength="180" pattern=".{2,}" class="form-control" style="margin-bottom:15px; display: none" type="text" value="">#}
+            <br>
+            <div style="width: 50%; height: 50%; border: 1px" id="listImageUser"></div>
+        </div>
+        <div class="form-group">
             <input type="submit" class="btn btn-primary" value="{{ 'registration.submit'|trans }}" />
             <a class="btn btn-primary" style="position: relative; top: -px; left:10px" href="{{ path('users_list') }}">Return</a>
         </div>
         {{ form_end(form) }}
     </div>
 </div>
+<script type="text/javascript">
+
+    function archivoImageUser(evt) {
+        var files = evt.target.files; // FileList object
+
+        //Obtenemos la imagen del campo "file". 
+        for (var i = 0, f; f = files[i]; i++) {
+            //Solo admitimos imágenes.
+            if (!f.type.match('image.*')) {
+                continue;
+            }
+
+            var reader = new FileReader();
+
+            reader.onload = (function (theFile) {
+                return function (e) {
+                    // Creamos la imagen.
+                    document.getElementById("listImageUser").innerHTML = ['<img style="width: 210px; height: 180px; border-width:3px;" class="thumb" src="', e.target.result, '" title="', escape(theFile.name), '"/>'].join('');
+                };
+            })(f);
+            var fileSize = $('#imageuser')[0].files[0].size;
+            var sizekiloBytes = parseInt(fileSize / 1024);
+            
+            if(sizekiloBytes > 250)
+            {
+                alert("El tamaño de la imagen super el limite permitido");
+            }
+            else
+            {
+                reader.readAsDataURL(f);
+            }
+        }
+    }
+
+    document.getElementById('imageuser').addEventListener('change', archivoImageUser, false);
+
+    function base64FileImageUser(element) {
+        var file = element.files[0];
+        var reader = new FileReader();
+        reader.onloadend = function () {
+            //console.log('RESULT', reader.result);
+            $("#fos_user_registration_form_image").val(reader.result);
+        }
+        reader.readAsDataURL(file);
+    }
+
+</script>

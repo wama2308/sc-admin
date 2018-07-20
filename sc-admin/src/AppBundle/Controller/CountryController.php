@@ -157,7 +157,7 @@ class CountryController extends Controller {
 
             $this->addFlash('notice', 'Country Updated');
 
-            return $this->redirectToRoute('country_list');
+            return $this->redirectToRoute('country_details', array('id' => $id));
         }
 
         $GeneralConfiguration = $this->get('doctrine_mongodb')->getRepository('AppBundle:GeneralConfiguration')->find("5ae08f86c5dfa106dc92610a");
@@ -171,7 +171,9 @@ class CountryController extends Controller {
      */
     public function detailsAction($id) {
         $country = $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->find($id);
-        return $this->render('@App/country/details.html.twig', array('country' => $country));
+        $GeneralConfiguration = $this->get('doctrine_mongodb')->getRepository('AppBundle:GeneralConfiguration')->find("5ae08f86c5dfa106dc92610a");
+        $ArrayLanguajes = $GeneralConfiguration->getLanguajes();
+        return $this->render('@App/country/details.html.twig', array('country' => $country, 'ArrayLanguajes' => $ArrayLanguajes));
     }
 
     /**
@@ -189,7 +191,7 @@ class CountryController extends Controller {
 
         $this->addFlash('error', 'Country Removed');
 
-        return $this->redirectToRoute('country_list');
+        return $this->redirectToRoute('country_details', array('id' => $id));
     }    
 
 }

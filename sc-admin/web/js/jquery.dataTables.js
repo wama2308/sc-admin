@@ -4167,7 +4167,8 @@
 		var language = settings.oLanguage;
 		var previousSearch = settings.oPreviousSearch;
 		var features = settings.aanFeatures;
-		var input = '<input type="search" class="'+classes.sFilterInput+'"/>';
+//		var input = '<input type="search" class="'+classes.sFilterInput+'"/>';
+		var input = '<input type="search" class="form-control"/>';
 	
 		var str = language.sSearch;
 		str = str.match(/_INPUT_/) ?
@@ -11657,7 +11658,8 @@
 			 *      } );
 			 *    } );
 			 */
-			"sSearch": "Search:",
+//			"sSearch": "Search:",
+			"sSearch": "",
 	
 	
 			/**
@@ -11668,7 +11670,7 @@
 			 *  @dtopt Language
 			 *  @name DataTable.defaults.language.searchPlaceholder
 			 */
-			"sSearchPlaceholder": "",
+			"sSearchPlaceholder": "Search...",
 	
 	
 			/**

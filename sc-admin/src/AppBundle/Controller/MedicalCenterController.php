@@ -79,7 +79,8 @@ class MedicalCenterController extends Controller {
             $arrayMaster[] = array(
                     "email" => $master,
                     "validation_code" => "",
-                    "status" => "0");
+                    "status" => "0",
+                    "created_at" => $fechaNow);
             $medicalcenter->setMaster($arrayMaster);            
             
             $medicalcenter->setContac1($contac1);
@@ -202,7 +203,8 @@ class MedicalCenterController extends Controller {
             $arrayMaster[] = array(
                     "email" => $master,
                     "validation_code" => "",
-                    "status" => "0");
+                    "status" => "0",
+                    "created_at" => $fechaNow);
             $medicalcenter->setMaster($arrayMaster);     
             
             $medicalcenter->setContac1($contac1);

@@ -85,6 +85,11 @@ class GeneralConfiguration
      */
     protected $sectormedicalcenter;    
     
+    /**
+     * @MongoDB\Field(type="collection")
+     */
+    protected $secret_questions;    
+    
     function __construct() 
     {
         $this->created_at = new \DateTime();
@@ -391,5 +396,27 @@ class GeneralConfiguration
     public function getSectormedicalcenter()
     {
         return $this->sectormedicalcenter;
+    }
+
+    /**
+     * Set secretQuestions
+     *
+     * @param collection $secretQuestions
+     * @return $this
+     */
+    public function setSecretQuestions($secretQuestions)
+    {
+        $this->secret_questions = $secretQuestions;
+        return $this;
+    }
+
+    /**
+     * Get secretQuestions
+     *
+     * @return collection $secretQuestions
+     */
+    public function getSecretQuestions()
+    {
+        return $this->secret_questions;
     }
 }

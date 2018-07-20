@@ -29,7 +29,7 @@ class UsersFront {
     protected $email;
     
     /**
-     * @MongoDB\Field(type="boolean")
+     * @MongoDB\Field(type="int")
      */
     protected $enabled;
     
@@ -49,9 +49,49 @@ class UsersFront {
     protected $modules;
     
     /**
+     * @MongoDB\Field(type="string")
+     */
+    protected $secret_question1;
+    
+    /**
+     * @MongoDB\Field(type="string")
+     */
+    protected $secret_question2;
+    
+    /**
+     * @MongoDB\Field(type="string")
+     */
+    protected $secret_question3;
+    
+    /**
+     * @MongoDB\Field(type="string")
+     */
+    protected $secret_answer1;
+    
+    /**
+     * @MongoDB\Field(type="string")
+     */
+    protected $secret_answer2;
+    
+    /**
+     * @MongoDB\Field(type="string")
+     */
+    protected $secret_answer3;
+    
+    /**
      * @MongoDB\Field(type="collection")
      */
     protected $last_login;
+    
+    /**
+     * @MongoDB\Field(type="collection")
+     */
+    protected $reset_password;
+    
+    /**
+     * @MongoDB\Field(type="collection")
+     */
+    protected $unlock_user;
     
     /**
      * @MongoDB\Field(type="date")
@@ -130,7 +170,7 @@ class UsersFront {
     /**
      * Set enabled
      *
-     * @param boolean $enabled
+     * @param int $enabled
      * @return $this
      */
     public function setEnabled($enabled)
@@ -142,7 +182,7 @@ class UsersFront {
     /**
      * Get enabled
      *
-     * @return boolean $enabled
+     * @return int $enabled
      */
     public function getEnabled()
     {
@@ -323,5 +363,159 @@ class UsersFront {
     public function getUpdatedBy()
     {
         return $this->updated_by;
+    }
+
+    /**
+     * Set secretQuestion1
+     *
+     * @param string $secretQuestion1
+     * @return $this
+     */
+    public function setSecretQuestion1($secretQuestion1)
+    {
+        $this->secret_question1 = $secretQuestion1;
+        return $this;
+    }
+
+    /**
+     * Get secretQuestion1
+     *
+     * @return string $secretQuestion1
+     */
+    public function getSecretQuestion1()
+    {
+        return $this->secret_question1;
+    }
+
+    /**
+     * Set secretQuestion2
+     *
+     * @param string $secretQuestion2
+     * @return $this
+     */
+    public function setSecretQuestion2($secretQuestion2)
+    {
+        $this->secret_question2 = $secretQuestion2;
+        return $this;
+    }
+
+    /**
+     * Get secretQuestion2
+     *
+     * @return string $secretQuestion2
+     */
+    public function getSecretQuestion2()
+    {
+        return $this->secret_question2;
+    }
+
+    /**
+     * Set secretQuestion3
+     *
+     * @param string $secretQuestion3
+     * @return $this
+     */
+    public function setSecretQuestion3($secretQuestion3)
+    {
+        $this->secret_question3 = $secretQuestion3;
+        return $this;
+    }
+
+    /**
+     * Get secretQuestion3
+     *
+     * @return string $secretQuestion3
+     */
+    public function getSecretQuestion3()
+    {
+        return $this->secret_question3;
+    }
+
+    /**
+     * Set secretAnswer1
+     *
+     * @param string $secretAnswer1
+     * @return $this
+     */
+    public function setSecretAnswer1($secretAnswer1)
+    {
+        $this->secret_answer1 = $secretAnswer1;
+        return $this;
+    }
+
+    /**
+     * Get secretAnswer1
+     *
+     * @return string $secretAnswer1
+     */
+    public function getSecretAnswer1()
+    {
+        return $this->secret_answer1;
+    }
+
+    /**
+     * Set secretAnswer2
+     *
+     * @param string $secretAnswer2
+     * @return $this
+     */
+    public function setSecretAnswer2($secretAnswer2)
+    {
+        $this->secret_answer2 = $secretAnswer2;
+        return $this;
+    }
+
+    /**
+     * Get secretAnswer2
+     *
+     * @return string $secretAnswer2
+     */
+    public function getSecretAnswer2()
+    {
+        return $this->secret_answer2;
+    }
+
+    /**
+     * Set secretAnswer3
+     *
+     * @param string $secretAnswer3
+     * @return $this
+     */
+    public function setSecretAnswer3($secretAnswer3)
+    {
+        $this->secret_answer3 = $secretAnswer3;
+        return $this;
+    }
+
+    /**
+     * Get secretAnswer3
+     *
+     * @return string $secretAnswer3
+     */
+    public function getSecretAnswer3()
+    {
+        return $this->secret_answer3;
+    }
+
+    /**
+     * Set resetPassword
+     *
+     * @param collection $resetPassword
+     * @return $this
+     */
+    public function setResetPassword($resetPassword)
+    {
+        $this->reset_password = $resetPassword;
+        return $this;
+    }
+
+    /**
+     * Get resetPassword
+     *
+     * @return collection $resetPassword
+     */
+    public function getResetPassword()
+    {
+        return $this->reset_password;
     }
 }

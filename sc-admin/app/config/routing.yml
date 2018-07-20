@@ -21,5 +21,14 @@ app_bundle_api:
     prefix:   /api
     resource: "@AppBundle/Resources/config/api-rest-routing.yml"
     
+api_login_check:
+    path: /api/login_check
+    
+#api_rest_check_master:    
+#    prefix:   /apiCheckMaster
+#    resource: "@AppBundle/Controller/ApiRest/ApiRestCheckMaster.php"
+#    defaults:
+#        _formats: json
+    
     
 

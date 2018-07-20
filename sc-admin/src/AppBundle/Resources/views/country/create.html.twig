@@ -1,5 +1,27 @@
 {% extends '@App/base.html.twig' %}
 
+{% block ol %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{{ path('homepage') }}">Home</a>
+        </li>
+        <li class="breadcrumb-item active">Country</li>
+        <li class="breadcrumb-item active">Create</li>
+        <!-- Breadcrumb Menu-->
+        <li class="breadcrumb-menu d-md-down-none">
+            {#<div class="btn-group" role="group" aria-label="Button group">
+                <a class="btn" href="#">
+                    <i class="icon-speech"></i>
+                </a>
+                <a class="btn" href="./">
+                    <i class="icon-graph"></i>  Dashboard</a>
+                <a class="btn" href="#">
+                    <i class="icon-settings"></i>  Settings</a>
+            </div>#}
+        </li>
+    </ol>        
+{% endblock %}
+
 {% block body %}
     <div class="card">
         <div class="card-header">
@@ -19,6 +41,7 @@
                             <label>Languaje</label>
                             <div class="selector-country">
                                 <select class="form-control select-languaje" name="languaje" id="languaje">
+{#                                <select class="form-control selectpicker" data-live-search="true" name="languaje" id="languaje">#}
                                     <option value="">Select...</option>  
                                     {% for ArrayLanguaje in ArrayLanguajes %}
                                         {% set selected = '' %}
@@ -61,7 +84,7 @@
                     <div class="row">     
                         <div class="form-group col-sm-6"> 
                             <label>Issuingbank</label>
-                            <input name="issuingbank" id="issuingbank" type="text" value="" style="text-transform: uppercase" placeholder="" class="form-control" data-role="tagsinput" >                
+                            <input name="issuingbank" id="issuingbank" type="text" value="" style="text-transform: uppercase" placeholder="Issuingbank" class="form-control" data-role="tagsinput" >                
                         </div>
                         <div class="form-group col-sm-6"> 
                             <label>Receivingbank</label>
@@ -100,7 +123,7 @@
                                 $("#country").focus().after("<span class='error' style='color:#FF0000;'>Enter the country</span>");
                                 return false;
                         } else if ($("#languaje").val() == "") {
-                                $("#languaje").focus().after("<span class='error' style='color:#FF0000;'>Select the language</span>");
+                                $("#languaje_chosen").focus().after("<span class='error' style='color:#FF0000;'>Select the language</span>");
                                 return false;
                         } else if ($("#time_zone").val() == "") {
                                 $("#time_zone").focus().after("<span class='error' style='color:#FF0000;'>Enter the time use</span>");
