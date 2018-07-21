@@ -41,7 +41,7 @@
                             <label>Languaje</label>
                             <div class="selector-country">
                                 <select class="form-control select-languaje" name="languaje" id="languaje">
-{#                                <select class="form-control selectpicker" data-live-search="true" name="languaje" id="languaje">#}
+                                    {#                                <select class="form-control selectpicker" data-live-search="true" name="languaje" id="languaje">#}
                                     <option value="">Select...</option>  
                                     {% for ArrayLanguaje in ArrayLanguajes %}
                                         {% set selected = '' %}
@@ -107,11 +107,11 @@
     </div>
     <script type="text/javascript">
         $(document).ready(function () {
-            
+
             $(".select-languaje").chosen({
                 placeholder_text_single: "Select the type of license"
             });
-            
+
             $('#tax_rate').mask("99999", {placeholder: " "});
             $('#telefone_prefix').mask("+999", {placeholder: " "});
 
@@ -153,5 +153,12 @@
                 });
 
         });
+        function wamita() {
+            if ($("#pinche").hasClass("aside-menu-lg-show")) {
+                alert("aaa");
+            } else {
+                alert("bbb");
+            }
+        }
     </script>  
 {% endblock %}
