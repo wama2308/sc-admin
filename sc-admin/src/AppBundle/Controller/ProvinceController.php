@@ -38,24 +38,15 @@ class ProvinceController extends Controller {
      * @Method({"GET", "POST"})
      */
     public function createAction(Request $request) {
-        $province = new Country();
+        $form = $this->createFormBuilder()->getForm();
         $user = $this->getUser()->getId();
-
-        $form = $this->createFormBuilder($province)
-                ->add('name', DocumentType::class, array('class' => 'AppBundle:Country', 'label' => 'Country', 'placeholder' => 'Select...',
-                    'attr' => array('class' => 'form-control select-country', 'style' => 'margin-bottom:15px')))
-                ->add('provinces', TextType::class, array('label' => 'Province/City', 'attr' => array('class' => 'form-control',
-                        'style' => 'margin-bottom:15px')))
-                ->add('save', SubmitType::class, array('label' => 'Save', 'attr' => array('class' => 'btn btn-primary', 'style' => 'margin-bottom:15px')))
-                ->getForm();
+        $fechaNow = new \MongoDate();
 
         $form->handleRequest($request);
+        $country_id = $request->request->get("country_id");
+        $province_name = $request->request->get("province");
 
-        if ($form->isSubmitted() && $form->isValid()) {
-
-            $province_name = $form['provinces']->getData();
-            $country_id = $form['name']->getData()->getId();
-            $fechaNow = new \MongoDate();
+        if (($country_id != "") && ($province_name != "")) {
 
             $province = $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->find($country_id);
             $province_exist = $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->findBy(array('id' => $country_id, 'provinces.name' => $province_name));
@@ -83,15 +74,15 @@ class ProvinceController extends Controller {
 
                 $dm = $this->get('doctrine_mongodb')->getManager();
                 $dm->persist($province);
-                $dm->flush();                
+                $dm->flush();
 
                 $this->addFlash('notice', 'Registered Province');
 
-                //return $this->redirectToRoute('province_list');
+                return $this->redirectToRoute('province_list');
             }
         }
-
-        return $this->render('@App/province/create.html.twig', array('form' => $form->createView()));
+        $countries = $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->findByActive(true);
+        return $this->render('@App/province/create.html.twig', array('countries' => $countries));
     }
 
     /**
@@ -99,29 +90,17 @@ class ProvinceController extends Controller {
      * @Method({"GET", "POST"})
      */
     public function editAction($id, $posicionProvince, Request $request) {
+        
         $country = $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->find($id);
-
-        $infoProvince = $country->getProvinces();
-        $nombreProvincia = $infoProvince[$posicionProvince]["name"];
+        $form = $this->createFormBuilder()->getForm();
+        
         $date = new \MongoDate();
-
-        $form = $this->createFormBuilder($country)
-                ->add('country_id', DocumentType::class, array('class' => 'AppBundle:Country',
-                    'label' => 'Country',
-                    'mapped' => false,
-                    'placeholder' => 'Select...',
-                    'data' => $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->find($id),
-                    'attr' => array('class' => 'form-control  select-country', 'style' => 'margin-bottom:15px')))
-                ->add('nombreProvince', TextType::class, array('label' => 'Province', 'mapped' => false, 'data' => $nombreProvincia, 'attr' => array('class' => 'form-control', 'style' => 'margin-bottom:15px')))
-                ->add('save', SubmitType::class, array('label' => 'Editar', 'attr' => array('class' => 'btn btn-primary', 'style' => 'margin-bottom:15px')))
-                ->getForm();
-
         $form->handleRequest($request);
+        $country_id = $request->request->get("country_id");
+        $province_name = $request->request->get("province");
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $province_name = $form['nombreProvince']->getData();
-            $country_id = $form['country_id']->getData()->getId();
-
+        if (($country_id != "") && ($province_name != "")) {
+            
             $provincia = $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->find($country_id);
             //$provincia = $this->get('doctrine_mongodb')->getRepository('AppBundle:Pais')->findBy(array('id' => $pais_id, 'provincia.name' => $nombreProvincia));
             $arrayProvince = $provincia->getProvinces();
@@ -137,8 +116,8 @@ class ProvinceController extends Controller {
 
             return $this->redirectToRoute('province_list');
         }
-
-        return $this->render('@App/province/edit.html.twig', array('country' => $country, 'form' => $form->createView()));
+        $countries = $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->findByActive(true);
+        return $this->render('@App/province/edit.html.twig', array('country' => $country, 'countries' => $countries, 'posicionProvince' => $posicionProvince));
     }
 
     /**
@@ -172,6 +151,6 @@ class ProvinceController extends Controller {
         $this->addFlash('error', 'Province Removed');
 
         return $this->redirectToRoute('province_list');
-    }    
+    }
 
 }
