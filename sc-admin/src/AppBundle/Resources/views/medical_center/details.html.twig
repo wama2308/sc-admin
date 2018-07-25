@@ -1,36 +1,351 @@
 {% extends '@App/base.html.twig' %}
 
+{% block ol %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{{ path('homepage') }}">Home</a>
+        </li>
+        <li class="breadcrumb-item active">
+            <a href="{{ path('medical_center_list') }}">Medical Center</a>
+        </li>
+        <li class="breadcrumb-item active">Details</li>
+        <!-- Breadcrumb Menu-->
+        <li class="breadcrumb-menu d-md-down-none">
+            {#<div class="btn-group" role="group" aria-label="Button group">
+                <a class="btn" href="#">
+                    <i class="icon-speech"></i>
+                </a>
+                <a class="btn" href="./">
+                    <i class="icon-graph"></i>  Dashboard</a>
+                <a class="btn" href="#">
+                    <i class="icon-settings"></i>  Settings</a>
+            </div>#}
+        </li>
+    </ol>        
+{% endblock %}
+
 {% block body %}
-    <br>
-    <div class="panel panel-body">
-        {% if exams.active == true %}
-            {% set status = "ACTIVE" %}                
-        {% else %}    
-            {% set status = "INACTIVE" %}
-        {% endif %}
-        {% set NameCategoria =  ''%}  
-        {% for ArrayCategoryExams in  ArrayCategoryExams %}
-            {% if exams.category == loop.index-1 %}
-                {% set NameCategoria =  ArrayCategoryExams%}  
-            {% endif %}
-        {% endfor %}
-        <table id="tableExams" class="table table-bordered" > 
-            <thead> 
-                <tr> 
-                    <td>Exam:</td><td>{{ exams.name }}</td>
-                <tr>
-                    <td>Category:</td><td>{{ NameCategoria }}</td>
-                </tr>
-                <tr>
-                    <td>Fields:</td><td>{{ exams.fields|join(' - ') }}</td>
-                </tr>
-                <tr>
-                    <td>Status:</td><td>{{ status }}</td>                                                                                              
-                </tr> 
-            </thead> 
-        </table>        
+    {% set status = "" %}             
+    {% set class = "" %}    
+    {% set country = "" %}    
+    {% set coin = "" %}    
+    {% set provinceName = "" %}    
+    {% set type = "" %}    
+    <div class="card">
+        <div class="card-header">
+            <strong>Details License</strong>
+            <a title="DELETE" href="{{ path('medical_center_delete', { 'id': medicalcenter.id }) }}" class="btn btn-danger" onclick="return confirm('¿Be sure to eliminate the medical center?');" style="; float: right"><i class="fas fa-minus-circle"></i> </a>
+            <strong style="float: right">&nbsp;&nbsp;</strong>
+            <a align="right" title="EDIT" href="{{ path('medical_center_edit', { 'id': medicalcenter.id }) }}" class="btn btn-default"  style="background-color: #a1c9c2; color: black; float: right"><i class="fas fa-edit"></i> </a>                        
+        </div>        
+        <div class="card-body">  
+            <div class="panel panel-body">
+                {% if medicalcenter.active == true %}
+                    {% set status = "ACTIVE" %}   
+                    {% set class = "badge badge-success" %}   
+                {% else %}    
+                    {% set status = "INACTIVE" %}
+                    {% set class = "badge badge-danger" %}  
+                {% endif %}
+
+                {% for countries in countries %}
+                    {% if countries.id == medicalcenter.countryid %}
+                        {% set country = countries.name %}
+                        {% set coin = countries.currencySymbol %}
+                        {% for province in countries.provinces %}
+                            {% if loop.index-1 == medicalcenter.provinceid %}
+                                {% set provinceName = province.name %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                {% endfor %}
+
+                {% for ArrayTypeMedicalCenter in ArrayTypeMedicalCenter %}
+                    {% if loop.index-1 == medicalcenter.type %}
+                        {% set type = ArrayTypeMedicalCenter %}                        
+                    {% endif %}    
+                {% endfor %}
+                <table class="table table-responsive-sm table-bordered table-striped table-sm">
+                    <tr> 
+                        <td align = "justify" style="width: 50px"><b>Medical Center</b></td>
+                        <td align = "justify" style="width: 100px">{{ medicalcenter.name }}</td>
+                    <tr>
+                        <td align = "justify" style="width: 50px"><b>Country</b></td>
+                        <td align = "justify" style="width: 100px">{{ country }}</td>
+                    </tr>
+                    <tr>
+                        <td align = "justify" style="width: 50px"><b>Province</b></td>
+                        <td align = "justify" style="width: 100px">{{ provinceName }}</td>
+                    </tr>
+                    <tr>
+                        <td align = "justify" style="width: 50px"><b>Code</b></td>
+                        <td align = "justify" style="width: 100px">{{ medicalcenter.code }}</td>
+                    </tr>
+                    <tr>
+                        <td align = "justify" style="width: 50px"><b>Type</b></td>
+                        <td align = "justify" style="width: 100px">{{ type }}</td>
+                    </tr>
+                    <tr>
+                        <td align = "justify" style="width: 50px"><b>Address</b></td>
+                        <td align = "justify" style="width: 100px">{{ medicalcenter.address }}</td>
+                    </tr>
+                    <tr>
+                        <td align = "justify" style="width: 50px"><b>Status</b></td>
+                        <td align = "justify" style="width: 100px"><span class = "{{class}}">{{status}}</span></td>           
+                    </tr>  
+                    <tr>
+                        <td align = "justify" style="width: 150px"><b>Email Master</b></td>
+                        <td align = "justify" style="width: 100px">{{ medicalcenter.master[0]['email'] }}</td>
+                    </tr>
+                    <tr>
+                        <td align = "justify" style="width: 50px"><b>Phone</b></td>
+                        <td align = "justify" style="width: 50px"><button type="button" class="clase-popover btn btn-primary btn-sm" data-container="body" data-toggle="popover" data-placement="right" title="Phone" data-content="{{ medicalcenter.phone|join(' | ') }}"><b>View</b></button></td>                                                
+                    </tr>  
+                    <tr>
+                        <td align = "justify" style="width: 150px"><b>Contac</b></td>
+                        <td align = "justify" style="width: 100px">{{ medicalcenter.contac1 }}</td>
+                    </tr>
+                    <tr>
+                        <td align = "justify" style="width: 50px"><b>Phone Contac</b></td>
+                        <td align = "justify" style="width: 50px"><button type="button" class="clase-popover btn btn-primary btn-sm" data-container="body" data-toggle="popover" data-placement="right" title="Phone Contac" data-content="{{ medicalcenter.contac1phone|join(' | ') }}"><b>View</b></button></td>                                                
+                    </tr>   
+                    <tr>
+                        <td align = "justify" style="width: 50px"><b>License</b></td>
+                        <td align = "justify" style="width: 50px"><button id="btnModalLicense" title="View License" class="btn btn-primary btn-sm"><b>View</b></button></td>                        
+                    </tr>  
+                    <tr>
+                        <td align = "justify" style="width: 50px"><b>Payments</b></td>
+                        <td align = "justify" style="width: 50px"><button id="btnModalPayments" title="View Payments" class="btn btn-primary btn-sm"><b>View</b></button></td>                        
+                    </tr>  
+                    <tr>
+                        <td align = "justify" style="width: 150px"><b>Payment Status</b></td>
+                        <td align = "justify" style="width: 100px">{{ medicalcenter.paymentstatus }}</td>
+                    </tr>
+                </table>   
+                <div id="licenseModal" class="mascara">
+                    <div class="contenido" style="">
+                        <span class="close" onclick="$('#licenseModal').hide();">&times;</span><br><br>
+                        <table class="table table-responsive-sm table-striped scrolled-wrapper">
+                            <tr> 
+                                <td align="center"><b>License</b></td>                                                                       
+                                <td align="center"><b>Duration Time</b></td>                                                                       
+                                <td align="center"><b>Amount</b></td>                                                                       
+                                <td align="center"><b>Expiration Date</b></td>                                                                       
+                                <td align="center"><b>status</b></td>                                                                       
+                            </tr>         
+
+                            {% for licensesMC in medicalcenter.licenses %}
+                                {% set license = '' %}                                   
+                                {% set durationtime = '' %}         
+                                {% set amount = '' %}                                        
+                                {% set status = '' %}                                        
+                                {% if licensesMC.status == 'Active' %}
+                                    {% set class = "badge badge-success" %}   
+                                {% else %}    
+                                    {% set class = "badge badge-danger" %}   
+                                {% endif %}
+
+                                {% for licenses in licenses %}
+                                    {% if licensesMC.license_id == licenses.id %}
+                                        {% set license = licenses.license %}                                           
+                                        {% set durationtime = licenses.durationtime %}         
+                                        {% set amount = licenses.amount %}                                          
+                                    {% endif %}
+                                {% endfor %}  
+                                <tr> 
+                                    <td align="center">{{ license }}</td>                                                                       
+                                    <td align="center">{{ durationtime }}</td>                                                                       
+                                    <td align="center">{{ amount }}</td>                                                                       
+                                    <td align="center">{{ licensesMC.expiration_date.toDateTime|date('Y-m-d') }}</td>                                                                       
+                                    <td align="center"><span class = "{{class}}">{{licensesMC.status}}</span></td>                                                                       
+                                </tr> 
+                            {% endfor %}
+                        </table>  
+                    </div>
+                </div>
+                <div id="paymentModal" class="mascara">
+                    <div class="contenido" style="">
+                        <span class="close" onclick="$('#paymentModal').hide();">&times;</span><br><br>
+                        <table class="table table-responsive-sm table-striped scrolled-wrapper">
+                            <tr> 
+                                <td align="center"><b>Way To Pay</b></td>                                                                       
+                                <td align="center"><b>Amount</b></td>                                                                       
+                                <td align="center"><b>Issuing Bank</b></td>                                                                       
+                                <td align="center"><b>Receiving Bank</b></td>                                                                       
+                                <td align="center"><b>Status</b></td>                                                                       
+                            </tr>         
+                            {% set status = "" %}    
+                            {% for payments in medicalcenter.payments %}
+                                {% if payments.status == 1 %}
+                                    {% set status = "Active" %}   
+                                    {% set class = "badge badge-success" %}   
+                                {% else %}    
+                                    {% set status = "Inactive" %}   
+                                    {% set class = "badge badge-danger" %}   
+                                {% endif %}
+
+                                <tr> 
+                                    <td align="center">{{ payments.waytopay }}</td>                                                                       
+                                    <td align="center">{{ payments.amount }} {{ coin }}</td>                                                                       
+                                    <td align="center">{{ payments.issuingbank }}</td>                                                                       
+                                    <td align="center">{{ payments.receivingbank }}</td>                                                                       
+                                    <td align="center"><span class = "{{class}}">{{status}}</span></td>                                                                       
+                                </tr> 
+                            {% endfor %}
+                        </table>  
+                    </div>
+                </div>
+            </div>
+            <a class="btn btn-primary" href="{{ path('medical_center_list') }}">Return</a>
+        </div>
     </div>
 
-    <a class="btn btn-primary" href="{{ path('exams_list') }}">Return</a>
+    <style type="text/css">
+        .mascara {
+            display: none; 
+            position: fixed; 
+            z-index: 1; 
+            padding-top: 100px; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgb(0,0,0); 
+            background-color: rgba(0,0,0,0.4); 
+            -webkit-transition: opacity 400ms ease-in;
+            -moz-transition: opacity 400ms ease-in;
+            transition: opacity 400ms ease-in;
+            pointer-events: auto;
+        }
+        .mascara > div {
+            width: 700px;
+            top: -25%;
+            position: relative;
+            margin: 10% auto;
+            padding: 5px 20px 13px 20px;
+            border-radius: 10px;
+            background: #e3e3e4;  /* fallback for old browsers */
+            {#background: -webkit-linear-gradient(to left, #FFFFFF, #FFEFBA);  /* Chrome 10-25, Safari 5.1-6 */
+            background: linear-gradient(to left, #FFFFFF, #FFEFBA); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+            -webkit-transition: opacity 400ms ease-in;
+            -moz-transition: opacity 400ms ease-in;#}
+            transition: opacity 400ms ease-in;
+        }
+        .contenido {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 50%;  
+            height: auto;
+            overflow-y: auto;
+            -webkit-animation-name: animatetop;
+            -webkit-animation-duration: 0.4s;
+            animation-name: animatetop;
+            animation-duration: 0.4s
+        }
+        /* Add Animation */
+        @-webkit-keyframes animatetop {
+            from {top:-300px; opacity:0} 
+            to {top:0; opacity:1}
+        }
+
+        @keyframes animatetop {
+            from {top:-300px; opacity:0}
+            to {top:0; opacity:1}
+        }
+        {#.close {
+            background: #000;
+            color: #FFFFFF;
+            line-height: 25px;
+            position: absolute;
+            right: -12px;
+            text-align: center;
+            top: -10px;
+            width: 24px;
+            text-decoration: none;
+            font-weight: bold;
+            -webkit-border-radius: 12px;
+            -moz-border-radius: 12px;
+            border-radius: 12px;
+            -moz-box-shadow: 1px 1px 3px #000;
+            -webkit-box-shadow: 1px 1px 3px #000;
+            box-shadow: 1px 1px 3px #000;
+        }
+        .close:hover { background: #00d9ff; }
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }#}
+        /* The Close Button */
+        .close {
+            color: #000;
+            float: end;
+            font-size: 30px;
+            font-weight: bold;
+            background: #000;
+            color: #FFFFFF;
+            line-height: 25px;
+            position: absolute;
+            right: 20px;
+            text-align: center;
+            top: 10px;
+            width: 34px;
+            text-decoration: none;
+            font-weight: bold;
+            -webkit-border-radius: 12px;
+            -moz-border-radius: 12px;
+            border-radius: 12px;
+            -moz-box-shadow: 1px 1px 3px #000;
+            -webkit-box-shadow: 1px 1px 3px #000;
+            box-shadow: 1px 1px 3px #000;
+
+        }
+        .close:hover { background: #00d9ff; }
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>    
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $(function () {
+                $('.clase-popover').popover({
+                    container: 'body'
+                })
+            })
+
+            var licenseModal = document.getElementById('licenseModal');
+            var paymentModal = document.getElementById('paymentModal');
+            var btnModalLicense = document.getElementById("btnModalLicense");
+            var btnModalPayments = document.getElementById("btnModalPayments");
+
+            btnModalLicense.onclick = function () {
+                licenseModal.style.display = "block";
+            }
+            
+            btnModalPayments.onclick = function () {
+                paymentModal.style.display = "block";
+            }
+
+            window.onclick = function (event) {
+                if (event.target === licenseModal) {
+
+                    licenseModal.style.display = "none";
+
+                }else if (event.target === paymentModal) {
+
+                    paymentModal.style.display = "none";
+
+                }
+            }
+
+        });
+    </script>  
 
 {% endblock %}

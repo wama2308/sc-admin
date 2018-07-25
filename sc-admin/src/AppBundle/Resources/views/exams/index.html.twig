@@ -1,5 +1,29 @@
 {% extends '@App/base.html.twig' %}
 
+{% block ol %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{{ path('homepage') }}">Home</a>
+        </li>
+        <li class="breadcrumb-item active">
+            <a href="{{ path('exams_list') }}">Exams</a>
+        </li>
+        <li class="breadcrumb-item active">List</li>
+        <!-- Breadcrumb Menu-->
+        <li class="breadcrumb-menu d-md-down-none">
+            {#<div class="btn-group" role="group" aria-label="Button group">
+                <a class="btn" href="#">
+                    <i class="icon-speech"></i>
+                </a>
+                <a class="btn" href="./">
+                    <i class="icon-graph"></i>  Dashboard</a>
+                <a class="btn" href="#">
+                    <i class="icon-settings"></i>  Settings</a>
+            </div>#}
+        </li>
+    </ol>        
+{% endblock %}
+
 {% block body %}
     <div class="card">
         <div class="card-header">
@@ -17,15 +41,17 @@
                         <th>Exam</th>    
                         <th>Category</th>    
                         <th>Status</th>    
-                        <th>Accion</th>                                                                                                    
+{#                        <th>Accion</th>                                                                                                    #}
                     </tr> 
                 </thead> 
                 <tbody> 
                     {% for exams in exams %}
                         {% if exams.active == true %}
-                            {% set status = "ACTIVE" %}                
+                            {% set status = "ACTIVE" %} 
+                            {% set class = "badge badge-success" %}   
                         {% else %}    
                             {% set status = "INACTIVE" %}
+                            {% set class = "badge badge-danger" %} 
                         {% endif %}
                         {% set NameCategoria = '' %}   
                         {% for ArrayCategoryExams in  ArrayCategoryExams %}
@@ -34,14 +60,14 @@
                             {% endif %}
                         {% endfor %}
                         <tr> 
-                            <td>{{exams.name}}</td>                                 
+                            <td><a title="View Details" class="nav-link" href="{{ path('exams_details', { 'id': exams.id }) }}">{{exams.name}}</a></td>                                                               
                             <td>{{NameCategoria}}</td>    
-                            <td>{{status}}</td>    
-                            <td style="width: 110px">
+                            <td><span class = "{{class}}">{{status}}</span></td>        
+                            {#<td style="width: 110px">
                                 <a title="VIEW" href="{{ path('exams_details', { 'id': exams.id }) }}" class="btn btn-info"><i class="fas fa-eye"></i></a>
                                 <a title="EDIT" href="{{ path('exams_edit', { 'id': exams.id }) }}" class="btn btn-default"  style="background-color: #a1c9c2; color: black "><i class="fas fa-edit"></i></a>
                                 <a title="DELETE" href="{{ path('exams_delete', { 'id': exams.id }) }}" class="btn btn-danger" onclick="return confirm('¿Be sure to eliminate the exam?');"><i class="fas fa-minus-circle"></i></a>
-                            </td> 
+                            </td> #}
 
                         </tr>  
                     {% endfor %}

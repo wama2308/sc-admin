@@ -1,11 +1,36 @@
 {% extends '@App/base.html.twig' %}
+
+{% block ol %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{{ path('homepage') }}">Home</a>
+        </li>
+        <li class="breadcrumb-item active">
+            <a href="{{ path('users_list') }}">Users</a>
+        </li>
+        <li class="breadcrumb-item active">List</li>
+        <!-- Breadcrumb Menu-->
+        <li class="breadcrumb-menu d-md-down-none">
+            {#<div class="btn-group" role="group" aria-label="Button group">
+                <a class="btn" href="#">
+                    <i class="icon-speech"></i>
+                </a>
+                <a class="btn" href="./">
+                    <i class="icon-graph"></i>  Dashboard</a>
+                <a class="btn" href="#">
+                    <i class="icon-settings"></i>  Settings</a>
+            </div>#}
+        </li>
+    </ol>        
+{% endblock %}
+
 {% block body %}
     <div class="card">
         <div class="card-header">
             <a class="btn btn-primary" href="{{ path('fos_user_registration_register') }}" role="button"><i class="fas fa-plus-circle"></i></a>
             &nbsp;&nbsp;&nbsp;&nbsp;            
             <strong>Users List</strong>
-{#            <small>List</small>#}
+            {#            <small>List</small>#}
         </div>
         <br>
         <div></div>
@@ -13,34 +38,35 @@
         <div class="card-body">
             {#    {{countries}}#}
             {% set status = "" %}
-            <table id="tableCountry" class="display nowrap dataTable dtr-inline collapsed"> 
+            <table id="tableCountry" class="table table-responsive-sm table-striped"> 
                 <thead> 
                     <tr> 
                         <th style="width: 270px">User</th>    
                         <th>Email</th>    
                         <th>Status</th>    
-                        <th>Accion</th>                                                                                                    
+                            {#                        <th>Accion</th>                                                                                                    #}
                     </tr> 
                 </thead> 
                 <tbody> 
                     {% for user in users %}
                         {% if user.enabled == true %}
-                            {% set status = "ACTIVE" %}                
+                            {% set status = "ACTIVE" %} 
+                            {% set class = "badge badge-success" %} 
                         {% else %}    
                             {% set status = "INACTIVE" %}
+                            {% set class = "badge badge-danger" %}
                         {% endif %}
-                        {% if user.enabled == true %}
-                            <tr> 
-                                <td style="width: 270px">{{user.username}}</td>                                 
-                                <td>{{user.email}}</td>                                 
-                                <td>{{status}}</td>  
-                                <td style="width: 110px">
+                        <tr> 
+                            <td><a title="View Details" class="nav-link" href="{{ path('users_details', { 'id': user.id }) }}">{{user.username}}</a></td>
+                            <td>{{user.email}}</td>                                 
+                            <td><span class = "{{class}}">{{status}}</span></td>       
+                                {#<td style="width: 110px">
                                     <a title="CHANGE" href="{{ path('change_password_edit', { 'id': user.id }) }}" class="btn btn-info"><i class="fas fa-key"></i></a>
                                     <a title="EDIT" href="{{ path('profile_edit', { 'id': user.id }) }}" class="btn btn-default"  style="background-color: #8080F5; color: black "><i class="fas fa-user-circle"></i></a>
                                     <a title="INACTIVE" href="{{ path('delete_user', { 'id': user.id }) }}" class="btn btn-danger" onclick="return confirm('¿Be sure to eliminate the user?');"><i class="fas fa-user-times"></i></a>
-                                </td> 
-                            </tr>     
-                        {% endif %}
+                                </td>#} 
+                        </tr>     
+
                     {% endfor %}
                 </tbody> 
             </table>    

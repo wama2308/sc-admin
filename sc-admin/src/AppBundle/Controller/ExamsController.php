@@ -108,7 +108,7 @@ class ExamsController extends Controller {
 
             $this->addFlash('notice', 'Exam Updated');
 
-            return $this->redirectToRoute('exams_list');
+            return $this->redirectToRoute('exams_details', array('id' => $id));
         }
         
         
@@ -144,7 +144,7 @@ class ExamsController extends Controller {
 
         $this->addFlash('error', 'Exam Removed');
 
-        return $this->redirectToRoute('exams_list');
+        return $this->redirectToRoute('exams_details', array('id' => $id));
     }
 
 }

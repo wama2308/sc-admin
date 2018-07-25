@@ -114,7 +114,7 @@ class ProvinceController extends Controller {
 
             $this->addFlash('notice', 'Province Updated');
 
-            return $this->redirectToRoute('province_list');
+            return $this->redirectToRoute('province_details', array('id' => $id, 'posicionProvince' => $posicionProvince));
         }
         $countries = $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->findByActive(true);
         return $this->render('@App/province/edit.html.twig', array('country' => $country, 'countries' => $countries, 'posicionProvince' => $posicionProvince));
@@ -128,9 +128,10 @@ class ProvinceController extends Controller {
         $CountryProvince = $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->find($id);
         $nameCountry = $CountryProvince->getName();
         $arrayProvince = $CountryProvince->getProvinces();
-        $nameProvince = $arrayProvince[$posicionProvince]["name"];
+        $nameProvince = $arrayProvince[$posicionProvince]["name"];        
+        $activeProvince = $arrayProvince[$posicionProvince]["active"];        
 
-        return $this->render('@App/province/details.html.twig', array('country' => $nameCountry, 'province' => $nameProvince));
+        return $this->render('@App/province/details.html.twig', array('country' => $nameCountry, 'province' => $nameProvince, 'id' => $id, 'posicionProvince' => $posicionProvince, 'activeProvince' => $activeProvince));
     }
 
     /**
@@ -150,7 +151,7 @@ class ProvinceController extends Controller {
 
         $this->addFlash('error', 'Province Removed');
 
-        return $this->redirectToRoute('province_list');
+        return $this->redirectToRoute('province_details', array('id' => $id, 'posicionProvince' => $posicionProvince));
     }
 
 }

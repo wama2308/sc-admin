@@ -338,11 +338,11 @@ class ApiRestCheckMaster extends Controller {
         if (!$userPassword) {
             return new JsonResponse('Password incorrecta', 403);
         }
-        return new Response('HOLA');
-//        $token = $this->get('lexik_jwt_authentication.encoder')
-//                ->encode(['username' => $user->getEmail(), 'id' => $user->getId(), 'roles' => $user->getRoles()]);
-//
-//        return new JsonResponse(['token' => $token]);
+//        return new Response('HOLA');
+        $token = $this->get('lexik_jwt_authentication.encoder')
+                ->encode(['username' => $user->getEmail(), 'id' => $user->getId(), 'roles' => $user->getRoles()]);
+
+        return new JsonResponse(['token' => $token]);
     }
 
     /**

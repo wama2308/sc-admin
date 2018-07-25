@@ -276,7 +276,7 @@ class MedicalCenterController extends Controller {
             $dm->flush();
             $this->addFlash('notice', 'Medical Center Updated');
 
-            return $this->redirectToRoute('medical_center_list');
+            return $this->redirectToRoute('medical_center_details', array('id' => $id));
         }
 
         $GeneralConfiguration = $this->get('doctrine_mongodb')->getRepository('AppBundle:GeneralConfiguration')->find("5ae08f86c5dfa106dc92610a");
@@ -293,8 +293,13 @@ class MedicalCenterController extends Controller {
      * @Method("GET")
      */
     public function detailsAction($id) {
-        $country = $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->find($id);
-        return $this->render('@App/medical_center/details.html.twig', array('country' => $country));
+        $medicalcenter = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->find($id);
+        $GeneralConfiguration = $this->get('doctrine_mongodb')->getRepository('AppBundle:GeneralConfiguration')->find("5ae08f86c5dfa106dc92610a");
+        $ArrayTypeMedicalCenter = $GeneralConfiguration->getTypemedicalcenter();
+        $ArraySectorMedicalCenter = $GeneralConfiguration->getSectormedicalcenter();
+        $countries = $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->findBy(array('provinces.name' => array('$exists' => true), 'active' => true));
+        $licenses = $this->get('doctrine_mongodb')->getRepository('AppBundle:License')->findByActive(true);
+        return $this->render('@App/medical_center/details.html.twig', array('medicalcenter' => $medicalcenter, 'ArrayTypeMedicalCenter' => $ArrayTypeMedicalCenter, 'countries' => $countries, 'licenses' => $licenses));
     }
 
     /**
@@ -312,7 +317,7 @@ class MedicalCenterController extends Controller {
 
         $this->addFlash('error', 'Medical Center Removed');
 
-        return $this->redirectToRoute('medical_center_list');
+        return $this->redirectToRoute('medical_center_details', array('id' => $id));
     }
 
     /**

@@ -6,7 +6,7 @@
             <a href="{{ path('homepage') }}">Home</a>
         </li>
         <li class="breadcrumb-item active">
-            <a href="{{ path('province_list') }}">Provinces</a>
+            <a href="{{ path('users_list') }}">Users</a>
         </li>
         <li class="breadcrumb-item active">Details</li>
         <!-- Breadcrumb Menu-->
@@ -28,14 +28,16 @@
     {% set status = "" %}             
     <div class="card">
         <div class="card-header">
-            <strong>Datails Province</strong>
-            <a title="DELETE" href="{{ path('province_delete', { 'id': id, 'posicionProvince': posicionProvince }) }}" class="btn btn-danger" onclick="return confirm('¿Be sure to eliminate the province?');" style="float: right"><i class="fas fa-minus-circle"></i> </a>
+            <strong>Datails User</strong>
+            <a style="float: right" title="INACTIVE" href="{{ path('delete_user', { 'id': user.id }) }}" class="btn btn-danger" onclick="return confirm('¿Be sure to eliminate the user?');"><i class="fas fa-user-times"></i></a>
             <strong style="float: right">&nbsp;&nbsp;</strong>
-            <a align="right" title="EDIT" href="{{ path('province_edit', { 'id': id, 'posicionProvince': posicionProvince }) }}" class="btn btn-default"  style="background-color: #a1c9c2; color: black; float: right"><i class="fas fa-edit"></i> </a>            
+            <a title="EDIT" href="{{ path('profile_edit', { 'id': user.id }) }}" class="btn btn-default"  style="background-color: #8080F5; color: black; float: right"><i class="fas fa-user-circle"></i></a>
+            <strong style="float: right">&nbsp;&nbsp;</strong>
+            <a style="float: right" title="CHANGE" href="{{ path('change_password_edit', { 'id': user.id }) }}" class="btn btn-info"><i class="fas fa-key"></i></a>
         </div>      
         <div class="card-body">    
             <div class="panel panel-body">
-                {% if activeProvince == true %}
+                {% if user.enabled == true %}
                     {% set status = "ACTIVE" %}             
                     {% set class = "badge badge-success" %}   
                 {% else %}    
@@ -45,20 +47,20 @@
 
                 <table class="table table-responsive-sm table-bordered table-striped table-sm">
                     <tr>
-                        <td align = "justify" style="width: 50px"><b>Country</b></td>
-                        <td align = "justify" style="width: 50px">{{country}}</td>                        
+                        <td align = "justify" style="width: 150px"><b>Username</b></td>
+                        <td align = "justify" style="width: 50px">{{user.username}}</td>                        
                     </tr>                    
                     <tr>
-                        <td align = "justify" style="width: 50px"><b>Province</b></td>
-                        <td align = "justify" style="width: 50px">{{province}}</td>                                                
+                        <td align = "justify" style="width: 150px"><b>Email</b></td>
+                        <td align = "justify" style="width: 50px">{{user.email}}</td>                                                
                     </tr>          
                     <tr>
-                        <td align = "justify" style="width: 50px"><b>Status</b></td>
+                        <td align = "justify" style="width: 150px"><b>Status</b></td>
                         <td align = "justify" style="width: 50px"><span class = "{{class}}">{{status}}</span></td>                        
                     </tr>  
                 </table> 
             </div>
-            <a class="btn btn-primary" href="{{ path('province_list') }}">Return</a>
+            <a class="btn btn-primary" href="{{ path('users_list') }}">Return</a>
         </div>
 
     </div>    

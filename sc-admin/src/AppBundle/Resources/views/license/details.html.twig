@@ -1,17 +1,48 @@
 {% extends '@App/base.html.twig' %}
 
+{% block ol %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{{ path('homepage') }}">Home</a>
+        </li>
+        <li class="breadcrumb-item active">
+            <a href="{{ path('license_list') }}">License</a>
+        </li>
+        <li class="breadcrumb-item active">Details</li>
+        <!-- Breadcrumb Menu-->
+        <li class="breadcrumb-menu d-md-down-none">
+            {#<div class="btn-group" role="group" aria-label="Button group">
+                <a class="btn" href="#">
+                    <i class="icon-speech"></i>
+                </a>
+                <a class="btn" href="./">
+                    <i class="icon-graph"></i>  Dashboard</a>
+                <a class="btn" href="#">
+                    <i class="icon-settings"></i>  Settings</a>
+            </div>#}
+        </li>
+    </ol>        
+{% endblock %}
+
 {% block body %}
+    {% set status = "" %}             
+    {% set class = "" %}    
     <div class="card">
         <div class="card-header">
             <strong>Details License</strong>
+            <a title="DELETE" href="{{ path('license_delete', { 'id': license.id }) }}" class="btn btn-danger" onclick="return confirm('¿Be sure to eliminate the license?');" style="; float: right"><i class="fas fa-minus-circle"></i> </a>
+            <strong style="float: right">&nbsp;&nbsp;</strong>
+            <a align="right" title="EDIT" href="{{ path('license_edit', { 'id': license.id }) }}" class="btn btn-default"  style="background-color: #a1c9c2; color: black; float: right"><i class="fas fa-edit"></i> </a>            
             {#            <small>List</small>#}
         </div>        
         <div class="card-body">  
             <div class="panel panel-body">
                 {% if license.active == true %}
-                    {% set status = "ACTIVE" %}                
+                    {% set status = "ACTIVE" %}   
+                    {% set class = "badge badge-success" %}   
                 {% else %}    
                     {% set status = "INACTIVE" %}
+                    {% set class = "badge badge-danger" %}  
                 {% endif %}
                 {#{% set NameCategoria =  ''%}  
                 {% for license in  license %}
@@ -19,87 +50,263 @@
                         {% set NameCategoria =  ArrayCategoryExams%}  
                     {% endif %}
                 {% endfor %}#}
-                <table id="tableExams" class="table table-bordered" > 
-                    <thead> 
-                        <tr> 
-                            <td style="width: 0px"><b>License:</b></td><td style="width: 100px">{{ license.license }}</td>
-                        <tr>
-                            <td style="width: 0px"><b>Users Quantity:</b></td><td style="width: 100px">{{ license.usersquantity }}</td>
-                        </tr>
-                        <tr>
-                            <td style="width: 0px"><b>Number of Clients:</b></td><td style="width: 100px">{{ license.numberclients }}</td>
-                        </tr>
-                        <tr>
-                            <td style="width: 0px"><b>Number of Exams:</b></td><td style="width: 100px">{{ license.numberexams }}</td>
-                        </tr>
-                        <tr>
-                            <td style="width: 0px"><b>Duration Time:</b></td><td style="width: 100px">{{ license.durationtime }}</td>
-                        </tr>
-                        <tr>
-                            <td style="width: 0px"><b>Notice of Payment:</b></td><td style="width: 100px">{{ license.noticepayment }}</td>
-                        </tr>
-                        <tr>
-                            <td style="width: 0px"><b>Description:</b></td><td style="width: 100px">{{ license.description }}</td>
-                        </tr>
-                        <tr>
-                            <td style="width: 0px"><b>Amount:</b></td><td style="width: 100px">{{ license.amount }}</td>
-                        </tr>                
-                        <tr>
-                            <td style="width: 0px"><b>Status:</b></td><td style="width: 100px">{{ status }}</td>
-                        </tr>                                               
-                    </thead> 
-                </table>   
-                <table class="table table-bordered" style="width: 560px">
-                    <thead> 
-                        <tr><td><b>EXAMS</b></td></tr>
-                    </thead>
-                    <tbody>
-                        {% for examsArray in  license.exams %}
-                            {% set NameExams = '' %}   
-                            {% for exams in  exams %}
-                                {% if examsArray == exams.id %}
-                                    {% set NameExams =  exams.name %}  
-                                {% endif %}
-                            {% endfor %}
-                            <tr><td>{{ NameExams }}</td></tr>                    
-                        {% endfor %}
-                    </tbody>
-                </table>
-                <table class="table table-bordered" style="width: 560px">
-                    <thead> 
-                        <tr><td><b>MODULES</b></td></tr>
-                    </thead>
-                    <tbody>
-                        {% for modulesArray in  license.modules %}
-                            {% set NameModule = '' %}   
-                            {% for ArrayModules in  ArrayModules %}
-                                {% if modulesArray == loop.index-1 %}
-                                    {% set NameModule =  ArrayModules %}  
-                                {% endif %}
-                            {% endfor %}
-                            <tr><td>{{ NameModule }}</td></tr>                    
-                        {% endfor %}
-                    </tbody>
-                </table>
-                <table class="table table-bordered" style="width: 560px">
-                    <thead> 
-                        <tr><td><b>COUNTRIES</b></td></tr>
-                    </thead>
-                    <tbody>
-                        {% for countriesArray in  license.countries %}
-                            {% set NameCountry = '' %}   
-                            {% for countries in  countries %}
-                                {% if countriesArray == countries.id %}
-                                    {% set NameCountry =  countries.name %}  
-                                {% endif %}
-                            {% endfor %}
-                            <tr><td>{{ NameCountry }}</td></tr>                    
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+                <table class="table table-responsive-sm table-bordered table-striped table-sm">
+                    <tr> 
+                        <td align = "justify" style="width: 50px"><b>License</b></td>
+                        <td align = "justify" style="width: 100px">{{ license.license }}</td>
+                    <tr>
+                        <td align = "justify" style="width: 50px"><b>Users Quantity</b></td>
+                        <td align = "justify" style="width: 100px">{{ license.usersquantity }}</td>
+                    </tr>
+                    <tr>
+                        <td align = "justify" style="width: 50px"><b>Number of Clients</b></td>
+                        <td align = "justify" style="width: 100px">{{ license.numberclients }}</td>
+                    </tr>
+                    <tr>
+                        <td align = "justify" style="width: 50px"><b>Number of Exams</b></td>
+                        <td align = "justify" style="width: 100px">{{ license.numberexams }}</td>
+                    </tr>
+                    <tr>
+                        <td align = "justify" style="width: 50px"><b>Duration Time</b></td>
+                        <td align = "justify" style="width: 100px">{{ license.durationtime }}</td>
+                    </tr>
+                    <tr>
+                        <td align = "justify" style="width: 50px"><b>Notice of Payment</b></td>
+                        <td align = "justify" style="width: 100px">{{ license.noticepayment }}</td>
+                    </tr>
+                    <tr>
+                        <td align = "justify" style="width: 50px"><b>Description</b></td>
+                        <td align = "justify" style="width: 100px">{{ license.description }}</td>
+                    </tr>
+                    <tr>
+                        <td align = "justify" style="width: 50px"><b>Amount</b></td>
+                        <td align = "justify" style="width: 100px">{{ license.amount }}</td>
+                    </tr>                
+                    <tr>
+                        <td align = "justify" style="width: 50px"><b>Status</b></td>
+                        <td align = "justify" style="width: 100px"><span class = "{{class}}">{{status}}</span></td>           
+                    </tr>        
+                    <tr>
+                        <td align = "justify" style="width: 50px"><b>Exams</b></td>
+                        <td align = "justify" style="width: 50px"><button id="btnModalExams" title="View Exams" class="btn btn-primary btn-sm"><b>View</b></button></td>                        
+                    </tr>                    
+                    <tr>
+                        <td align = "justify" style="width: 50px"><b>Modules</b></td>
+                        <td align = "justify" style="width: 50px"><button id="btnModalModules" title="View Modules" class="btn btn-primary btn-sm"><b>View</b></button></td>                        
+                    </tr>                    
+                    <tr>
+                        <td align = "justify" style="width: 50px"><b>Countries</b></td>
+                        <td align = "justify" style="width: 50px"><button id="btnModalCountries" title="View Countries" class="btn btn-primary btn-sm"><b>View</b></button></td>                        
+                    </tr>                    
+                </table>                               
+                <div id="examModal" class="mascara">
+                    <div class="contenido" style="">
+                        <span class="close" onclick="$('#examModal').hide();">&times;</span><br><br>
+                        <table class="table table-responsive-sm table-striped scrolled-wrapper">
+                            <tr> 
+                                <td align="center"><b>Exams</b></td>                                                                       
+                            </tr>         
 
+                            {% for exams in exams %}
+                                {% if exams.id in license.exams %}
+                                    <tr> 
+                                        <td align="center">{{exams.name}}</td>                                                                       
+                                    </tr>                                
+                                {% endif %}  
+                            {% endfor %}
+                        </table>  
+                    </div>
+                </div>
+                <div id="modulesModal" class="mascara">
+                    <div class="contenido" style="">
+                        <span class="close" onclick="$('#modulesModal').hide();">&times;</span><br><br>
+                        <table class="table table-responsive-sm table-striped scrolled-wrapper">
+                            <tr> 
+                                <td align="center"><b>Modules</b></td>                                                                       
+                            </tr>         
+
+                            {% for ArrayModules in ArrayModules %}
+                                {% if loop.index-1 in license.modules %}
+                                    <tr> 
+                                        <td align="center">{{ArrayModules}}</td>                                                                       
+                                    </tr>                                
+                                {% endif %}  
+                            {% endfor %}
+                        </table>  
+                    </div>
+                </div>
+                <div id="countriesModal" class="mascara">
+                    <div class="contenido" style="">
+                        <span class="close" onclick="$('#countriesModal').hide();">&times;</span><br><br>
+                        <table class="table table-responsive-sm table-striped scrolled-wrapper">
+                            <tr> 
+                                <td align="center"><b>Countries</b></td>                                                                       
+                            </tr>         
+
+                            {% for countries in countries %}
+                                {% if countries.id in license.countries %}
+                                    <tr> 
+                                        <td align="center">{{countries.name}}</td>                                                                       
+                                    </tr>                                
+                                {% endif %}  
+                            {% endfor %}
+                        </table>  
+                    </div>
+                </div>
+            </div>
             <a class="btn btn-primary" href="{{ path('license_list') }}">Return</a>
         </div>
     </div>
+
+    <style type="text/css">
+        .mascara {
+            display: none; 
+            position: fixed; 
+            z-index: 1; 
+            padding-top: 100px; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgb(0,0,0); 
+            background-color: rgba(0,0,0,0.4); 
+            -webkit-transition: opacity 400ms ease-in;
+            -moz-transition: opacity 400ms ease-in;
+            transition: opacity 400ms ease-in;
+            pointer-events: auto;
+        }
+        .mascara > div {
+            width: 350px;
+            top: -25%;
+            position: relative;
+            margin: 10% auto;
+            padding: 5px 20px 13px 20px;
+            border-radius: 10px;
+            background: #e3e3e4;  /* fallback for old browsers */
+            {#background: -webkit-linear-gradient(to left, #FFFFFF, #FFEFBA);  /* Chrome 10-25, Safari 5.1-6 */
+            background: linear-gradient(to left, #FFFFFF, #FFEFBA); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+            -webkit-transition: opacity 400ms ease-in;
+            -moz-transition: opacity 400ms ease-in;#}
+            transition: opacity 400ms ease-in;
+        }
+        .contenido {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 50%;  
+            height: auto;
+            overflow-y: auto;
+            -webkit-animation-name: animatetop;
+            -webkit-animation-duration: 0.4s;
+            animation-name: animatetop;
+            animation-duration: 0.4s
+        }
+        /* Add Animation */
+        @-webkit-keyframes animatetop {
+            from {top:-300px; opacity:0} 
+            to {top:0; opacity:1}
+        }
+
+        @keyframes animatetop {
+            from {top:-300px; opacity:0}
+            to {top:0; opacity:1}
+        }
+        {#.close {
+            background: #000;
+            color: #FFFFFF;
+            line-height: 25px;
+            position: absolute;
+            right: -12px;
+            text-align: center;
+            top: -10px;
+            width: 24px;
+            text-decoration: none;
+            font-weight: bold;
+            -webkit-border-radius: 12px;
+            -moz-border-radius: 12px;
+            border-radius: 12px;
+            -moz-box-shadow: 1px 1px 3px #000;
+            -webkit-box-shadow: 1px 1px 3px #000;
+            box-shadow: 1px 1px 3px #000;
+        }
+        .close:hover { background: #00d9ff; }
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }#}
+        /* The Close Button */
+        .close {
+            color: #000;
+            float: end;
+            font-size: 30px;
+            font-weight: bold;
+            background: #000;
+            color: #FFFFFF;
+            line-height: 25px;
+            position: absolute;
+            right: 20px;
+            text-align: center;
+            top: 10px;
+            width: 34px;
+            text-decoration: none;
+            font-weight: bold;
+            -webkit-border-radius: 12px;
+            -moz-border-radius: 12px;
+            border-radius: 12px;
+            -moz-box-shadow: 1px 1px 3px #000;
+            -webkit-box-shadow: 1px 1px 3px #000;
+            box-shadow: 1px 1px 3px #000;
+
+        }
+        .close:hover { background: #00d9ff; }
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            var examModal = document.getElementById('examModal');
+            var modulesModal = document.getElementById('modulesModal');
+            var countriesModal = document.getElementById('countriesModal');
+            var btn = document.getElementById("btnModalExams");
+            var btnModalModules = document.getElementById("btnModalModules");
+            var btnModalCountries = document.getElementById("btnModalCountries");
+
+            btn.onclick = function () {
+                examModal.style.display = "block";
+            }
+
+            btnModalModules.onclick = function () {
+                modulesModal.style.display = "block";
+            }
+
+            btnModalCountries.onclick = function () {
+                countriesModal.style.display = "block";
+            }
+
+            window.onclick = function (event) {
+                if (event.target == examModal) {
+
+                    examModal.style.display = "none";
+
+                } else if (event.target == modulesModal) {
+
+                    modulesModal.style.display = "none";
+
+                } else if (event.target == countriesModal) {
+
+                    countriesModal.style.display = "none";
+                }
+            }
+
+
+        });
+    </script>      
 {% endblock %}

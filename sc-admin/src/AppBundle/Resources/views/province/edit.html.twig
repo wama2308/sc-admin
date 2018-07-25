@@ -1,5 +1,29 @@
 {% extends '@App/base.html.twig' %}
 
+{% block ol %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{{ path('homepage') }}">Home</a>
+        </li>
+        <li class="breadcrumb-item active">
+            <a href="{{ path('province_list') }}">Provinces</a>
+        </li>
+        <li class="breadcrumb-item active">Update</li>
+        <!-- Breadcrumb Menu-->
+        <li class="breadcrumb-menu d-md-down-none">
+            {#<div class="btn-group" role="group" aria-label="Button group">
+                <a class="btn" href="#">
+                    <i class="icon-speech"></i>
+                </a>
+                <a class="btn" href="./">
+                    <i class="icon-graph"></i>  Dashboard</a>
+                <a class="btn" href="#">
+                    <i class="icon-settings"></i>  Settings</a>
+            </div>#}
+        </li>
+    </ol>        
+{% endblock %}
+
 {% block body %}
     <div class="card">
         <div class="card-header">
@@ -29,8 +53,8 @@
                     <input name="province" id="province" type="text" value="{{ country.provinces[posicionProvince]['name'] }}" placeholder="Province" class="form-control">
                 </div>
                 <div class="form-group">       
-                    <input type="submit" value="Save" class="btn btn-primary" id="button">&nbsp;&nbsp;&nbsp;
-                    <a class="btn btn-primary" href="{{ path('province_list') }}">Return</a>
+                    <input type="submit" value="Edit" class="btn btn-primary" id="button">&nbsp;&nbsp;&nbsp;
+                    <a class="btn btn-primary" href="{{ path('province_details', { 'id': country.id, 'posicionProvince': posicionProvince}) }}">Return</a>                    
                 </div>
             </form>
 

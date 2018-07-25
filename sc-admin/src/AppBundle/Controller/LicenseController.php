@@ -161,7 +161,7 @@ class LicenseController extends Controller {
 
             $this->addFlash('notice', 'License Updated');
 
-            return $this->redirectToRoute('license_list');
+            return $this->redirectToRoute('license_details', array('id' => $id));
         }
 
         $exams = $this->get('doctrine_mongodb')->getRepository('AppBundle:Exams')->findByActive(true);
@@ -202,7 +202,7 @@ class LicenseController extends Controller {
 
         $this->addFlash('error', 'License Removed');
 
-        return $this->redirectToRoute('license_list');
+        return $this->redirectToRoute('license_details', array('id' => $id));
     }
 
 }

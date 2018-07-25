@@ -1,5 +1,29 @@
 {% extends '@App/base.html.twig' %}
 
+{% block ol %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{{ path('homepage') }}">Home</a>
+        </li>
+        <li class="breadcrumb-item active">
+            <a href="{{ path('license_list') }}">License</a>
+        </li>
+        <li class="breadcrumb-item active">Update</li>
+        <!-- Breadcrumb Menu-->
+        <li class="breadcrumb-menu d-md-down-none">
+            {#<div class="btn-group" role="group" aria-label="Button group">
+                <a class="btn" href="#">
+                    <i class="icon-speech"></i>
+                </a>
+                <a class="btn" href="./">
+                    <i class="icon-graph"></i>  Dashboard</a>
+                <a class="btn" href="#">
+                    <i class="icon-settings"></i>  Settings</a>
+            </div>#}
+        </li>
+    </ol>        
+{% endblock %}
+
 {% block body %}
     <div class="card">
         <div class="card-header">
@@ -123,7 +147,7 @@
                     <div class="form-group">       
                         <input type="submit" value="Edit" class="btn btn-primary" id="button">&nbsp;&nbsp;&nbsp;
                         {#                <input type="button" value="wama" class="btn btn-primary" id="" onclick="wama();">&nbsp;&nbsp;&nbsp;#}
-                        <a class="btn btn-primary" href="{{ path('license_list') }}">Return</a>
+                        <a class="btn btn-primary" href="{{ path('license_details', { 'id': license.id }) }}">Return</a>
                     </div>
                 </form>      
             </div>    

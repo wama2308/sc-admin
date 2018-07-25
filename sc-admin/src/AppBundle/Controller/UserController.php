@@ -82,10 +82,10 @@ class UserController extends Controller {
 
             $this->addFlash('notice', 'User Updated');
 
-            return $this->redirectToRoute('users_list');
+            return $this->redirectToRoute('users_details', array('id' => $id));
         }
 
-        return $this->render('@App/user/editProfile.html.twig', array('country' => $user, 'form' => $form->createView()));
+        return $this->render('@App/user/editProfile.html.twig', array('country' => $user, 'id' => $id, 'form' => $form->createView()));
     }
 
     /**
@@ -160,10 +160,10 @@ class UserController extends Controller {
 
             $this->addFlash('notice', 'Password Changed');
 
-            return $this->redirectToRoute('users_list');
+            return $this->redirectToRoute('users_details', array('id' => $id));
         }
 
-        return $this->render('@App/user/changePassword.html.twig', array('country' => $user, 'form' => $form->createView()));
+        return $this->render('@App/user/changePassword.html.twig', array('country' => $user, 'id' => $id, 'form' => $form->createView()));
     }
 
     /**
@@ -181,7 +181,16 @@ class UserController extends Controller {
 
         $this->addFlash('error', 'User Removed');
 
-        return $this->redirectToRoute('users_list');
+        return $this->redirectToRoute('users_details', array('id' => $id));
+    }
+    
+    /**
+     * @Route("/users/details/{id}", name="users_details")
+     * @Method("GET")
+     */
+    public function detailsAction($id) {
+        $user = $this->get('doctrine_mongodb')->getRepository('AppBundle:User')->find($id);
+        return $this->render('@App/user/detailsUser.html.twig', array('user' => $user));
     }
 
 }

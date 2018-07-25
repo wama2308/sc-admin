@@ -1,4 +1,29 @@
 {% extends '@App/base.html.twig' %}
+
+{% block ol %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{{ path('homepage') }}">Home</a>
+        </li>
+        <li class="breadcrumb-item active">
+            <a href="{{ path('users_list') }}">Users</a>
+        </li>
+        <li class="breadcrumb-item active">Edit Profile</li>
+        <!-- Breadcrumb Menu-->
+        <li class="breadcrumb-menu d-md-down-none">
+            {#<div class="btn-group" role="group" aria-label="Button group">
+                <a class="btn" href="#">
+                    <i class="icon-speech"></i>
+                </a>
+                <a class="btn" href="./">
+                    <i class="icon-graph"></i>  Dashboard</a>
+                <a class="btn" href="#">
+                    <i class="icon-settings"></i>  Settings</a>
+            </div>#}
+        </li>
+    </ol>        
+{% endblock %}
+
 {% block body %}
     <div class="card">
         <div class="card-header">
@@ -9,7 +34,7 @@
         <div class="card-body">
             {{ form_start(form) }}
             {{ form_widget(form) }}
-            <a class="btn btn-primary" style="position: relative; top: -50px; left:85px" href="{{ path('users_list') }}">Return</a>
+            <a class="btn btn-primary" style="position: relative; top: -50px; left:85px" href="{{ path('users_details', { 'id': id }) }}">Return</a>
             {{ form_end(form) }}
         </div>
     </div>
