@@ -18,7 +18,7 @@ use AppBundle\Document\UsersFront;
 use \Datetime;
 use AppBundle\Document\GeneralConfiguration;
 
-class ApiRestCheckMaster extends Controller {
+class ApiRestUserController extends Controller {
 //  validation_code medical center master: 0 =  inicio, 1 = codigo enviado, 2 = codigo vencido
 //  validation_code reset_password: 0 =  inicio, 1 = codigo enviado, 2 = codigo vencido
 //  validation_code unlock_user: 0 =  inicio, 1 = codigo enviado, 2 = codigo vencido
