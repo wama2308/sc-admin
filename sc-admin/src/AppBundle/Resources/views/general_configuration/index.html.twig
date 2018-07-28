@@ -1,0 +1,78 @@
+{% extends '@App/base.html.twig' %}
+
+{% block ol %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{{ path('homepage') }}">Home</a>
+        </li>
+        <li class="breadcrumb-item active">
+            <a href="{{ path('modules_list') }}">Modules</a>
+        </li>
+        <li class="breadcrumb-item active">List</li>
+        <!-- Breadcrumb Menu-->
+        <li class="breadcrumb-menu d-md-down-none">
+            {#<div class="btn-group" role="group" aria-label="Button group">
+                <a class="btn" href="#">
+                    <i class="icon-speech"></i>
+                </a>
+                <a class="btn" href="./">
+                    <i class="icon-graph"></i>  Dashboard</a>
+                <a class="btn" href="#">
+                    <i class="icon-settings"></i>  Settings</a>
+            </div>#}
+        </li>
+    </ol>        
+{% endblock %}
+
+{% block body %}
+    <div class="card">
+        <div class="card-header">
+            <a class="btn btn-primary" href="{{ path('modules_create') }}" role="button"><i class="fas fa-plus-circle"></i> </a>&nbsp;&nbsp;&nbsp;&nbsp;          
+            <strong>List Modules</strong>
+            {#            <small>List</small>#}
+        </div>        
+        <div class="card-body">
+            <div></div>
+
+            <table id="tableModules" class="table table-responsive-sm table-striped"> 
+                <thead> 
+                    <tr> 
+                        <th>Name</th>    
+                        <th>Route</th>    
+                        <th>Action</th>    
+                        <th>Status</th>    
+                    </tr> 
+                </thead> 
+                <tbody> 
+                    {% for modules in modules %}
+                        {% if modules.status == 1 %}
+                            {% set status = "ACTIVE" %}             
+                            {% set class = "badge badge-success" %}   
+                        {% else %}    
+                            {% set status = "INACTIVE" %}
+                            {% set class = "badge badge-danger" %}   
+                        {% endif %}                        
+                        <tr> 
+{#                            <td><a title="View Details" class="nav-link" href="{{ path('modules_details', { 'positionModules': loop.index-1 }) }}">{{modules.name}}</a></td>                                 #}
+                            <td><a title="View Details" class="nav-link" href="{{ path('modules_details', { 'id': modules._id, 'positionModule': loop.index-1  }) }}">{{modules.name}}</a></td>                                 
+                            <td>{{modules.route}}</td>         
+                            <td>{{modules.action}}</td>      
+                            <td><span class = "{{class}}">{{status}}</span></td>      
+                        </tr>   
+
+                    {% endfor %}
+                </tbody> 
+            </table>    
+        </div>
+    </div>
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            $('#tableModules')
+                    .addClass('nowrap')
+                    .dataTable();
+        });
+
+    </script>  
+
+{% endblock %}

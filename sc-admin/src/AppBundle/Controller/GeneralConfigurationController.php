@@ -11,26 +11,18 @@ use Symfony\Component\HttpFoundation\Request;
 class GeneralConfigurationController extends Controller {
 
     /**
-     * @Route("/general_configuration/index", name="general_configuration_list")     
+     * @Route("/modules/index", name="modules_list")     
      * @Method("GET")
      */
     public function listAction(Request $request) {
 
-//        $m = $this->container->get('doctrine_mongodb.odm.default_connection');
-//        $db = $m->selectDatabase('smart_clinic');
-//        $collection = $db->createCollection('Country');
-//        $countries = $collection->find();
-//        return $this->render('@Admin/country/index.html.twig', array('countries' => $countries));
-        //var_dump($countries);
-//        $countries = $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->findAll();
-//        //var_dump($countries);
-//        $GeneralConfiguration = $this->get('doctrine_mongodb')->getRepository('AppBundle:GeneralConfiguration')->find("5ae08f86c5dfa106dc92610a");
-//        $ArrayLanguajes = $GeneralConfiguration->getLanguajes();
-//        return $this->render('@App/country/index.html.twig', array('countries' => $countries, 'ArrayLanguajes' => $ArrayLanguajes));
+        $GeneralConfiguration = $this->get('doctrine_mongodb')->getRepository('AppBundle:GeneralConfiguration')->find("5ae08f86c5dfa106dc92610a");
+        $modules = $GeneralConfiguration->getModules();
+        return $this->render('@App/general_configuration/index.html.twig', array('modules' => $modules));
     }
 
     /**
-     * @Route("/general_configuration/create", name="general_configuration_create")
+     * @Route("/modules/create", name="modules_create")
      * @Method({"GET", "POST"})
      */
     public function createAction(Request $request) {
@@ -39,152 +31,135 @@ class GeneralConfigurationController extends Controller {
         $user = $this->getUser()->getId();
 
         $form->handleRequest($request);
-        $name = $request->request->get("country");
-        $timeZone = $request->request->get("time_zone");
-        $acronym = $request->request->get("acronym");
-        $coin = $request->request->get("coin");
-        $currencySymbol = $request->request->get("currency_symbol");
-        $taxRate = $request->request->get("tax_rate");
-        $telefonePrefix = $request->request->get("telefone_prefix");
-        $languaje = $request->request->get("languaje");
-        $issuingbank = $request->request->get("issuingbank");
-        $arrayIssuingbank = explode(",", $issuingbank);
-        $receivingbank = $request->request->get("receivingbank");
-        $arrayReceivingbank = explode(",", $receivingbank);
-        $waytopay = $request->request->get("waytopay");
-        $arrayWaytopay = explode(",", $waytopay);
+        $module = $request->request->get("module");
+        $route = $request->request->get("route");
+        $action = $request->request->get("action");
+        $description = $request->request->get("description");
+        $permits = $request->request->get("permits");
+        $arrayPermits = explode(",", $permits);
+
 
         //if ($form->isSubmitted() && $form->isValid()) {
-        if (($name != "") && ($timeZone != "") && ($acronym != "") && ($coin != "") && ($currencySymbol != "") && ($taxRate != "") && ($telefonePrefix != "") && ($languaje != "")) {
+        if (($module != "") && ($route != "") && ($action != "") && ($description != "") && ($permits != "")) {
 
             $fechaNow = new \MongoDate();
 
-            $country = new Country();
-            $country->setName($name);
-            $country->setTimezone($timeZone);
-            $country->setAcronym($acronym);
-            $country->setCoin($coin);
-            $country->setCurrencySymbol($currencySymbol);
-            $country->setTaxRate($taxRate);
-            $country->setTelephonePrefix($telefonePrefix);
-            $country->setActive(true);
-            $country->setLanguaje($languaje);
-            $country->setIssuingbank($arrayIssuingbank);
-            $country->setReceivingbank($arrayReceivingbank);
-            $country->setWaytopay($arrayWaytopay);
-            $country->setCreatedAt($fechaNow);
-            $country->setCreatedBy($user);
-            $country->setUpdatedAt($fechaNow);
-            $country->setUpdatedBy($user);
+            $GeneralConfiguration = $this->get('doctrine_mongodb')->getRepository('AppBundle:GeneralConfiguration')->find("5ae08f86c5dfa106dc92610a");
+            $arrayModules = $GeneralConfiguration->getModules();
+            $module_id = new \MongoId();
+
+            $arrayModules[] = array(
+                "_id" => $module_id,
+                "name" => $module,
+                "route" => $route,
+                "action" => $action,
+                "description" => $description,
+                "permits" => $arrayPermits,
+                "status" => 1,
+                "created_at" => $fechaNow,
+                "created_by" => $user,
+                "updated_at" => $fechaNow,
+                "updated_by" => $user);
+
+            $GeneralConfiguration->setModules($arrayModules);
 
             $dm = $this->get('doctrine_mongodb')->getManager();
-            $dm->persist($country);
+            $dm->persist($GeneralConfiguration);
             $dm->flush();
 
-            $this->addFlash('notice', 'Registered Country');
+            $this->addFlash('notice', 'Registered Module');
 
-            return $this->redirectToRoute('country_list');
+//            return $this->redirectToRoute('modules_list');
         }
 
-        $GeneralConfiguration = $this->get('doctrine_mongodb')->getRepository('AppBundle:GeneralConfiguration')->find("5ae08f86c5dfa106dc92610a");
-        $ArrayLanguajes = $GeneralConfiguration->getLanguajes();
-        return $this->render('@App/country/create.html.twig', array('ArrayLanguajes' => $ArrayLanguajes));
+        return $this->render('@App/general_configuration/create.html.twig');
     }
 
     /**
-     * @Route("/general_configuration/edit/{id}", name="general_configuration_edit")
+     * @Route("/modules/edit/{id}/{positionModule}", name="modules_edit")
      * @Method({"GET", "POST"})
      */
-    public function editAction($id, Request $request) {
+    public function editAction($id, $positionModule, Request $request) {
         $country = $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->find($id);
         $fechaNow = new \MongoDate();
         $user = $this->getUser()->getId();
 
-        $country->setName($country->getName());
-        $country->setTimezone($country->getTimezone());
-        $country->setAcronym($country->getAcronym());
-        $country->setCoin($country->getCoin());
-        $country->setCurrencySymbol($country->getCurrencySymbol());
-        $country->setTaxRate($country->getTaxRate());
-        $country->setTelephonePrefix($country->getTelephonePrefix());
-        $country->setLanguaje($country->getLanguaje());
-        $country->setIssuingbank($country->getIssuingbank());
-        $country->setReceivingbank($country->getReceivingbank());
-        $country->setWaytopay($country->getWaytopay());
+        $module = $request->request->get("module");
+        $route = $request->request->get("route");
+        $action = $request->request->get("action");
+        $description = $request->request->get("description");
+        $permits = $request->request->get("permits");
+        $arrayPermits = explode(",", $permits);
 
-        $name = $request->request->get("country");
-        $timeZone = $request->request->get("time_zone");
-        $acronym = $request->request->get("acronym");
-        $coin = $request->request->get("coin");
-        $currencySymbol = $request->request->get("currency_symbol");
-        $taxRate = $request->request->get("tax_rate");
-        $telefonePrefix = $request->request->get("telefone_prefix");
-        $languaje = $request->request->get("languaje");
-        $issuingbank = $request->request->get("issuingbank");
-        $arrayIssuingbank = explode(",", $issuingbank);
-        $receivingbank = $request->request->get("receivingbank");
-        $arrayReceivingbank = explode(",", $receivingbank);
-        $waytopay = $request->request->get("waytopay");
-        $arrayWaytopay = explode(",", $waytopay);
+        if (($module != "") && ($route != "") && ($action != "") && ($description != "") && ($permits != "")) {
 
-        if (($name != "") && ($timeZone != "") && ($acronym != "") && ($coin != "") && ($currencySymbol != "") && ($taxRate != "") && ($telefonePrefix != "") && ($languaje != "")) {
+            $fechaNow = new \MongoDate();
+
+            $GeneralConfiguration = $this->get('doctrine_mongodb')->getRepository('AppBundle:GeneralConfiguration')->find("5ae08f86c5dfa106dc92610a");
+            $arrayModules = $GeneralConfiguration->getModules();
+            
+            $arrayModules[$positionModule]["name"] = $module;
+            $arrayModules[$positionModule]["route"] = $route;
+            $arrayModules[$positionModule]["action"] = $action;
+            $arrayModules[$positionModule]["description"] = $description;
+            $arrayModules[$positionModule]["permits"] = $arrayPermits;
+            $arrayModules[$positionModule]["updated_at"] = $fechaNow;
+            $arrayModules[$positionModule]["updated_by"] = $user;
+            
+            $GeneralConfiguration->setModules($arrayModules);
+           
 
             $dm = $this->get('doctrine_mongodb')->getManager();
-            $country = $dm->getRepository('AppBundle:Country')->find($id);
-
-            $country->setName($name);
-            $country->setTimezone($timeZone);
-            $country->setAcronym($acronym);
-            $country->setCoin($coin);
-            $country->setCurrencySymbol($currencySymbol);
-            $country->setTaxRate($taxRate);
-            $country->setTelephonePrefix($telefonePrefix);
-            $country->setLanguaje($languaje);
-            $country->setIssuingbank($arrayIssuingbank);
-            $country->setReceivingbank($arrayReceivingbank);
-            $country->setWaytopay($arrayWaytopay);
-            $country->setUpdatedAt($fechaNow);
-            $country->setUpdatedBy($user);
-
+            $dm->persist($GeneralConfiguration);
             $dm->flush();
 
-            $this->addFlash('notice', 'Country Updated');
+            $this->addFlash('notice', 'Module Updated');
 
-            return $this->redirectToRoute('country_details', array('id' => $id));
+            return $this->redirectToRoute('modules_details', array('id' => $id, 'positionModule' => $positionModule));
         }
 
         $GeneralConfiguration = $this->get('doctrine_mongodb')->getRepository('AppBundle:GeneralConfiguration')->find("5ae08f86c5dfa106dc92610a");
-        $ArrayLanguajes = $GeneralConfiguration->getLanguajes();
-        return $this->render('@App/country/edit.html.twig', array('country' => $country, 'ArrayLanguajes' => $ArrayLanguajes));
+        $modules = $GeneralConfiguration->getModules();
+        return $this->render('@App/general_configuration/edit.html.twig', array('modules' => $modules, 'id' => $id, 'positionModule' => $positionModule));
     }
 
     /**
-     * @Route("/general_configuration/details/{id}", name="general_configuration_details")
+     * @Route("/modules/details/{id}/{positionModule}", name="modules_details")
      * @Method("GET")
      */
-    public function detailsAction($id) {
-        $country = $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->find($id);
+    public function detailsAction($id, $positionModule) {
+
         $GeneralConfiguration = $this->get('doctrine_mongodb')->getRepository('AppBundle:GeneralConfiguration')->find("5ae08f86c5dfa106dc92610a");
-        $ArrayLanguajes = $GeneralConfiguration->getLanguajes();
-        return $this->render('@App/country/details.html.twig', array('country' => $country, 'ArrayLanguajes' => $ArrayLanguajes));
+        $arrayModules = $GeneralConfiguration->getModules();
+        $id = $arrayModules[$positionModule]["_id"];
+        $name = $arrayModules[$positionModule]["name"];
+        $route = $arrayModules[$positionModule]["route"];
+        $action = $arrayModules[$positionModule]["action"];
+        $description = $arrayModules[$positionModule]["description"];
+        $statusModule = $arrayModules[$positionModule]["status"];
+        $permits = $arrayModules[$positionModule]["permits"];
+        //var_dump($permits);
+        return $this->render('@App/general_configuration/details.html.twig', array('id' => $id, 'name' => $name, 'route' => $route, 'action' => $action, 'statusModule' => $statusModule, 'permits' => $permits, 'description' => $description, 'positionModule' => $positionModule));
     }
 
     /**
-     * @Route("/general_configuration/delete/{id}", name="general_configuration_delete")
+     * @Route("/modules/delete/{id}/{positionModule}", name="modules_delete")
      * @Method("GET")
      */
-    public function deleteAction($id) {
+    public function deleteAction($id, $positionModule) {
+
+        $GeneralConfiguration = $this->get('doctrine_mongodb')->getRepository('AppBundle:GeneralConfiguration')->find("5ae08f86c5dfa106dc92610a");
+        $arrayModules = $GeneralConfiguration->getModules();
+        $arrayModules[$positionModule]["status"] = 0;
+        $GeneralConfiguration->setModules($arrayModules);
 
         $dm = $this->get('doctrine_mongodb')->getManager();
-        $country = $dm->getRepository('AppBundle:Country')->find($id);
-
-        $country->setActive(false);
-
+        $dm->persist($GeneralConfiguration);
         $dm->flush();
 
-        $this->addFlash('error', 'Country Removed');
+        $this->addFlash('error', 'Module Removed');
 
-        return $this->redirectToRoute('country_details', array('id' => $id));
-    }    
+        return $this->redirectToRoute('modules_details', array('id' => $id, 'positionModule' => $positionModule));
+    }
 
 }

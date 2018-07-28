@@ -1,0 +1,96 @@
+{% extends '@App/base.html.twig' %}
+
+{% block ol %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{{ path('homepage') }}">Home</a>
+        </li>
+        <li class="breadcrumb-item active">
+            <a href="{{ path('modules_list') }}">Modules</a>
+        </li>
+        <li class="breadcrumb-item active">Update</li>
+        <!-- Breadcrumb Menu-->
+        <li class="breadcrumb-menu d-md-down-none">
+            {#<div class="btn-group" role="group" aria-label="Button group">
+                <a class="btn" href="#">
+                    <i class="icon-speech"></i>
+                </a>
+                <a class="btn" href="./">
+                    <i class="icon-graph"></i>  Dashboard</a>
+                <a class="btn" href="#">
+                    <i class="icon-settings"></i>  Settings</a>
+            </div>#}
+        </li>
+    </ol>        
+{% endblock %}
+
+{% block body %}
+    <div class="card">
+        <div class="card-header">
+            <strong>Update Module</strong>
+            {#            <small>List</small>#}
+        </div>
+        <div class="card-body">
+            <div class="card-block">
+                <form action="" method="post" id="formid">    
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input name="module" id="module" type="text" value="{{ modules[positionModule]['name'] }}" placeholder="Name" class="form-control">
+                    </div>           
+                    <div class="form-group">
+                        <label>Route</label>
+                        <input name="route" id="route" type="text" value="{{ modules[positionModule]['route'] }}" placeholder="Route" class="form-control">
+                    </div>           
+                    <div class="form-group">
+                        <label>Action</label>
+                        <input name="action" id="action" type="text" value="{{ modules[positionModule]['action'] }}" placeholder="Action" class="form-control">
+                    </div>      
+                    <div class="form-group">         
+                        <label>Description</label>
+                        <textarea name="description" id="description" type="text" class="form-control">{{ modules[positionModule]['description'] }}</textarea>
+                    </div>
+                    <div class="form-group"> 
+                        <label>Permits</label>
+                        <input name="permits" id="permits" type="text" value="{{ modules[positionModule]['permits']|join(',') }}" style="text-transform: uppercase" placeholder="Permits" class="form-control" data-role="tagsinput" >                
+                    </div>
+                    <div class="form-group">       
+                        <input type="submit" value="Edit" class="btn btn-primary" id="button">&nbsp;&nbsp;&nbsp;
+                        <a class="btn btn-primary" href="{{ path('modules_details', { 'id': id, 'positionModule': positionModule  }) }}">Return</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $("#button").click(function () {
+                        $(".error").remove();
+                        if ($("#module").val() == "") {
+                                $("#module").focus().after("<span class='error' style='color:#FF0000;'>Enter the name module</span>");
+                                return false;
+                        } else if ($("#route").val() == "") {
+                                $("#route").focus().after("<span class='error' style='color:#FF0000;'>Enter the route</span>");
+                                return false;
+                        } else if ($("#action").val() == "") {
+                                $("#action").focus().after("<span class='error' style='color:#FF0000;'>Enter the action</span>");
+                                return false;
+                        } else if ($("#description").val() == "") {
+                                $("#description").focus().after("<span class='error' style='color:#FF0000;'>Enter the description</span>");
+                                return false;
+                        } else if ($("#permits").val() == "") {
+                                $("#permits").focus().after("<span class='error' style='color:#FF0000;'>Enter the permits</span>");
+                                return false;
+                        }
+            });
+            $("#module, #route, #action, #description, #permits").keyup(function () {
+                        if ($(this).val() != "") {
+                                $(".error").fadeOut();
+                                return false;
+                        }
+                });
+
+        });
+
+    </script>  
+{% endblock %}

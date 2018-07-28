@@ -1,0 +1,90 @@
+{% extends '@App/base.html.twig' %}
+
+{% block ol %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{{ path('homepage') }}">Home</a>
+        </li>
+        <li class="breadcrumb-item active">
+            <a href="{{ path('modules_list') }}">Modules</a>
+        </li>
+        <li class="breadcrumb-item active">Details</li>
+        <!-- Breadcrumb Menu-->
+        <li class="breadcrumb-menu d-md-down-none">
+            {#<div class="btn-group" role="group" aria-label="Button group">
+                <a class="btn" href="#">
+                    <i class="icon-speech"></i>
+                </a>
+                <a class="btn" href="./">
+                    <i class="icon-graph"></i>  Dashboard</a>
+                <a class="btn" href="#">
+                    <i class="icon-settings"></i>  Settings</a>
+            </div>#}
+        </li>
+    </ol>        
+{% endblock %}
+
+{% block body %}
+    {% set status = "" %}             
+    {% set class = "" %}       
+    <div class="card">
+        <div class="card-header">
+            <strong>Details Module</strong>
+            <a title="DELETE" href="{{ path('modules_delete', { 'id': id, 'positionModule' : positionModule  }) }}" class="btn btn-danger" onclick="return confirm('¿Be sure to eliminate the modules?');" style="; float: right"><i class="fas fa-minus-circle"></i> </a>
+            <strong style="float: right">&nbsp;&nbsp;</strong>
+            <a align="right" title="EDIT" href="{{ path('modules_edit', { 'id': id, 'positionModule' : positionModule }) }}" class="btn btn-default"  style="background-color: #a1c9c2; color: black; float: right"><i class="fas fa-edit"></i> </a>            
+        </div>        
+        <div class="card-body">
+            <div class="panel panel-body">
+                {% if statusModule == 1 %}
+                    {% set status = "ACTIVE" %}             
+                    {% set class = "badge badge-success" %}   
+                {% else %}    
+                    {% set status = "INACTIVE" %}
+                    {% set class = "badge badge-danger" %}   
+                {% endif %}
+                <table class="table table-responsive-sm table-bordered table-striped table-sm">
+                    <tr>
+                        <td align = "justify" style="width: 50px"><b>Name</b></td>
+                        <td align = "justify" style="width: 50px">{{name}}</td>                        
+                    </tr>                    
+                    <tr>
+                        <td align = "justify" style="width: 50px"><b>Route</b></td>
+                        <td align = "justify" style="width: 50px">{{route}}</td>                                                
+                    </tr>                    
+                    <tr>
+                        <td align = "justify" style="width: 50px"><b>Action</b></td>
+                        <td align = "justify" style="width: 50px">{{action}}</td>                        
+                    </tr>                    
+                    <tr>
+                        <td align = "justify" style="width: 50px"><b>Description</b></td>
+                        <td align = "justify" style="width: 50px">{{description}}</td>                        
+                    </tr>                    
+                    <tr>
+                        <td align = "justify" style="width: 50px"><b>Status</b></td>
+                        <td align = "justify" style="width: 50px"><span class = "{{class}}">{{status}}</span></td>                        
+                    </tr>                                        
+                    <tr>
+                        <td align = "justify" style="width: 50px"><b>Way to pay</b></td>
+                        <td align = "justify" style="width: 100px"><button type="button" class="permits-popover btn btn-primary btn-sm" data-container="body" data-toggle="popover" data-placement="right" title="Permits" data-content="{{ permits|join(' - ') }}"><b>View</b></button></td>                                                
+                    </tr>                    
+                </table>                  
+            </div>
+            <a class="btn btn-primary" href="{{ path('modules_list') }}">Return</a>
+        </div>
+
+    </div>
+   
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            
+            $(function () {
+                $('.permits-popover').popover({
+                    container: 'body'
+                })
+            })
+            
+        });
+    </script>  
+{% endblock %}

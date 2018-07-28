@@ -105,7 +105,7 @@ class ProvinceController extends Controller {
             //$provincia = $this->get('doctrine_mongodb')->getRepository('AppBundle:Pais')->findBy(array('id' => $pais_id, 'provincia.name' => $nombreProvincia));
             $arrayProvince = $provincia->getProvinces();
             $arrayProvince[$posicionProvince]["name"] = $province_name;
-            $arrayProvince[$posicionProvince]["created_at"] = $date;
+            $arrayProvince[$posicionProvince]["updated_at"] = $date;
             $country->setProvinces($arrayProvince);
 
             $dm = $this->get('doctrine_mongodb')->getManager();
