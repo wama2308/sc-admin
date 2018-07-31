@@ -103,7 +103,7 @@
                             </div>
                             <div class="form-group col-sm-6">  
                                 <label>Master</label>
-                                <input name="master" id="master" type="text" value="" placeholder="Email" class="form-control" >                    
+                                <input name="master" id="master" type="text" value="" placeholder="Email" onchange="validateEmail(this.value);" class="form-control" >                    
                             </div>
                         </div>
                         <div class="row">
@@ -1150,6 +1150,21 @@
                     $("#inputFile4Base64").val(reader.result);
                 }
                 reader.readAsDataURL(file);
+            }
+
+            function validateEmail(email) {
+
+                var opcion = 60;
+                $.ajax({
+                    type: 'POST',
+                    url: "{{ path('validateEmail') }}",
+                    data: {email: email,opcion: opcion},
+                    success: function (html) {
+                         $("#master").focus().after(html);
+{#                        $("#master").focus().after("<span class='error' style='color:#FF0000;'>Enter the master email</span>");#}
+                    }
+                });
+
             }
 
 

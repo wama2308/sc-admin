@@ -96,10 +96,10 @@
                                     {#<option value="">Select...</option>  #}
                                     {% for ArrayModules in ArrayModules %}
                                         {% set selected = 'selected' %}    
-                                        {% if loop.index-1 in license.modules %}
-                                            <option value="{{loop.index-1}}" {{ selected }}>{{ArrayModules}}</option>
+                                        {% if ArrayModules._id|trans in license.modules %}
+                                            <option value="{{ArrayModules._id}}" {{ selected }}>{{ArrayModules.name}}</option>
                                         {% else %}  
-                                            <option value="{{loop.index-1}}">{{ArrayModules}}</option>
+                                            <option value="{{ArrayModules._id}}">{{ArrayModules.name}}</option>
                                         {% endif %}  
                                     {% endfor %}
 

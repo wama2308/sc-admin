@@ -99,9 +99,16 @@
             {% endif %}
         {% endfor %}
     </select>
+{% elseif opcion == 60 %}   
+{#    {% if answer == 1 %}
+        <div id="divEmail"><span class='error' style='color:#FF0000;'>Este email ya esta registrado</span></div>
+    {% elseif answer == 2 %}
+        
+    {% endif %}#}
 {% elseif opcion == 30 %}    
 {% elseif opcion == 40 %}    
 {% elseif opcion == 50 %}    
+
 {% elseif opcion == 100 %}    
 
 {% endif %}    
@@ -129,8 +136,8 @@
         var myModalLicense = document.getElementById('myModalLicense');
         var span = document.getElementsByClassName("close")[0];
         span.onclick = function () {
-            myModalLicense.style.display = "none";   
-             $('#license').val("").trigger('chosen:updated');
+            myModalLicense.style.display = "none";
+            $('#license').val("").trigger('chosen:updated');
         }
 
         $(".select-province").chosen({
@@ -157,6 +164,30 @@
             placeholder_text_single: "Select the way to pay",
             width: "100%"
         });
+
+    {#        alert("{{ answer }}");#}
+        if ("{{ answer }}" === '1') {
+            $("#divEmail").html("");
+            $("#master").focus().after("<div id='divEmail'><span class='error' style='color:#FF0000;'>This email already registered</span></div>");
+            $("#master").val("");            
+
+        } else {
+            
+            $("#divEmail").html("");
+            var regex = /[\w-\.]{2,}@([\w-]{2,}\.)*([\w-]{2,}\.)[\w-]{2,4}/;
+            if (!regex.test($('#master').val().trim())) {
+                
+                $("#divEmail").html("");
+                $("#master").focus().after("<div id='divEmail'><span class='error' style='color:#FF0000;'>Wrong email format</span></div>");
+                $("#master").val("");
+                return false;                
+            }else{
+                
+                $("#divEmail").html("");
+                return false;                
+            }
+
+        }
 
 
     });

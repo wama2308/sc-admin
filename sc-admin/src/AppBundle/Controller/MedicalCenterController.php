@@ -44,7 +44,7 @@ class MedicalCenterController extends Controller {
 
         $form->handleRequest($request);
         $country = $request->request->get("country");
-        $province = $request->request->get("province");        
+        $province = $request->request->get("province");
         $name = $request->request->get("name");
         $code = $request->request->get("code");
         $typemedicalcenter = $request->request->get("typemedicalcenter");
@@ -53,12 +53,12 @@ class MedicalCenterController extends Controller {
         $phone = $request->request->get("phone");
         $arrayPhone = explode(",", $phone);
         $master = $request->request->get("master");
-        
+
         $contac1 = $request->request->get("contac1");
 
         $telephonecontact1 = $request->request->get("telephonecontact1");
         $arraytelephonecontact1 = explode(",", $telephonecontact1);
-        
+
         $countLicenses = $request->request->get("countLicenses");
         $countPayments = $request->request->get("countPayments");
 
@@ -69,22 +69,22 @@ class MedicalCenterController extends Controller {
             $medicalcenter = new MedicalCenter();
 
             $medicalcenter->setCountryid($country);
-            $medicalcenter->setProvinceid($province);            
+            $medicalcenter->setProvinceid($province);
             $medicalcenter->setName($name);
             $medicalcenter->setCode($code);
             $medicalcenter->setType($typemedicalcenter);
             $medicalcenter->setAddress($address);
             $medicalcenter->setPhone($arrayPhone);
-            
+
             $arrayMaster[] = array(
-                    "email" => $master,
-                    "validation_code" => "",
-                    "status" => "0",
-                    "created_at" => $fechaNow);
-            $medicalcenter->setMaster($arrayMaster);            
-            
+                "email" => $master,
+                "validation_code" => "",
+                "status" => "0",
+                "created_at" => $fechaNow);
+            $medicalcenter->setMaster($arrayMaster);
+
             $medicalcenter->setContac1($contac1);
-            $medicalcenter->setContac1phone($arraytelephonecontact1);            
+            $medicalcenter->setContac1phone($arraytelephonecontact1);
 
             for ($i = 0; $i < $countLicenses; $i++) {
 
@@ -94,14 +94,38 @@ class MedicalCenterController extends Controller {
                 $nuevafecha = date('Y-m-d h:i:s', $nuevafecha);
                 $fecha_expiration = new \MongoDate(strtotime($nuevafecha));
 
+                ////////////////////////////////////////////////////////////////
+                $GeneralConfiguration = $this->get('doctrine_mongodb')->getRepository('AppBundle:GeneralConfiguration')->find("5ae08f86c5dfa106dc92610a");
+                $arrayModules = $GeneralConfiguration->getModules();
+                $license = $this->get('doctrine_mongodb')->getRepository('AppBundle:License')->find($request->request->get("licenseId_" . $i));
+                $modules = $license->getModules();
+                $acum = 0;
+
+                foreach ($arrayModules as $arrayModule) {
+
+                    foreach ($modules as $module) {
+                        if ($arrayModule["_id"] == $module) {
+                            $arrayModulesInsert[] = array(
+                                "name" => $arrayModule["name"],
+                                "route" => $arrayModule["route"],
+                                "action" => $arrayModule["action"],
+                                "permits" => $arrayModule["permits"]);
+                        }
+                    }
+                }
+                ////////////////////////////////////////////////////////////////
+
                 $arrayLicenses[] = array(
                     "license_id" => $request->request->get("licenseId_" . $i),
                     "expiration_date" => $fecha_expiration,
                     "status" => "Active",
+                    "modules" => $arrayModulesInsert,
                     "created_at" => $fechaNow,
                     "created_by" => $user,
                     "updated_at" => $fechaNow,
                     "updated_by" => $user);
+                
+                unset($arrayModulesInsert);
             }
 
             $medicalcenter->setLicenses($arrayLicenses);
@@ -180,7 +204,7 @@ class MedicalCenterController extends Controller {
         $phone = $request->request->get("phone");
         $arrayPhone = explode(",", $phone);
         $master = $request->request->get("master");
-        
+
         $contac1 = $request->request->get("contac1");
         $telephonecontact1 = $request->request->get("telephonecontact1");
         $arraytelephonecontact1 = explode(",", $telephonecontact1);
@@ -193,22 +217,22 @@ class MedicalCenterController extends Controller {
             $medicalcenter = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->find($id);
 
             $medicalcenter->setCountryid($country);
-            $medicalcenter->setProvinceid($province);            
+            $medicalcenter->setProvinceid($province);
             $medicalcenter->setName($name);
             $medicalcenter->setCode($code);
             $medicalcenter->setType($typemedicalcenter);
             $medicalcenter->setAddress($address);
             $medicalcenter->setPhone($arrayPhone);
-            
+
             $arrayMaster[] = array(
-                    "email" => $master,
-                    "validation_code" => "",
-                    "status" => "0",
-                    "created_at" => $fechaNow);
-            $medicalcenter->setMaster($arrayMaster);     
-            
+                "email" => $master,
+                "validation_code" => "",
+                "status" => "0",
+                "created_at" => $fechaNow);
+            $medicalcenter->setMaster($arrayMaster);
+
             $medicalcenter->setContac1($contac1);
-            $medicalcenter->setContac1phone($arraytelephonecontact1);            
+            $medicalcenter->setContac1phone($arraytelephonecontact1);
 
             for ($i = 0; $i < $countLicenses; $i++) {
 
@@ -223,15 +247,39 @@ class MedicalCenterController extends Controller {
                 } else {
                     $status = "Active";
                 }
+                
+                ////////////////////////////////////////////////////////////////
+                $GeneralConfiguration = $this->get('doctrine_mongodb')->getRepository('AppBundle:GeneralConfiguration')->find("5ae08f86c5dfa106dc92610a");
+                $arrayModules = $GeneralConfiguration->getModules();
+                $license = $this->get('doctrine_mongodb')->getRepository('AppBundle:License')->find($request->request->get("licenseId_" . $i));
+                $modules = $license->getModules();
+                $acum = 0;
+
+                foreach ($arrayModules as $arrayModule) {
+
+                    foreach ($modules as $module) {
+                        if ($arrayModule["_id"] == $module) {
+                            $arrayModulesInsert[] = array(
+                                "name" => $arrayModule["name"],
+                                "route" => $arrayModule["route"],
+                                "action" => $arrayModule["action"],
+                                "permits" => $arrayModule["permits"]);
+                        }
+                    }
+                }
+                ////////////////////////////////////////////////////////////////
 
                 $arrayLicenses[] = array(
                     "license_id" => $request->request->get("licenseId_" . $i),
                     "expiration_date" => $fecha_expiration,
                     "status" => $status,
+                    "modules" => $arrayModulesInsert,
                     "created_at" => $fechaNow,
                     "created_by" => $user,
                     "updated_at" => $fechaNow,
                     "updated_by" => $user);
+                
+                unset($arrayModulesInsert);
             }
             $medicalcenter->setLicenses($arrayLicenses);
 
@@ -242,7 +290,7 @@ class MedicalCenterController extends Controller {
                 } else {
                     $status = true;
                 }
-                
+
                 $arrayPayments[] = array(
                     "waytopay" => $request->request->get("waytopay_" . $i),
                     "daystopay" => $request->request->get("daystopay_" . $i),
@@ -476,6 +524,37 @@ class MedicalCenterController extends Controller {
 
             //$this->addFlash('error', 'Province Removed');
             return $this->render('@App/medical_center/loadProvince.html.twig', array('opcion' => $opcion));
+        }
+        return new Response('Unauthorized Request, No es XmlHttpRequest', Response::HTTP_UNAUTHORIZED);
+    }
+    
+    /**
+     * @Route("/medical_center/validateEmail", name="validateEmail")
+     * @Method({"GET", "POST"})
+     */
+    public function validateEmail(Request $request) {
+
+        if ($request->isXmlHttpRequest()) {
+
+            $email = $request->request->get("email");
+            $opcion = $request->request->get("opcion");
+            $answer = 0;
+            $EmailExist = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->findBy(array('master.email' => $email));
+//            echo "aaaa";
+//            var_dump($EmailExist);
+            if($EmailExist){
+                $answer = 1;
+                return $this->render('@App/medical_center/loadProvince.html.twig', array('opcion' => $opcion, 'answer' => $answer));                
+            }
+            else{
+                $answer = 2;
+                return $this->render('@App/medical_center/loadProvince.html.twig', array('opcion' => $opcion, 'answer' => $answer));                
+            }
+
+            
+
+            //$this->addFlash('error', 'Province Removed');
+            
         }
         return new Response('Unauthorized Request, No es XmlHttpRequest', Response::HTTP_UNAUTHORIZED);
     }

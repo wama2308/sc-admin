@@ -122,13 +122,17 @@
                         <span class="close" onclick="$('#modulesModal').hide();">&times;</span><br><br>
                         <table class="table table-responsive-sm table-striped scrolled-wrapper">
                             <tr> 
+{#                                <td align="center"><b>Modules{{dump(ArrayModules)}}-{{dump(license.modules)}}</b></td>                                                                       #}
                                 <td align="center"><b>Modules</b></td>                                                                       
                             </tr>         
 
                             {% for ArrayModules in ArrayModules %}
-                                {% if loop.index-1 in license.modules %}
+                                {#<tr> 
+                                    <td align="center">{{ArrayModules._id}}</td>                                                                       
+                                </tr> #}
+                                {% if ArrayModules._id|trans in license.modules %}
                                     <tr> 
-                                        <td align="center">{{ArrayModules}}</td>                                                                       
+                                        <td align="center">{{ArrayModules.name}}</td>                                                                       
                                     </tr>                                
                                 {% endif %}  
                             {% endfor %}

@@ -184,6 +184,7 @@ class LicenseController extends Controller {
         $countries = $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->findByActive(true);
         $GeneralConfiguration = $this->get('doctrine_mongodb')->getRepository('AppBundle:GeneralConfiguration')->find("5ae08f86c5dfa106dc92610a");
         $ArrayModules = $GeneralConfiguration->getModules();
+//        var_dump($license->getModules());
         return $this->render('@App/license/details.html.twig', array('license' => $license, 'exams' => $exams, 'ArrayModules' => $ArrayModules, 'countries' => $countries));
     }
 

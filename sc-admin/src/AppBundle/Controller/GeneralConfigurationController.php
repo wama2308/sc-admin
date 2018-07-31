@@ -69,7 +69,7 @@ class GeneralConfigurationController extends Controller {
 
             $this->addFlash('notice', 'Registered Module');
 
-//            return $this->redirectToRoute('modules_list');
+            return $this->redirectToRoute('modules_list');
         }
 
         return $this->render('@App/general_configuration/create.html.twig');

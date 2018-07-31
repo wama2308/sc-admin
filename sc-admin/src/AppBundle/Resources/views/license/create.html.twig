@@ -87,7 +87,7 @@
                                 <select class="form-control select-modules" name="modules[]" id="modules" multiple="">
                                     {#<option value="">Select...</option>  #}
                                     {% for ArrayModules in ArrayModules %}
-                                        <option value="{{loop.index-1}}">{{ArrayModules}}</option>
+                                        <option value="{{ArrayModules._id}}">{{ArrayModules.name}}</option>
                                     {% endfor %}
 
                                 </select>

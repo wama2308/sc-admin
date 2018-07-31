@@ -1,5 +1,30 @@
 {% extends '@App/base.html.twig' %}
 
+{% block ol %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{{ path('homepage') }}">Home</a>
+        </li>
+        <li class="breadcrumb-item active">
+            <a href="{{ path('medical_center_list') }}">Medical Center</a>
+        </li>
+        <li class="breadcrumb-item active">Update</li>
+        <!-- Breadcrumb Menu-->
+        <li class="breadcrumb-menu d-md-down-none">
+            {#<div class="btn-group" role="group" aria-label="Button group">
+                <a class="btn" href="#">
+                    <i class="icon-speech"></i>
+                </a>
+                <a class="btn" href="./">
+                    <i class="icon-graph"></i>  Dashboard</a>
+                <a class="btn" href="#">
+                    <i class="icon-settings"></i>  Settings</a>
+            </div>#}
+        </li>
+    </ol>        
+{% endblock %}
+
+
 {% block body %}
     <div class="card">
         <div class="card-header">
@@ -92,7 +117,7 @@
                             {% endfor %}
                             <div class="form-group col-sm-6">  
                                 <label>Master</label>
-                                <input name="master" id="master" type="text" value="{{ emailMc }}" placeholder="Email" class="form-control" >                    
+                                <input name="master" id="master" type="text" value="{{ emailMc }}" placeholder="Email" class="form-control" onchange="validateEmail(this.value);">                    
                             </div>                
                         </div>                
                         <div class="row">
@@ -885,10 +910,21 @@
         }
 
         function restaLicensesEdit(amountCelda) {
-            var valorAmountCelda = amountCelda;
-            var valorAmount = $("#amountTotal").val();
-            var resultadoAmount = valorAmount - valorAmountCelda;
-            $("#amountTotal").val(resultadoAmount);
+            var acumPayment = 0;
+            for (i = 0; i <= $("#countPayments").val(); i++) {
+                if ($("#trPayments_" + i).is(":visible")) {
+                    acumPayment++;
+                }
+            }
+            if (acumPayment === 0) {
+
+                var valorAmountCelda = amountCelda;
+                var valorAmount = $("#amountTotal").val();
+                var resultadoAmount = valorAmount - valorAmountCelda;
+                $("#amountTotal").val(resultadoAmount);
+                $("#remaining").val(resultadoAmount);
+            }
+            else{}
         }
 
         function paymentType() {
@@ -1132,8 +1168,8 @@
                         <input type="hidden" id="waytopay_' + counter + '" name="waytopay_' + counter + '"  value="' + $("#waytopay").children(':selected').text() + '" />\n\
                         <input type="hidden" id="daystopay_' + counter + '" name="daystopay_' + counter + '"  value="' + document.getElementById("daystopay").value + '" />\n\
                         <input type="hidden" id="amount_' + counter + '" name="amount_' + counter + '"  value="' + document.getElementById("amount").value + '" />\n\
-                        <input type="hidden" id="issuingbank_' + counter + '" name="issuingbank_' + counter + '"  value="' + $("#issuingbank").children(':selected').text() + '" />\n\
-                        <input type="hidden" id="receivingbank_' + counter + '" name="receivingbank_' + counter + '"  value="' + $("#receivingbank").children(':selected').text() + '" />\n\
+                        <input type="hidden" id="issuingbank_' + counter + '" name="issuingbank_' + counter + '"  value="' + issuingbank + '" />\n\
+                        <input type="hidden" id="receivingbank_' + counter + '" name="receivingbank_' + counter + '"  value="' + receivingbank + '" />\n\
                         <input type="hidden" id="cardholder_' + counter + '" name="cardholder_' + counter + '"  value="' + document.getElementById("cardholder").value + '" />\n\
                         <input type="hidden" id="cardnumber_' + counter + '" name="cardnumber_' + counter + '"  value="' + document.getElementById("cardnumber").value + '" />\n\
                         <input type="hidden" id="expiration_' + counter + '" name="expiration_' + counter + '"  value="' + document.getElementById("expiration").value + '" />\n\
@@ -1238,17 +1274,32 @@
         function deleteLicense(medicalcenterid, position) {
 
             if (confirm("¿Be sure to eliminate the license?")) {
-                var opcion = 40;
-                $.ajax({
-                    type: 'POST',
-                    url: "{{ path('deletelicense') }}",
-                    data: {medicalcenterid: medicalcenterid, position: position, opcion: opcion},
-                    success: function (html) {
-                        //$("#" + div).html(html);
+
+                var acumPayment = 0;
+                for (i = 0; i <= $("#countPayments").val(); i++) {
+                    if ($("#trPayments_" + i).is(":visible")) {
+                        acumPayment++;
                     }
-                });
-                $("#statusRegisterLicense_" + position).val("2");
-                $("#trlicense_" + position).hide();
+                }
+                if (acumPayment === 0) {
+                    var opcion = 40;
+                    $.ajax({
+                        type: 'POST',
+                        url: "{{ path('deletelicense') }}",
+                        data: {medicalcenterid: medicalcenterid, position: position, opcion: opcion},
+                        success: function (html) {
+                            //$("#" + div).html(html);
+                        }
+                    });
+                    $("#statusRegisterLicense_" + position).val("2");
+                    $("#trlicense_" + position).hide();
+
+                } else {
+
+                    alert("before removing the license you must eliminate the payments of the mass");
+                    return false;
+
+                }
             } else {
             }
         }
@@ -1306,6 +1357,21 @@
             }
             reader.readAsDataURL(file);
         }
+        
+        function validateEmail(email) {
 
+                var opcion = 60;
+                $.ajax({
+                    type: 'POST',
+                    url: "{{ path('validateEmail') }}",
+                    data: {email: email,opcion: opcion},
+                    success: function (html) {
+                         $("#master").focus().after(html);
+{#                        $("#master").focus().after("<span class='error' style='color:#FF0000;'>Enter the master email</span>");#}
+                    }
+                });
+
+        }
+            
     </script>  
 {% endblock %}
