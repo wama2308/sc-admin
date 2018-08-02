@@ -90,6 +90,16 @@ class GeneralConfiguration
      */
     protected $secret_questions;    
     
+    /**
+     * @MongoDB\Field(type="collection")
+     */
+    protected $methods;    
+    
+    /**
+     * @MongoDB\Field(type="collection")
+     */
+    protected $permits;    
+    
     function __construct() 
     {
         $this->created_at = new \DateTime();

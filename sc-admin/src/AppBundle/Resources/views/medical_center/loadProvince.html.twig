@@ -100,11 +100,11 @@
         {% endfor %}
     </select>
 {% elseif opcion == 60 %}   
-{#    {% if answer == 1 %}
-        <div id="divEmail"><span class='error' style='color:#FF0000;'>Este email ya esta registrado</span></div>
-    {% elseif answer == 2 %}
-        
-    {% endif %}#}
+    {#    {% if answer == 1 %}
+            <div id="divEmail"><span class='error' style='color:#FF0000;'>Este email ya esta registrado</span></div>
+        {% elseif answer == 2 %}
+            
+        {% endif %}#}
 {% elseif opcion == 30 %}    
 {% elseif opcion == 40 %}    
 {% elseif opcion == 50 %}    
@@ -166,30 +166,36 @@
         });
 
     {#        alert("{{ answer }}");#}
-        if ("{{ answer }}" === '1') {
-            $("#divEmail").html("");
-            $("#master").focus().after("<div id='divEmail'><span class='error' style='color:#FF0000;'>This email already registered</span></div>");
-            $("#master").val("");            
+            if ("{{ answer }}" === '1') {
+                var master = $("#master").val();
+                var master_ = $("#master_").val();
+                if (master === master_) {
+                    $("#divEmail").html("");
+                } else {
+                    $("#divEmail").html("");
+                    $("#master").focus().after("<div id='divEmail'><span class='error' style='color:#FF0000;'>This email already registered</span></div>");
+                    $("#master").val("");
+                }
 
-        } else {
-            
-            $("#divEmail").html("");
-            var regex = /[\w-\.]{2,}@([\w-]{2,}\.)*([\w-]{2,}\.)[\w-]{2,4}/;
-            if (!regex.test($('#master').val().trim())) {
-                
+            } else {
+
                 $("#divEmail").html("");
-                $("#master").focus().after("<div id='divEmail'><span class='error' style='color:#FF0000;'>Wrong email format</span></div>");
-                $("#master").val("");
-                return false;                
-            }else{
-                
-                $("#divEmail").html("");
-                return false;                
+                var regex = /[\w-\.]{2,}@([\w-]{2,}\.)*([\w-]{2,}\.)[\w-]{2,4}/;
+                if (!regex.test($('#master').val().trim())) {
+
+                    $("#divEmail").html("");
+                            $("#master").focus().after("<div id='divEmail'><span class='error' style='color:#FF0000;'>Wrong email format</span></div>");
+                            $("#master").val("");
+                            return false;                
+                } else {
+
+                    $("#divEmail").html("");
+                            return false;                
+                }
+
             }
 
-        }
 
-
-    });
+        });
 
 </script>

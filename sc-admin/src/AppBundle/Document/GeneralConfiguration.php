@@ -90,6 +90,16 @@ class GeneralConfiguration
      */
     protected $secret_questions;    
     
+    /**
+     * @MongoDB\Field(type="collection")
+     */
+    protected $methods;    
+    
+    /**
+     * @MongoDB\Field(type="collection")
+     */
+    protected $permits;    
+    
     function __construct() 
     {
         $this->created_at = new \DateTime();
@@ -418,5 +428,49 @@ class GeneralConfiguration
     public function getSecretQuestions()
     {
         return $this->secret_questions;
+    }
+
+    /**
+     * Set methods
+     *
+     * @param collection $methods
+     * @return $this
+     */
+    public function setMethods($methods)
+    {
+        $this->methods = $methods;
+        return $this;
+    }
+
+    /**
+     * Get methods
+     *
+     * @return collection $methods
+     */
+    public function getMethods()
+    {
+        return $this->methods;
+    }
+
+    /**
+     * Set permits
+     *
+     * @param collection $permits
+     * @return $this
+     */
+    public function setPermits($permits)
+    {
+        $this->permits = $permits;
+        return $this;
+    }
+
+    /**
+     * Get permits
+     *
+     * @return collection $permits
+     */
+    public function getPermits()
+    {
+        return $this->permits;
     }
 }

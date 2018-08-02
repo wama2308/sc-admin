@@ -45,46 +45,189 @@
                 {% endif %}
                 <table class="table table-responsive-sm table-bordered table-striped table-sm">
                     <tr>
-                        <td align = "justify" style="width: 50px"><b>Name</b></td>
+                        <td align = "justify" style="width: 150px"><b>Name</b></td>
                         <td align = "justify" style="width: 50px">{{name}}</td>                        
                     </tr>                    
                     <tr>
-                        <td align = "justify" style="width: 50px"><b>Route</b></td>
-                        <td align = "justify" style="width: 50px">{{route}}</td>                                                
+                        <td align = "justify" style="width: 150px"><b>Controller</b></td>
+                        <td align = "justify" style="width: 50px">{{controller}}</td>                                                
                     </tr>                    
                     <tr>
-                        <td align = "justify" style="width: 50px"><b>Action</b></td>
-                        <td align = "justify" style="width: 50px">{{action}}</td>                        
-                    </tr>                    
-                    <tr>
-                        <td align = "justify" style="width: 50px"><b>Description</b></td>
+                        <td align = "justify" style="width: 150px"><b>Description</b></td>
                         <td align = "justify" style="width: 50px">{{description}}</td>                        
                     </tr>                    
                     <tr>
-                        <td align = "justify" style="width: 50px"><b>Status</b></td>
+                        <td align = "justify" style="width: 150px"><b>Status</b></td>
                         <td align = "justify" style="width: 50px"><span class = "{{class}}">{{status}}</span></td>                        
                     </tr>                                        
                     <tr>
-                        <td align = "justify" style="width: 50px"><b>Permits</b></td>
-                        <td align = "justify" style="width: 100px"><button type="button" class="permits-popover btn btn-primary btn-sm" data-container="body" data-toggle="popover" data-placement="right" title="Permits" data-content="{{ permits|join(' - ') }}"><b>View</b></button></td>                                                
+                        <td align = "justify" style="width: 150px"><b>Permits</b></td>
+                        <td align = "justify" style="width: 50px"><button id="btnModalPermits" title="View Permits" class="btn btn-primary btn-sm"><b>View</b></button></td>                                                                        
                     </tr>                    
-                </table>                  
+                </table>    
+                <div id="permitsModal" class="mascara">
+                    <div class="contenido" style="">
+                        <span class="close" onclick="$('#permitsModal').hide();">&times;</span><br><br>
+                        <table class="table table-responsive-sm table-striped scrolled-wrapper">
+                            <tr> 
+                                <td align="center"><b>Name</b></td>                                                                       
+                                <td align="center"><b>Route</b></td>                                                                       
+                                <td align="center"><b>Action</b></td>                                                                       
+                                <td align="center"><b>Method</b></td>                                                                                                       
+                            </tr>         
+                            {% for permits in permits %}
+                                <tr> 
+                                    <td align="center">{{ permits.permit }}</td>                                                                       
+                                    <td align="center">{{ permits.route }}</td>                                                                       
+                                    <td align="center">{{ permits.action}}</td>                                                                       
+                                    <td align="center"><button type="button" class="methods-popover btn btn-primary btn-sm" data-container="body" data-toggle="popover" data-placement="top" title="Methods" data-content="{{ permits.method|join(' - ') }}"><b>View</b></button></td>                                                                                                                                                                                                                      
+                                </tr> 
+                            {% endfor %}
+                        </table>  
+                    </div>
+                </div>
             </div>
             <a class="btn btn-primary" href="{{ path('modules_list') }}">Return</a>
         </div>
 
     </div>
-   
+
+    <style type="text/css">
+        .mascara {
+            display: none; 
+            position: fixed; 
+            z-index: 1; 
+            padding-top: 100px; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgb(0,0,0); 
+            background-color: rgba(0,0,0,0.4); 
+            -webkit-transition: opacity 400ms ease-in;
+            -moz-transition: opacity 400ms ease-in;
+            transition: opacity 400ms ease-in;
+            pointer-events: auto;
+        }
+        .mascara > div {
+            width: 700px;
+            top: -25%;
+            position: relative;
+            margin: 10% auto;
+            padding: 5px 20px 13px 20px;
+            border-radius: 10px;
+            background: #e3e3e4;  /* fallback for old browsers */
+            {#background: -webkit-linear-gradient(to left, #FFFFFF, #FFEFBA);  /* Chrome 10-25, Safari 5.1-6 */
+            background: linear-gradient(to left, #FFFFFF, #FFEFBA); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+            -webkit-transition: opacity 400ms ease-in;
+            -moz-transition: opacity 400ms ease-in;#}
+            transition: opacity 400ms ease-in;
+        }
+        .contenido {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 50%;  
+            height: auto;
+            overflow-y: auto;
+            -webkit-animation-name: animatetop;
+            -webkit-animation-duration: 0.4s;
+            animation-name: animatetop;
+            animation-duration: 0.4s
+        }
+        /* Add Animation */
+        @-webkit-keyframes animatetop {
+            from {top:-300px; opacity:0} 
+            to {top:0; opacity:1}
+        }
+
+        @keyframes animatetop {
+            from {top:-300px; opacity:0}
+            to {top:0; opacity:1}
+        }
+        {#.close {
+            background: #000;
+            color: #FFFFFF;
+            line-height: 25px;
+            position: absolute;
+            right: -12px;
+            text-align: center;
+            top: -10px;
+            width: 24px;
+            text-decoration: none;
+            font-weight: bold;
+            -webkit-border-radius: 12px;
+            -moz-border-radius: 12px;
+            border-radius: 12px;
+            -moz-box-shadow: 1px 1px 3px #000;
+            -webkit-box-shadow: 1px 1px 3px #000;
+            box-shadow: 1px 1px 3px #000;
+        }
+        .close:hover { background: #00d9ff; }
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }#}
+        /* The Close Button */
+        .close {
+            color: #000;
+            float: end;
+            font-size: 30px;
+            font-weight: bold;
+            background: #000;
+            color: #FFFFFF;
+            line-height: 25px;
+            position: absolute;
+            right: 20px;
+            text-align: center;
+            top: 10px;
+            width: 34px;
+            text-decoration: none;
+            font-weight: bold;
+            -webkit-border-radius: 12px;
+            -moz-border-radius: 12px;
+            border-radius: 12px;
+            -moz-box-shadow: 1px 1px 3px #000;
+            -webkit-box-shadow: 1px 1px 3px #000;
+            box-shadow: 1px 1px 3px #000;
+
+        }
+        .close:hover { background: #00d9ff; }
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>    
 
     <script type="text/javascript">
         $(document).ready(function () {
-            
+
             $(function () {
-                $('.permits-popover').popover({
+                $('.methods-popover').popover({
                     container: 'body'
                 })
             })
+
+            var permitsModal = document.getElementById('permitsModal');
+            var btnModalPermits = document.getElementById("btnModalPermits");
+
+            btnModalPermits.onclick = function () {
+                permitsModal.style.display = "block";
+            }
             
+             window.onclick = function (event) {
+                if (event.target === permitsModal) {
+
+                    permitsModal.style.display = "none";
+
+                }
+            }
+
+
         });
     </script>  
 {% endblock %}

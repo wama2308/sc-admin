@@ -32,15 +32,12 @@ class GeneralConfigurationController extends Controller {
 
         $form->handleRequest($request);
         $module = $request->request->get("module");
-        $route = $request->request->get("route");
-        $action = $request->request->get("action");
+        $controller = $request->request->get("controller");
         $description = $request->request->get("description");
-        $permits = $request->request->get("permits");
-        $arrayPermits = explode(",", $permits);
-
+        $countPermits = $request->request->get("countPermits");
 
         //if ($form->isSubmitted() && $form->isValid()) {
-        if (($module != "") && ($route != "") && ($action != "") && ($description != "") && ($permits != "")) {
+        if (($module != "") && ($controller != "") && ($countPermits != "0")) {
 
             $fechaNow = new \MongoDate();
 
@@ -48,11 +45,23 @@ class GeneralConfigurationController extends Controller {
             $arrayModules = $GeneralConfiguration->getModules();
             $module_id = new \MongoId();
 
+            for ($i = 0; $i < $countPermits; $i++) {
+
+                $arrayMethod = explode(",", $request->request->get("method_" . $i));
+
+                $arrayPermits[] = array(
+                    "permit" => $request->request->get("permit_" . $i),
+                    "route" => $request->request->get("route_" . $i),
+                    "action" => $request->request->get("action_" . $i),
+                    "method" => $arrayMethod,
+                    "descriptionPermit" => $request->request->get("descriptionPermit_" . $i));
+            }
+
             $arrayModules[] = array(
                 "_id" => $module_id,
                 "name" => $module,
-                "route" => $route,
-                "action" => $action,
+                "controller" => $controller,
+                "description" => $description,
                 "description" => $description,
                 "permits" => $arrayPermits,
                 "status" => 1,
@@ -71,8 +80,10 @@ class GeneralConfigurationController extends Controller {
 
             return $this->redirectToRoute('modules_list');
         }
-
-        return $this->render('@App/general_configuration/create.html.twig');
+        $GeneralConfiguration = $this->get('doctrine_mongodb')->getRepository('AppBundle:GeneralConfiguration')->find("5ae08f86c5dfa106dc92610a");
+        $methodArray = $GeneralConfiguration->getMethods();
+        $permitsArray = $GeneralConfiguration->getPermits();
+        return $this->render('@App/general_configuration/create.html.twig', array('methodArray' => $methodArray, 'permitsArray' => $permitsArray));
     }
 
     /**
@@ -80,37 +91,56 @@ class GeneralConfigurationController extends Controller {
      * @Method({"GET", "POST"})
      */
     public function editAction($id, $positionModule, Request $request) {
-        $country = $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->find($id);
+
         $fechaNow = new \MongoDate();
         $user = $this->getUser()->getId();
 
         $module = $request->request->get("module");
-        $route = $request->request->get("route");
-        $action = $request->request->get("action");
+        $controller = $request->request->get("controller");
         $description = $request->request->get("description");
-        $permits = $request->request->get("permits");
-        $arrayPermits = explode(",", $permits);
+        $countPermits = $request->request->get("countPermits");
 
-        if (($module != "") && ($route != "") && ($action != "") && ($description != "") && ($permits != "")) {
+        //if ($form->isSubmitted() && $form->isValid()) {
+        if (($module != "") && ($controller != "") && ($countPermits != "0")) {
 
             $fechaNow = new \MongoDate();
 
             $GeneralConfiguration = $this->get('doctrine_mongodb')->getRepository('AppBundle:GeneralConfiguration')->find("5ae08f86c5dfa106dc92610a");
             $arrayModules = $GeneralConfiguration->getModules();
-            
-            $arrayModules[$positionModule]["name"] = $module;
-            $arrayModules[$positionModule]["route"] = $route;
-            $arrayModules[$positionModule]["action"] = $action;
-            $arrayModules[$positionModule]["description"] = $description;
-            $arrayModules[$positionModule]["permits"] = $arrayPermits;
-            $arrayModules[$positionModule]["updated_at"] = $fechaNow;
-            $arrayModules[$positionModule]["updated_by"] = $user;
-            
+            $module_id = new \MongoId();
+
+            for ($i = 0; $i <= $countPermits; $i++) {
+                
+                if ($request->request->get("permit_" . $i) != null) {
+//                    var_dump($request->request->get("permit_" . $i));
+                    $arrayMethod = explode(",", $request->request->get("method_" . $i));
+
+                    $arrayPermits[] = array(
+                        "permit" => $request->request->get("permit_" . $i),
+                        "route" => $request->request->get("route_" . $i),
+                        "action" => $request->request->get("action_" . $i),
+                        "method" => $arrayMethod,
+                        "descriptionPermit" => $request->request->get("descriptionPermit_" . $i));
+                }
+            }
+//            var_dump($arrayPermits);
+            $arrayModules[$positionModule] = array(
+                "_id" => $module_id,
+                "name" => $module,
+                "controller" => $controller,
+                "description" => $description,
+                "description" => $description,
+                "permits" => $arrayPermits,
+                "status" => 1,
+                "created_at" => $fechaNow,
+                "created_by" => $user,
+                "updated_at" => $fechaNow,
+                "updated_by" => $user);
+
             $GeneralConfiguration->setModules($arrayModules);
-           
 
             $dm = $this->get('doctrine_mongodb')->getManager();
-            $dm->persist($GeneralConfiguration);
+//            $dm->persist($GeneralConfiguration);
             $dm->flush();
 
             $this->addFlash('notice', 'Module Updated');
@@ -120,7 +150,9 @@ class GeneralConfigurationController extends Controller {
 
         $GeneralConfiguration = $this->get('doctrine_mongodb')->getRepository('AppBundle:GeneralConfiguration')->find("5ae08f86c5dfa106dc92610a");
         $modules = $GeneralConfiguration->getModules();
-        return $this->render('@App/general_configuration/edit.html.twig', array('modules' => $modules, 'id' => $id, 'positionModule' => $positionModule));
+        $methodArray = $GeneralConfiguration->getMethods();
+        $permitsArray = $GeneralConfiguration->getPermits();
+        return $this->render('@App/general_configuration/edit.html.twig', array('modules' => $modules, 'id' => $id, 'positionModule' => $positionModule, 'methodArray' => $methodArray, 'permitsArray' => $permitsArray));
     }
 
     /**
@@ -133,13 +165,12 @@ class GeneralConfigurationController extends Controller {
         $arrayModules = $GeneralConfiguration->getModules();
         $id = $arrayModules[$positionModule]["_id"];
         $name = $arrayModules[$positionModule]["name"];
-        $route = $arrayModules[$positionModule]["route"];
-        $action = $arrayModules[$positionModule]["action"];
+        $controller = $arrayModules[$positionModule]["controller"];
         $description = $arrayModules[$positionModule]["description"];
-        $statusModule = $arrayModules[$positionModule]["status"];
         $permits = $arrayModules[$positionModule]["permits"];
+        $statusModule = $arrayModules[$positionModule]["status"];
         //var_dump($permits);
-        return $this->render('@App/general_configuration/details.html.twig', array('id' => $id, 'name' => $name, 'route' => $route, 'action' => $action, 'statusModule' => $statusModule, 'permits' => $permits, 'description' => $description, 'positionModule' => $positionModule));
+        return $this->render('@App/general_configuration/details.html.twig', array('id' => $id, 'name' => $name, 'controller' => $controller, 'statusModule' => $statusModule, 'permits' => $permits, 'description' => $description, 'positionModule' => $positionModule));
     }
 
     /**

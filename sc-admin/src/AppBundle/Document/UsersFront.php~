@@ -518,4 +518,26 @@ class UsersFront {
     {
         return $this->reset_password;
     }
+
+    /**
+     * Set unlockUser
+     *
+     * @param collection $unlockUser
+     * @return $this
+     */
+    public function setUnlockUser($unlockUser)
+    {
+        $this->unlock_user = $unlockUser;
+        return $this;
+    }
+
+    /**
+     * Get unlockUser
+     *
+     * @return collection $unlockUser
+     */
+    public function getUnlockUser()
+    {
+        return $this->unlock_user;
+    }
 }

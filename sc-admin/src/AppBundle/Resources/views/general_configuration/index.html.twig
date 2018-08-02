@@ -38,8 +38,8 @@
                 <thead> 
                     <tr> 
                         <th>Name</th>    
-                        <th>Route</th>    
-                        <th>Action</th>    
+                        <th>Controller</th>    
+                        <th>Description</th>    
                         <th>Status</th>    
                     </tr> 
                 </thead> 
@@ -55,8 +55,8 @@
                         <tr> 
 {#                            <td><a title="View Details" class="nav-link" href="{{ path('modules_details', { 'positionModules': loop.index-1 }) }}">{{modules.name}}</a></td>                                 #}
                             <td><a title="View Details" class="nav-link" href="{{ path('modules_details', { 'id': modules._id, 'positionModule': loop.index-1  }) }}">{{modules.name}}</a></td>                                 
-                            <td>{{modules.route}}</td>         
-                            <td>{{modules.action}}</td>      
+                            <td>{{modules.controller}}</td>         
+                            <td>{{modules.description}}</td>      
                             <td><span class = "{{class}}">{{status}}</span></td>      
                         </tr>   
 

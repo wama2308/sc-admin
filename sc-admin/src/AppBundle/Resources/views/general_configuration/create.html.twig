@@ -33,26 +33,84 @@
         <div class="card-body">
             <div class="card-block">
                 <form action="{{ path('modules_create') }}" method="post" id="formid">    
-                    <div class="form-group">
-                        <label>Name</label>
-                        <input name="module" id="module" type="text" value="" placeholder="Name" class="form-control">
-                    </div>           
-                    <div class="form-group">
-                        <label>Route</label>
-                        <input name="route" id="route" type="text" value="" placeholder="Route" class="form-control">
-                    </div>           
-                    <div class="form-group">
-                        <label>Action</label>
-                        <input name="action" id="action" type="text" value="" placeholder="Action" class="form-control">
-                    </div>      
-                    <div class="form-group">         
-                        <label>Description</label>
-                        <textarea name="description" id="description" type="text" class="form-control"></textarea>
+                    <div class="row">
+                        <div class="form-group col-sm-6">
+                            <label>Name</label>
+                            <input name="module" id="module" type="text" value="" placeholder="Name" class="form-control">
+                        </div>           
+                        <div class="form-group col-sm-6">
+                            <label>Controller</label>
+                            <input name="controller" id="controller" type="text" value="" placeholder="Controller" class="form-control">
+                        </div>           
                     </div>
-                    <div class="form-group"> 
-                        <label>Permits</label>
-                        <input name="permits" id="permits" type="text" value="" style="text-transform: uppercase" placeholder="Permits" class="form-control" data-role="tagsinput" >                
+                    <div class="row">
+                        <div class="form-group col-sm-6">         
+                            <label>Description</label>
+                            <textarea name="description" id="description" type="text" class="form-control"></textarea>
+                        </div>
                     </div>
+                    <fieldset class="col-md-12 border border-button">
+                        <legend><h5>Permits</h5></legend>
+                        <div class="row">
+                            <div class="form-group col-sm-6"> 
+                                <label>Permit</label>
+                                <div class="selector-exam">
+                                    <select class="form-control select-permit" style="width: 100%" name="permit" id="permit">
+                                        <option value="">Select...</option>  
+                                        {% for permitsArray in permitsArray %}
+                                            {% set selected = '' %}
+                                            <option value="{{permitsArray}}">{{permitsArray}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group col-sm-6"> 
+                                <label>Route</label>
+                                <input name="route" id="route" type="text" value="" placeholder="Route" class="form-control">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-sm-6"> 
+                                <label>Action</label>
+                                <input name="action" id="action" type="text" value="" placeholder="Action" class="form-control">
+                            </div>
+                            <div class="form-group col-sm-6"> 
+                                <label>Method</label>
+                                <div class="selector-exam">
+                                    <select class="form-control select-method" style="width: 100%" name="method[]" id="method" multiple="">
+{#                                        <option value="">Select...</option>  #}
+                                        {% for methodArray in methodArray %}
+                                            {% set selected = '' %}
+                                            <option value="{{methodArray}}">{{methodArray}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-sm-6">         
+                                <label>Description</label>
+                                <textarea name="descriptionPermit" id="descriptionPermit" type="text" class="form-control"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">  
+                            <input type="button" value="Add" class="btn btn-primary" id="addButtonPermits" onclick="addPermits();">&nbsp;&nbsp;&nbsp;                                                                                                                                             
+                        </div>  
+                        <div class="form-group">      
+                            <br>
+                            <input name="countPermits" id="countPermits" type="hidden" value="0">
+                            <table id="tablePermits" class="table table-bordered table-hover" style="display: none; width: 100%">
+                                <tr align="center" style="background-color: silver;">
+                                    <th align="center">Permit</th>                            
+                                    <th align="center">Route</th>                            
+                                    <th align="center">Action</th>                            
+                                    <th align="center">Method</th>                                                                
+                                    <th align="center">Action</th>
+                                </tr>
+                            </table>                        
+                        </div>
+                    </fieldset>
+                    <br>
                     <div class="form-group">       
                         <input type="submit" value="Save" class="btn btn-primary" id="button">&nbsp;&nbsp;&nbsp;
                         <a class="btn btn-primary" href="{{ path('modules_list') }}">Return</a>
@@ -64,33 +122,128 @@
     <script type="text/javascript">
         $(document).ready(function () {
 
+            $(".select-permit").chosen({
+                placeholder_text_multiple: "Select a method",
+                disable_search_threshold: 3,
+                no_results_text: "There are no results!"
+            });
+
+            $(".select-method").chosen({
+                placeholder_text_single: "Select the method"
+            });
+
             $("#button").click(function () {
                         $(".error").remove();
-                        if ($("#module").val() == "") {
+                        if ($("#module").val() === "") {
                                 $("#module").focus().after("<span class='error' style='color:#FF0000;'>Enter the name module</span>");
                                 return false;
-                        } else if ($("#route").val() == "") {
-                                $("#route").focus().after("<span class='error' style='color:#FF0000;'>Enter the route</span>");
+                        } else if ($("#controller").val() === "") {
+                                $("#controller").focus().after("<span class='error' style='color:#FF0000;'>Enter the controller</span>");
                                 return false;
-                        } else if ($("#action").val() == "") {
-                                $("#action").focus().after("<span class='error' style='color:#FF0000;'>Enter the action</span>");
-                                return false;
-                        } else if ($("#description").val() == "") {
-                                $("#description").focus().after("<span class='error' style='color:#FF0000;'>Enter the description</span>");
-                                return false;
-                        } else if ($("#permits").val() == "") {
-                                $("#permits").focus().after("<span class='error' style='color:#FF0000;'>Enter the permits</span>");
-                                return false;
+                        } else if ($("#countPermits").val() === "0") {
+                                alert("You must enter the permits");
+                                return false;                
                         }
             });
-            $("#module, #route, #action, #description, #permits").keyup(function () {
-                        if ($(this).val() != "") {
+            $("#module, #controller").keyup(function () {
+                        if ($(this).val() !== "") {
                                 $(".error").fadeOut();
                                 return false;
                         }
                 });
-
+            
+            $("#countPermits").val(0);
+            
         });
+
+        function addPermits()
+        {
+            var permit = $("#permit").children(':selected').text();
+            var permitVal = $("#permit").val();
+            var route = $('#route').val();
+            var action = $('#action').val();
+            var method = $("#method").children(':selected').text();
+            var methodVal = $("#method").val();
+            var descriptionPermit = $('#descriptionPermit').val();
+            var i = 0; //contador para asignar id al boton que borrara la fila
+            var counter = $("#countPermits").val();
+            
+            if (counter !== "0") {
+                for (i = 0; i <= counter; i++) {
+                    if ($("#permit_" + i).val() === permit) {
+                        alert("This permit is already in the table");
+                        $("#fields").val("");
+                        return false;
+                    }
+                }
+            }
+
+            if (permitVal === "")
+            {
+                alert("Select the permit");
+                return false;
+            }
+
+            if (route === "")
+            {
+                alert("Enter the route");
+                return false;
+            }
+
+            if (action === "")
+            {
+                alert("Enter the action");
+                return false;
+            }
+
+            if (method === "")
+            {
+                alert("Select the method");
+                return false;
+            }
+
+            counter = $("#countPermits").val();
+
+
+            $("#tablePermits").show();
+            var fila = '<tr align="center" id="row' + counter + '">\n\
+            <td align="center">' + permit + '</td>\n\
+            <input type="hidden" id="permit_' + counter + '" name="permit_' + counter + '"  value="' + permit + '" />\n\
+            <input type="hidden" id="route_' + counter + '" name="route_' + counter + '"  value="' + route + '" />\n\
+            <input type="hidden" id="action_' + counter + '" name="action_' + counter + '"  value="' + action + '" />\n\
+            <input type="hidden" id="method_' + counter + '" name="method_' + counter + '"  value="' + methodVal + '" />\n\
+            <input type="hidden" id="descriptionPermit_' + counter + '" name="descriptionPermit_' + counter + '"  value="' + descriptionPermit + '" />\n\
+            <td align="center">' + route + '</td>\n\
+            <td align="center">' + action + '</td>\n\
+            <td align="center">' + methodVal + '</td>\n\
+            <td><button type="button" name="remove" id="' + counter + '" onclick="$(this).parent().parent().remove(); restPermits()" class="btn btn-danger" style=""><i class="fas fa-minus-circle"></i></button></td>\n\
+        </tr>';
+            counter++;
+
+            $("#countPermits").val(counter);
+
+            $('#tablePermits tr:first').after(fila);
+            var nFilas = $("#tablePermits tr").length;
+            $('#permit').val("").trigger('chosen:updated');
+            $('#method').val("").trigger('chosen:updated');
+            $('#route').val("");
+            $('#action').val("");
+            $('#descriptionPermit').val("");
+
+        }
+
+        function restPermits()
+        {
+            var valor = $("#countPermits").val();
+            var valor1 = 1;
+            var resultado = valor - valor1;
+            $("#countPermits").val(resultado);
+
+            if (resultado === 0)
+            {
+                $("#tablePermits").hide();
+            }
+        }
 
     </script>  
 {% endblock %}
