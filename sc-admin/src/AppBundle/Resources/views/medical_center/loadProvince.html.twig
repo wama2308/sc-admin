@@ -1,3 +1,4 @@
+{% set answerG = "" %}         
 {% if opcion == 1 %}    
     <select class="form-control select-province" style="" name="province" id="province">
         <option value="">Select...</option>     
@@ -100,11 +101,8 @@
         {% endfor %}
     </select>
 {% elseif opcion == 60 %}   
-    {#    {% if answer == 1 %}
-            <div id="divEmail"><span class='error' style='color:#FF0000;'>Este email ya esta registrado</span></div>
-        {% elseif answer == 2 %}
-            
-        {% endif %}#}
+    {% set answerG = answer %}         
+
 {% elseif opcion == 30 %}    
 {% elseif opcion == 40 %}    
 {% elseif opcion == 50 %}    
@@ -132,70 +130,73 @@
 </style> 
 
 <script type="text/javascript">
-    $(document).ready(function () {
-        var myModalLicense = document.getElementById('myModalLicense');
-        var span = document.getElementsByClassName("close")[0];
-        span.onclick = function () {
-            myModalLicense.style.display = "none";
-            $('#license').val("").trigger('chosen:updated');
-        }
+        $(document).ready(function () {
+            var myModalLicense = document.getElementById('myModalLicense');
+            var span = document.getElementsByClassName("close")[0];
+            span.onclick = function () {
+                myModalLicense.style.display = "none";
+                $('#license').val("").trigger('chosen:updated');
+            }
 
-        $(".select-province").chosen({
-            placeholder_text_single: "Select the province",
-            width: "100%"
-        });
+            $(".select-province").chosen({
+                placeholder_text_single: "Select the province",
+                width: "100%"
+            });
 
-        $(".select-licenses").chosen({
-            placeholder_text_single: "Select the license",
-            width: "100%"
-        });
+            $(".select-licenses").chosen({
+                placeholder_text_single: "Select the license",
+                width: "100%"
+            });
 
-        $(".select-waytopay").chosen({
-            placeholder_text_single: "Select the way to pay",
-            width: "100%"
-        });
+            $(".select-waytopay").chosen({
+                placeholder_text_single: "Select the way to pay",
+                width: "100%"
+            });
 
-        $(".select-issuingbank").chosen({
-            placeholder_text_single: "Select the way to pay",
-            width: "100%"
-        });
+            $(".select-issuingbank").chosen({
+                placeholder_text_single: "Select the way to pay",
+                width: "100%"
+            });
 
-        $(".select-receivingbank").chosen({
-            placeholder_text_single: "Select the way to pay",
-            width: "100%"
-        });
+            $(".select-receivingbank").chosen({
+                placeholder_text_single: "Select the way to pay",
+                width: "100%"
+            });    
 
-    {#        alert("{{ answer }}");#}
-            if ("{{ answer }}" === '1') {
-                var master = $("#master").val();
-                var master_ = $("#master_").val();
-                if (master === master_) {
-                    $("#divEmail").html("");
+            if ("{{ opcion }}" === "60") {
+
+                if ("{{ answerG }}" === '1') {
+                    var master = $("#master").val();
+                    var master_ = $("#master_").val();
+                    if (master === master_) {
+                        $("#divEmail").html("");
+                    } else {
+                        $("#divEmail").html("");
+                        $("#master").focus().after("<div id='divEmail'><span class='error' style='color:#FF0000;'>This email already registered</span></div>");
+                        $("#master").val("");
+                    }
+
                 } else {
+
                     $("#divEmail").html("");
-                    $("#master").focus().after("<div id='divEmail'><span class='error' style='color:#FF0000;'>This email already registered</span></div>");
-                    $("#master").val("");
+                    var regex = /[\w-\.]{2,}@([\w-]{2,}\.)*([\w-]{2,}\.)[\w-]{2,4}/;
+                    if (!regex.test($('#master').val().trim())) {
+
+                        $("#divEmail").html("");
+                                $("#master").focus().after("<div id='divEmail'><span class='error' style='color:#FF0000;'>Wrong email format</span></div>");
+                                $("#master").val("");
+                                return false;                
+                    } else {
+
+                        $("#divEmail").html("");
+                                return false;                
+                    }
+
                 }
 
             } else {
-
-                $("#divEmail").html("");
-                var regex = /[\w-\.]{2,}@([\w-]{2,}\.)*([\w-]{2,}\.)[\w-]{2,4}/;
-                if (!regex.test($('#master').val().trim())) {
-
-                    $("#divEmail").html("");
-                            $("#master").focus().after("<div id='divEmail'><span class='error' style='color:#FF0000;'>Wrong email format</span></div>");
-                            $("#master").val("");
-                            return false;                
-                } else {
-
-                    $("#divEmail").html("");
-                            return false;                
-                }
-
             }
 
-
         });
-
+       
 </script>

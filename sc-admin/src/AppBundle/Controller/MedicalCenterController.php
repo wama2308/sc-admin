@@ -107,8 +107,7 @@ class MedicalCenterController extends Controller {
                         if ($arrayModule["_id"] == $module) {
                             $arrayModulesInsert[] = array(
                                 "name" => $arrayModule["name"],
-                                "route" => $arrayModule["route"],
-                                "action" => $arrayModule["action"],
+                                "controller" => $arrayModule["controller"],                                
                                 "permits" => $arrayModule["permits"]);
                         }
                     }
@@ -261,8 +260,7 @@ class MedicalCenterController extends Controller {
                         if ($arrayModule["_id"] == $module) {
                             $arrayModulesInsert[] = array(
                                 "name" => $arrayModule["name"],
-                                "route" => $arrayModule["route"],
-                                "action" => $arrayModule["action"],
+                                "controller" => $arrayModule["controller"],                                
                                 "permits" => $arrayModule["permits"]);
                         }
                     }
