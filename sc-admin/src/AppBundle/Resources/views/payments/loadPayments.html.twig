@@ -1,0 +1,148 @@
+{% if opcion == 1 %}  
+    <select class="form-control select-waytopay" style="width: 95%" name="waytopay" id="waytopay" onchange="wayToPayOperation();">            
+        <option value="">Select...</option> 
+        {% for waytopay in waytopay %}
+            {% set selected = 'selected' %}
+            {% if waytopay == waytopayEdit %}
+                <option value="{{waytopay}}" {{ selected }}>{{waytopay}}</option>  
+            {% else %}  
+                <option value="{{waytopay}}">{{waytopay}}</option>
+            {% endif %}  
+        {% endfor %}
+    </select>
+{% elseif opcion == 2 %}  
+    <select class="form-control select-issuingbank" style="width: 95%" name="issuingbank" id="issuingbank" onchange="" disabled="">  
+        <option value="">Select...</option> 
+        {% for issuingbank in issuingbank %}
+            {% set selected = 'selected' %}
+            {% if issuingbank == issuingbankEdit %}
+                <option value="{{issuingbank}}" {{ selected }}>{{issuingbank}}</option>  
+            {% else %}  
+                <option value="{{issuingbank}}">{{issuingbank}}</option>
+            {% endif %}  
+        {% endfor %}
+    </select>
+{% elseif opcion == 3 %}  
+    <select class="form-control select-receivingbank" style="width: 95%" name="receivingbank" id="receivingbank" onchange="" disabled="">
+        <option value="">Select...</option> 
+        {% for receivingbank in receivingbank %}
+            {% set selected = 'selected' %}
+            {% if receivingbank == receivingbankEdit %}
+                <option value="{{receivingbank}}" {{ selected }}>{{receivingbank}}</option>  
+            {% else %}  
+                <option value="{{receivingbank}}">{{receivingbank}}</option>
+            {% endif %}  
+        {% endfor %}
+    </select>
+
+{% endif %}    
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        
+        $(".select-waytopay").chosen({
+            placeholder_text_single: "Select the way to pay",
+            width: "100%"
+        });
+
+        $(".select-issuingbank").chosen({
+            placeholder_text_single: "Select the way to pay",
+            width: "100%"
+        });
+
+        $(".select-receivingbank").chosen({
+            placeholder_text_single: "Select the way to pay",
+            width: "100%"
+        });
+
+        if (($("#waytopay").val() === "") || ($("#waytopay").val() === "EFECTIVO"))
+        {
+            $("#divInfoTarjetas").hide();
+            $("#divNumCheck").hide();
+            $("#divProofTransfer").hide();
+
+            $("#cardholder").val("");
+            $("#cardnumber").val("");
+            $("#expiration").val("");
+            $("#cvv").val("");
+            $("#operationnumber").val("");
+            $("#files4").val("");
+            $("#inputFile4Base64").val("");
+            $("#list4").html("");
+
+            $("#receivingbank").attr('disabled', true).trigger("chosen:updated");
+            $("#issuingbank").attr('disabled', true).trigger("chosen:updated");
+            $("#operationnumber").prop("disabled", true);
+
+        } else if (($("#waytopay").val() === "TDD") || ($("#waytopay").val() === "TDC"))
+        {
+            $("#divInfoTarjetas").show();
+            $("#divNumCheck").show();
+            $("#divProofTransfer").hide();
+
+{#            $("#operationnumber").val("");#}
+            $("#files4").val("");
+            $("#inputFile4Base64").val("");
+            $("#list4").html("");
+
+            $("#receivingbank").attr('disabled', false).trigger("chosen:updated");
+            $("#issuingbank").attr('disabled', false).trigger("chosen:updated");
+            $("#operationnumber").prop("disabled", false);
+
+        } else if ($("#waytopay").val() === "CHEQUE")
+        {
+            $("#divInfoTarjetas").hide();
+            $("#divNumCheck").show();
+            $("#divProofTransfer").hide();
+
+            $("#cardholder").val("");
+            $("#cardnumber").val("");
+            $("#expiration").val("");
+            $("#cvv").val("");
+            $("#files4").val("");
+            $("#inputFile4Base64").val("");
+            $("#list4").html("");
+{#            $("#operationnumber").val("");#}
+
+            $("#receivingbank").attr('disabled', false).trigger("chosen:updated");
+            $("#issuingbank").attr('disabled', false).trigger("chosen:updated");
+            $("#operationnumber").prop("disabled", false);
+
+        } else if (($("#waytopay").val() === "TRANSFERENCIA") || ($("#waytopay").val() === "DEPOSITO"))
+        {
+            $("#divInfoTarjetas").hide();
+            $("#divNumCheck").show();
+            $("#divProofTransfer").show();
+
+            $("#cardholder").val("");
+            $("#cardnumber").val("");
+            $("#expiration").val("");
+            $("#cvv").val("");
+{#            $("#operationnumber").val("");#}
+
+            $("#receivingbank").attr('disabled', false).trigger("chosen:updated");
+            $("#issuingbank").attr('disabled', false).trigger("chosen:updated");
+            $("#operationnumber").prop("disabled", false);
+        }
+        
+        if ("{{ daystopayEdit }}" !== "0")
+        {
+            $('#paymenttype').val("partial").trigger('chosen:updated');
+            $("#divDaystopay").show();
+{#            $("#amount").val("0");#}
+            $("#amount").prop("disabled", false);
+        } else
+        {
+            $('#paymenttype').val("full").trigger('chosen:updated');
+            $("#divDaystopay").hide();
+            {#$("#daystopay").val("0");
+            var amountTotal = $("#amountTotal").val();
+            $("#amount").val(amountTotal);
+            $("#amount").prop("disabled", true);
+            var amount = parseFloat($("#amountTotal").val()) - parseFloat($("#total").val());
+            $("#amount").val(amount);#}
+        }
+
+    });
+
+</script>

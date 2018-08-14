@@ -795,5 +795,42 @@ class ApiRestUserController extends Controller {
             return new Response('Operacion exitosa');
         }
     }
+    
+    /**
+     * @Route("/api/LoadModules")     
+     * @Method("GET")
+     */
+    public function LoadModulesAction(Request $request) {
+
+        $token = $request->headers->get('Authorization');
+        if ($token == "") {
+            $data = array('message' => 'Token invalido');
+            return new JsonResponse($data, 403);
+        } else {
+            $data_token = $this->get('lexik_jwt_authentication.encoder')->decode($token);
+            if ($data_token == false) {
+                $data = array('message' => 'Authentication Required');
+                return new JsonResponse($data, 403);
+            } else {
+                $user_id = $data_token["id"];
+                $user = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findOneBy(['_id' => $user_id]);
+                if ($user) {
+
+                    $encoders = array(new XmlEncoder(), new JsonEncoder());
+                    $normalizers = array(new ObjectNormalizer());
+
+                    $serializer = new Serializer($normalizers, $encoders);
+
+                    $provinces = $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->findAll();
+
+                    $jsonContent = $serializer->serialize($provinces, 'json');
+                    return new Response($jsonContent);
+                } else {
+                    $data = array('message' => 'Error al consultar los datos, problemas con el token');
+                    return new JsonResponse($data, 403);
+                }
+            }
+        }
+    }
 
 }

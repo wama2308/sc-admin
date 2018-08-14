@@ -1,0 +1,131 @@
+{% extends '@App/base.html.twig' %}
+
+{% block ol %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{{ path('homepage') }}">Home</a>
+        </li>
+        <li class="breadcrumb-item active">
+            <a href="{{ path('payments_list') }}">Payments</a>
+        </li>
+        <li class="breadcrumb-item active">Details</li>
+        <!-- Breadcrumb Menu-->
+        <li class="breadcrumb-menu d-md-down-none">
+            {#<div class="btn-group" role="group" aria-label="Button group">
+                <a class="btn" href="#">
+                    <i class="icon-speech"></i>
+                </a>
+                <a class="btn" href="./">
+                    <i class="icon-graph"></i>  Dashboard</a>
+                <a class="btn" href="#">
+                    <i class="icon-settings"></i>  Settings</a>
+            </div>#}
+        </li>
+    </ol>        
+{% endblock %}
+
+{% block body %}
+    {% set NameLanguaje = '' %}  
+    {% set status = "" %}             
+    {% set class = "" %}    
+    {% set acumAmountLicense = 0 %}   
+    {% set acumAmountPayments = 0 %}   
+    {% set acumRemaining = 0 %}   
+    {% if medicalcenter.paymentstatus == "Paid out" %}
+        {% set status =  medicalcenter.paymentstatus %}             
+        {% set class = "badge badge-success" %}   
+    {% else %}    
+        {% set status = medicalcenter.paymentstatus %}
+        {% set class = "badge badge-danger" %}   
+    {% endif %}    
+    <div class="card">
+        <div class="card-header">
+            <strong>Details Payment</strong>
+            {#<a title="DELETE" href="{{ path('country_delete', { 'id': country.id }) }}" class="btn btn-danger" onclick="return confirm('¿Be sure to eliminate the country?');" style="; float: right"><i class="fas fa-minus-circle"></i> </a>
+            <strong style="float: right">&nbsp;&nbsp;</strong>
+            <a align="right" title="EDIT" href="{{ path('country_edit', { 'id': country.id }) }}" class="btn btn-default"  style="background-color: #a1c9c2; color: black; float: right"><i class="fas fa-edit"></i> </a>            #}
+        </div>        
+        <div class="card-body">
+            <div class="panel panel-body">
+                <table class="table table-responsive-sm table-bordered table-striped table-sm">
+                    <tr>
+                        <td align = "justify" style="width: 80px"><b>Status Payment</b></td>
+                        <td align = "justify" style="width: 100px"><span class = "{{class}}">{{status}}</span></td>                        
+                    </tr>                                                         
+                </table>  
+
+                <div align="center" id="labelLicense" style="display: block"><h4 style="background-color: silver; align-items: center">Licenses</h4></div>
+                <a class="btn btn-primary btn-sm" href="" title="Add License" role="button"><i class="fas fa-plus-circle"></i> </a>&nbsp;&nbsp;&nbsp;&nbsp;          
+                <br>                
+                <table id="tablelicenses" class="table table-responsive-sm table-bordered table-striped table-sm" style="display: table; width: 100%">
+                    <tr align="center" style="background-color: silver;">
+                        <th align="center">License</th>                            
+                        <th align="center">Users Quantity</th>                            
+                        <th align="center">Number of Clients</th>                            
+                        <th align="center">Number of Exams</th>                            
+                        <th align="center">Duration Time</th>                            
+                        <th align="center">Amount</th>   
+                        <th align="center">Action</th>
+                    </tr>
+                    {% for arrayLicenseData in arrayLicenseData %}
+                        {% set acumAmountLicense = acumAmountLicense + arrayLicenseData.amount %} 
+                        <tr align="center" id="trlicense_{{ loop.index-1 }}">
+                            <td align="center">{{ arrayLicenseData.license }}</td>                            
+                            <td align="center">{{ arrayLicenseData.usersquantity }}</td>                            
+                            <td align="center">{{ arrayLicenseData.numberclients }}</td>                            
+                            <td align="center">{{ arrayLicenseData.numberexams }}</td>                            
+                            <td align="center">{{ arrayLicenseData.durationtime }}</td>
+                            <td align="center">{{ arrayLicenseData.amount }}</td>
+                            <td align="center"><a title="Renovate" href="" class="btn btn-info btn-sm "><i class="fas fa-reply"></i> </a></td>
+                        </tr>
+
+                    {% endfor %}
+                </table>
+                <div id="divAmount" align="right" style="display: block"><b>Total to pay:</b>&nbsp;&nbsp;<input readonly="" name="amountTotal" id="amountTotal" type="text" value="{{ acumAmountLicense }}" placeholder="" class="" style=" width: 15%;padding: 1px 45px;margin: 5px 0;box-sizing: border-box;border: none;border-bottom: 2px solid black;"><label id="labelAmountCurrentSymbol"><b></b></label></div>                    
+                <br>
+                <br>
+                <div align="center" id="labelLicense" style="display: block"><h4 style="background-color: silver; align-items: center">Payments</h4></div>
+                <a class="btn btn-primary btn-sm" href="{{ path('payment_create', { 'id': id }) }}" title="Add Payment" role="button"><i class="fas fa-plus-circle"></i> </a>&nbsp;&nbsp;&nbsp;&nbsp;          
+                <table id="tablelicenses" class="table table-responsive-sm table-bordered table-striped table-sm" style="display: table; width: 100%">
+                    <tr align="center" style="background-color: silver;">
+                        <th align="center">Way to pay</th>                            
+                        <th align="center">Operation number</th>                            
+                        <th align="center">Issuing bank</th>                            
+                        <th align="center">Receiving bank</th>                            
+                        <th align="center">Amount</th>                            
+                        <th align="center">Action</th>
+                    </tr>
+                    {% for payments in medicalcenter.payments %}
+                        {% if payments.status == 1 %}
+                            {% set acumAmountPayments = acumAmountPayments + payments.amount %} 
+                            <tr align="center" id="trlicense_{{ loop.index-1 }}">
+                                <td align="center">{{ payments.waytopay }}</td>                            
+                                <td align="center">{{ payments.operationnumber }}</td>                            
+                                <td align="center">{{ payments.issuingbank }}</td>                            
+                                <td align="center">{{ payments.receivingbank }}</td>                            
+                                <td align="center">{{ payments.amount }}</td>                            
+                                <td align="center">
+                                    <a title="Edit Payment" href="{{ path('payment_edit', { 'id' : id, 'position' : loop.index-1 }) }}" class="btn btn-info btn-sm "><i class="fas fa-edit"></i> </a>
+                                    <a title="Delete Payment" href="{{ path('payments_delete', { 'id' : id, 'position' : loop.index-1 }) }}" class="btn btn-danger btn-sm " onclick="return confirm('¿Be sure to eliminate the payment?');"><i class="fas fa-minus-circle"></i> </a>
+                                </td>
+                                
+                            </tr>
+                        {% endif %}    
+                    {% endfor %}
+                </table>
+                {% set acumRemaining = acumAmountLicense - acumAmountPayments %} 
+                <div id="divRemaining" align="right" style="display: block"><b>Remaining:</b>&nbsp;&nbsp;<input readonly="" name="remaining" id="remaining" type="text" value="{{ acumRemaining }}" placeholder="" class="" style=" width: 15%;padding: 1px 45px;margin: 5px 0;box-sizing: border-box;border: none;border-bottom: 2px solid black;"><label id="labelAmountCurrentSymbol"><b></b></label></div>
+                <div id="divTotalPayment" align="right" style="display: block"><b>Total to pay:</b>&nbsp;&nbsp;<input readonly="" name="total" id="total" type="text" value="{{ acumAmountPayments }}" placeholder="" class="" style=" width: 15%;padding: 1px 45px;margin: 5px 0;box-sizing: border-box;border: none;border-bottom: 2px solid black;"><label id="labelAmountCurrentSymbol"><b></b></label></div>
+
+
+            </div>            
+        </div>
+
+    </div>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+        });
+    </script>  
+{% endblock %}

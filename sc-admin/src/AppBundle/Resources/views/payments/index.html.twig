@@ -1,0 +1,73 @@
+{% extends '@App/base.html.twig' %}
+
+{% block ol %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{{ path('homepage') }}">Home</a>
+        </li>
+        <li class="breadcrumb-item active">
+            <a href="{{ path('payments_list') }}">Payments</a>
+        </li>
+        <li class="breadcrumb-item active">List</li>
+        <!-- Breadcrumb Menu-->
+        <li class="breadcrumb-menu d-md-down-none">
+            {#<div class="btn-group" role="group" aria-label="Button group">
+                <a class="btn" href="#">
+                    <i class="icon-speech"></i>
+                </a>
+                <a class="btn" href="./">
+                    <i class="icon-graph"></i>  Dashboard</a>
+                <a class="btn" href="#">
+                    <i class="icon-settings"></i>  Settings</a>
+            </div>#}
+        </li>
+    </ol>        
+{% endblock %}
+
+{% block body %}
+    <div class="card">
+        <div class="card-header">
+{#            <a class="btn btn-primary" href="{{ path('country_create') }}" role="button"><i class="fas fa-plus-circle"></i> </a>&nbsp;&nbsp;&nbsp;&nbsp;          #}
+            <strong>List Payments</strong>
+            {#            <small>List</small>#}
+        </div>        
+        <div class="card-body">
+            <div></div>
+
+            <table id="tablePayments" class="table table-responsive-sm table-striped"> 
+                <thead> 
+                    <tr> 
+                        <th>Medical Center</th>    
+                        <th>Status Payment</th>                            
+                    </tr> 
+                </thead> 
+                <tbody> 
+                    {% for medicalcenter in medicalcenter %}
+                        {% if medicalcenter.paymentstatus == "Paid out" %}
+                            {% set status =  medicalcenter.paymentstatus %}             
+                            {% set class = "badge badge-success" %}   
+                        {% else %}    
+                            {% set status = medicalcenter.paymentstatus %}
+                            {% set class = "badge badge-danger" %}   
+                        {% endif %}                        
+                        <tr> 
+                            <td><a title="View Details" class="nav-link" href="{{ path('payments_details', { 'id': medicalcenter.id }) }}">{{medicalcenter.name}}</a></td>                                                             
+                            <td><span class = "{{class}}">{{status}}</span></td>                                  
+                        </tr>   
+
+                    {% endfor %}
+                </tbody> 
+            </table>    
+        </div>
+    </div>
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            $('#tablePayments')
+                    .addClass('nowrap')
+                    .dataTable();
+        });
+
+    </script>  
+
+{% endblock %}
