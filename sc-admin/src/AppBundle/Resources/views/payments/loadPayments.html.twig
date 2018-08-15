@@ -34,12 +34,89 @@
             {% endif %}  
         {% endfor %}
     </select>
+{% elseif opcion == 4 %}    
+    <select class="form-control select-licenses" name="license" id="license" onchange="loadAjax(this.value, 'divLicenses', 5);
+            loadInfoLicense();">
+        <option value="">Select...</option> 
+        {% for licensecountry in licensecountry %}
+            {% set selected = '' %}
+            <option value="{{licensecountry.id}}">{{licensecountry.license}}</option>
+        {% endfor %}
+    </select>
+{% elseif opcion == 5 %}    
+    <span class="close" onclick="$('#licenseModal').hide();">&times;</span>
+    <table align="center" id="tablelicenses" class="table table-bordered table-hover" style="width: 100%; border-radius: 40px">
+        <tr align="center" style="">
+            <th colspan="2" align="center"><img src="{{ asset('img/sc.png') }}" alt="License" width="280px" height="80px"/></th>                                                            
+        </tr>
+        <tr align="center" style="">
+            <th style="width: 30px" align="center"><b>License</b></th>   
+        <input name="licenseid" id="licenseid" type="hidden" value="{{ license.id }}" >                    
+        <input name="inputLicense" id="inputLicense" type="hidden" value="{{ license.license }}" >                    
+        <input name="inputUsersQuantity" id="inputUsersQuantity" type="hidden" value="{{ license.usersquantity }}" >                    
+        <input name="inputNumberClients" id="inputNumberClients" type="hidden" value="{{ license.numberclients }}" >                    
+        <input name="inputNumberExams" id="inputNumberExams" type="hidden" value="{{ license.numberexams }}" >                    
+        <input name="inputDurationTime" id="inputDurationTime" type="hidden" value="{{ license.durationtime }}" >                    
+        <input name="inputAmount" id="inputAmount" type="hidden" value="{{ license.amount }}" >                    
+        <input name="inputCurrentSymbol" id="inputCurrentSymbol" type="hidden" value="{{ country.currencySymbol }}" >                    
+        <th style="width: 30px" align="center" id="thLicense">{{ license.license }}</th>                                                            
+    </tr>
+    <tr align="center" style="">
+        <th style="width: 30px" align="center"><b>Users Quantity</b></th>                                                            
+        <th style="width: 30px" align="center">{{ license.usersquantity }}</th>                                                            
+    </tr>
+    <tr align="center" style="">
+        <th style="width: 30px" align="center"><b>Number of Clients</b></th>                                                            
+        <th style="width: 30px" align="center">{{ license.numberclients }}</th>                                                            
+    </tr>
+    <tr align="center" style="">
+        <th style="width: 30px" align="center"><b>Number of Exams</b></th>                                                            
+        <th style="width: 30px" align="center">{{ license.numberexams }}</th>                                                            
+    </tr>
+    <tr align="center" style="">
+        <th style="width: 30px" align="center"><b>Duration Time</b></th>                                                            
+        <th style="width: 30px" align="center">{{ license.durationtime }}</th>                                                            
+    </tr>
+    <tr align="center" style="">
+        <th style="width: 30px" align="center"><b>Amount</b></th>                                                            
+        <th style="width: 30px" align="center">{{ license.amount }} {{ country.currencySymbol }}</th>                                                            
+    </tr>    
+</table>   
+{% elseif opcion == 6 %}    
+    <table id="tablePayments" class="table table-responsive-sm table-striped"> 
+        <thead> 
+            <tr> 
+                <th>Medical Center</th>    
+                <th>Status Payment</th>                            
+            </tr> 
+        </thead> 
+        <tbody> 
+            {% for medicalcenter in medicalcenter %}
+                {% if medicalcenter.paymentstatus == "Paid out" %}
+                    {% set status =  medicalcenter.paymentstatus %}             
+                    {% set class = "badge badge-success" %}   
+                {% else %}    
+                    {% set status = medicalcenter.paymentstatus %}
+                    {% set class = "badge badge-danger" %}   
+                {% endif %}                        
+                <tr> 
+                    <td><a title="View Details" class="nav-link" href="{{ path('payments_details', { 'id': medicalcenter.id }) }}">{{medicalcenter.name}}</a></td>                                                             
+                    <td><span class = "{{class}}">{{status}}</span></td>                                  
+                </tr>   
 
+            {% endfor %}
+        </tbody> 
+    </table>    
 {% endif %}    
 
 <script type="text/javascript">
     $(document).ready(function () {
-        
+
+        $(".select-licenses").chosen({
+            placeholder_text_single: "Select the license",
+            width: "100%"
+        });
+
         $(".select-waytopay").chosen({
             placeholder_text_single: "Select the way to pay",
             width: "100%"
@@ -80,69 +157,67 @@
             $("#divNumCheck").show();
             $("#divProofTransfer").hide();
 
-{#            $("#operationnumber").val("");#}
-            $("#files4").val("");
-            $("#inputFile4Base64").val("");
-            $("#list4").html("");
+    {#            $("#operationnumber").val("");#}
+                $("#files4").val("");
+                $("#inputFile4Base64").val("");
+                $("#list4").html("");
 
-            $("#receivingbank").attr('disabled', false).trigger("chosen:updated");
-            $("#issuingbank").attr('disabled', false).trigger("chosen:updated");
-            $("#operationnumber").prop("disabled", false);
+                $("#receivingbank").attr('disabled', false).trigger("chosen:updated");
+                $("#issuingbank").attr('disabled', false).trigger("chosen:updated");
+                $("#operationnumber").prop("disabled", false);
 
-        } else if ($("#waytopay").val() === "CHEQUE")
-        {
-            $("#divInfoTarjetas").hide();
-            $("#divNumCheck").show();
-            $("#divProofTransfer").hide();
+            } else if ($("#waytopay").val() === "CHEQUE")
+            {
+                $("#divInfoTarjetas").hide();
+                $("#divNumCheck").show();
+                $("#divProofTransfer").hide();
 
-            $("#cardholder").val("");
-            $("#cardnumber").val("");
-            $("#expiration").val("");
-            $("#cvv").val("");
-            $("#files4").val("");
-            $("#inputFile4Base64").val("");
-            $("#list4").html("");
-{#            $("#operationnumber").val("");#}
+                $("#cardholder").val("");
+                $("#cardnumber").val("");
+                $("#expiration").val("");
+                $("#cvv").val("");
+                $("#files4").val("");
+                $("#inputFile4Base64").val("");
+                $("#list4").html("");
+    {#            $("#operationnumber").val("");#}
 
-            $("#receivingbank").attr('disabled', false).trigger("chosen:updated");
-            $("#issuingbank").attr('disabled', false).trigger("chosen:updated");
-            $("#operationnumber").prop("disabled", false);
+                $("#receivingbank").attr('disabled', false).trigger("chosen:updated");
+                $("#issuingbank").attr('disabled', false).trigger("chosen:updated");
+                $("#operationnumber").prop("disabled", false);
 
-        } else if (($("#waytopay").val() === "TRANSFERENCIA") || ($("#waytopay").val() === "DEPOSITO"))
-        {
-            $("#divInfoTarjetas").hide();
-            $("#divNumCheck").show();
-            $("#divProofTransfer").show();
+            } else if (($("#waytopay").val() === "TRANSFERENCIA") || ($("#waytopay").val() === "DEPOSITO"))
+            {
+                $("#divInfoTarjetas").hide();
+                $("#divNumCheck").show();
+                $("#divProofTransfer").show();
 
-            $("#cardholder").val("");
-            $("#cardnumber").val("");
-            $("#expiration").val("");
-            $("#cvv").val("");
-{#            $("#operationnumber").val("");#}
+                $("#cardholder").val("");
+                $("#cardnumber").val("");
+                $("#expiration").val("");
+                $("#cvv").val("");
+    {#            $("#operationnumber").val("");#}
 
-            $("#receivingbank").attr('disabled', false).trigger("chosen:updated");
-            $("#issuingbank").attr('disabled', false).trigger("chosen:updated");
-            $("#operationnumber").prop("disabled", false);
-        }
-        
-        if ("{{ daystopayEdit }}" !== "0")
-        {
-            $('#paymenttype').val("partial").trigger('chosen:updated');
-            $("#divDaystopay").show();
-{#            $("#amount").val("0");#}
-            $("#amount").prop("disabled", false);
-        } else
-        {
-            $('#paymenttype').val("full").trigger('chosen:updated');
-            $("#divDaystopay").hide();
-            {#$("#daystopay").val("0");
-            var amountTotal = $("#amountTotal").val();
-            $("#amount").val(amountTotal);
-            $("#amount").prop("disabled", true);
-            var amount = parseFloat($("#amountTotal").val()) - parseFloat($("#total").val());
-            $("#amount").val(amount);#}
-        }
+                $("#receivingbank").attr('disabled', false).trigger("chosen:updated");
+                $("#issuingbank").attr('disabled', false).trigger("chosen:updated");
+                $("#operationnumber").prop("disabled", false);
+            }
+    {#alert({{ daystopayEdit|number_format }});
+    alert({{ daystopayEdit}});#}
+                    if ("{{ daystopayEdit }}" === "")
+                    {
 
-    });
+
+                    } else if ("{{ daystopayEdit|number_format }}" === "0")
+                    {
+                        $('#paymenttype').val("full").trigger('chosen:updated');
+                        $("#divDaystopay").hide();
+                    } else if ("{{ daystopayEdit|number_format }}" > 0)
+                    {
+                        $('#paymenttype').val("partial").trigger('chosen:updated');
+                        $("#divDaystopay").show();
+                        $("#amount").prop("disabled", false);
+                    }
+
+                });
 
 </script>

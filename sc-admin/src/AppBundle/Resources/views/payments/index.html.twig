@@ -8,7 +8,7 @@
         <li class="breadcrumb-item active">
             <a href="{{ path('payments_list') }}">Payments</a>
         </li>
-        <li class="breadcrumb-item active">List</li>
+        <li class="breadcrumb-item active"> Search Medical Center</li>
         <!-- Breadcrumb Menu-->
         <li class="breadcrumb-menu d-md-down-none">
             {#<div class="btn-group" role="group" aria-label="Button group">
@@ -27,46 +27,73 @@
 {% block body %}
     <div class="card">
         <div class="card-header">
-{#            <a class="btn btn-primary" href="{{ path('country_create') }}" role="button"><i class="fas fa-plus-circle"></i> </a>&nbsp;&nbsp;&nbsp;&nbsp;          #}
-            <strong>List Payments</strong>
+            {#            <a class="btn btn-primary" href="{{ path('country_create') }}" role="button"><i class="fas fa-plus-circle"></i> </a>&nbsp;&nbsp;&nbsp;&nbsp;          #}
+            <strong>Search Medical Center</strong>
             {#            <small>List</small>#}
         </div>        
         <div class="card-body">
-            <div></div>
+            <div class="panel panel-body">
+                <form action="" method="post" id="formid" enctype="multipart/form-data">  
+                    <div class="row">
+                        {#<div class="form-group col-sm-6">  
+                            <input name="a" id="a" type="hidden" value="" class="form-control">                    
+                        </div>#}
+                        <div class="form-group col-sm-6">  
+                            <label>Medical Center</label>
+                            <input name="medicalCenter" id="medicalCenter" type="text" value="" placeholder="Search..." class="form-control" onkeyup="loadAjax(this.value, 'divPaymentsMedicalCenter', 6);"  style="">                    
+                        </div>
+                    </div>
+                </form>
+                <div id="divPaymentsMedicalCenter">
+                    {#<table id="tablePayments" class="table table-responsive-sm table-striped"> 
+                        <thead> 
+                            <tr> 
+                                <th>Medical Center</th>    
+                                <th>Status Payment</th>                            
+                            </tr> 
+                        </thead> 
+                        <tbody> 
+                            {% for medicalcenter in medicalcenter %}
+                                {% if medicalcenter.paymentstatus == "Paid out" %}
+                                    {% set status =  medicalcenter.paymentstatus %}             
+                                    {% set class = "badge badge-success" %}   
+                                {% else %}    
+                                    {% set status = medicalcenter.paymentstatus %}
+                                    {% set class = "badge badge-danger" %}   
+                                {% endif %}                        
+                                <tr> 
+                                    <td><a title="View Details" class="nav-link" href="{{ path('payments_details', { 'id': medicalcenter.id }) }}">{{medicalcenter.name}}</a></td>                                                             
+                                    <td><span class = "{{class}}">{{status}}</span></td>                                  
+                                </tr>   
 
-            <table id="tablePayments" class="table table-responsive-sm table-striped"> 
-                <thead> 
-                    <tr> 
-                        <th>Medical Center</th>    
-                        <th>Status Payment</th>                            
-                    </tr> 
-                </thead> 
-                <tbody> 
-                    {% for medicalcenter in medicalcenter %}
-                        {% if medicalcenter.paymentstatus == "Paid out" %}
-                            {% set status =  medicalcenter.paymentstatus %}             
-                            {% set class = "badge badge-success" %}   
-                        {% else %}    
-                            {% set status = medicalcenter.paymentstatus %}
-                            {% set class = "badge badge-danger" %}   
-                        {% endif %}                        
-                        <tr> 
-                            <td><a title="View Details" class="nav-link" href="{{ path('payments_details', { 'id': medicalcenter.id }) }}">{{medicalcenter.name}}</a></td>                                                             
-                            <td><span class = "{{class}}">{{status}}</span></td>                                  
-                        </tr>   
-
-                    {% endfor %}
-                </tbody> 
-            </table>    
+                            {% endfor %}
+                        </tbody> 
+                    </table>#}  
+                </div>
+            </div>
         </div>
     </div>
     <script type="text/javascript">
 
         $(document).ready(function () {
-            $('#tablePayments')
-                    .addClass('nowrap')
-                    .dataTable();
+
         });
+
+        function loadAjax(valor, div, opcion)
+        {
+            var valor_id = valor;            
+            if (valor_id !== "")
+            {
+                $.ajax({
+                    type: 'POST',
+                    url: "{{ path('load_payments') }}",
+                    data: {valor_id: valor_id, opcion: opcion},
+                    success: function (html) {
+                        $("#" + div).html(html);
+                    }
+                });
+            }
+        }
 
     </script>  
 

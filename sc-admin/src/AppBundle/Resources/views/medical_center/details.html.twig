@@ -69,6 +69,7 @@
                     <tr> 
                         <td align = "justify" style="width: 50px"><b>Medical Center</b></td>
                         <td align = "justify" style="width: 100px">{{ medicalcenter.name }}</td>
+                    </tr>
                     <tr>
                         <td align = "justify" style="width: 50px"><b>Country</b></td>
                         <td align = "justify" style="width: 100px">{{ country }}</td>
@@ -328,7 +329,7 @@
             btnModalLicense.onclick = function () {
                 licenseModal.style.display = "block";
             }
-            
+
             btnModalPayments.onclick = function () {
                 paymentModal.style.display = "block";
             }
@@ -338,7 +339,7 @@
 
                     licenseModal.style.display = "none";
 
-                }else if (event.target === paymentModal) {
+                } else if (event.target === paymentModal) {
 
                     paymentModal.style.display = "none";
 

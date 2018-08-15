@@ -416,12 +416,10 @@ class MedicalCenterController extends Controller {
 
         if ($request->isXmlHttpRequest()) {
             $country_id = $request->request->get('valor_id');
-            $opcion = $request->request->get('opcion');
-            $opcion = $request->request->get('opcion');
+            $opcion = $request->request->get('opcion');            
             $valoredit = $request->request->get('valoredit');
             if ($opcion == 3) {
                 $licensecountry = $this->get('doctrine_mongodb')->getRepository('AppBundle:License')->findBy(array('countries' => $country_id));
-                //var_dump($licensecountry);
                 return $this->render('@App/medical_center/loadProvince.html.twig', array('licensecountry' => $licensecountry, 'opcion' => $opcion));
             }
         }

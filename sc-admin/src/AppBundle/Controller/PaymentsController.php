@@ -26,6 +26,11 @@ class PaymentsController extends Controller {
      */
     public function listAction(Request $request) {
 
+//        $p = "Funda";
+//        $b = "/^$p/";
+//        $a = new \MongoRegex($b);
+//        $medicalcenter1 = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->findBy(array('name' => $a));
+//        var_dump($medicalcenter1);
         $medicalcenter = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->findByActive(true);
         $countries = $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->findAll();
         //var_dump($countries);
@@ -98,8 +103,21 @@ class PaymentsController extends Controller {
 
         foreach ($arrayLicenses as $arrayLicenses) {
             if ($arrayLicenses['status'] == "Active") {
+
+                $renovation = "";
+                $acumRenovation = 0;
+                if (isset($arrayLicenses['renovation'])) {
+                    $renovation = $arrayLicenses['renovation'];
+                    foreach ($renovation as $renovation) {
+                        $acumRenovation = $acumRenovation + $renovation['amount'];
+                    }
+                } else {
+                    $renovation = "";
+                }
+
                 $licensesData = $this->get('doctrine_mongodb')->getRepository('AppBundle:License')->find($arrayLicenses['license_id']);
-                $acumLicenses = $acumLicenses + $licensesData->getAmount();
+                
+                $acumLicenses = $acumLicenses + $acumRenovation + $licensesData->getAmount();
             }
         }
 
@@ -137,13 +155,13 @@ class PaymentsController extends Controller {
         $inputFile4Base64 = $request->request->get("inputFile4Base64");
         $operationnumber = $request->request->get("operationnumber");
         $medicalcenterPayment = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->find($id);
-        
+
         $issuingbankData = ($issuingbank == null) ? "Any" : $issuingbank;
         $receivingbankData = ($receivingbank == null) ? "Any" : $receivingbank;
         $operationnumberData = ($operationnumber == null) ? "" : $operationnumber;
-        
 
-        if (($waytopay != "") || ($paymenttype != "") || ($amount != "")){
+
+        if (($waytopay != "") || ($paymenttype != "") || ($amount != "")) {
 
             $medicalcenterPayment = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->find($id);
             $arrayPaymentsNew = $medicalcenterPayment->getPayments();
@@ -163,7 +181,7 @@ class PaymentsController extends Controller {
 
             $amountTotal = $request->request->get("amountTotal");
             $total = $request->request->get("totalEdit") + $request->request->get("amount");
-            
+
             if ($amountTotal == $total) {
                 $estatusPayments = "Paid out";
             } else {
@@ -195,8 +213,20 @@ class PaymentsController extends Controller {
 
         foreach ($arrayLicenses as $arrayLicenses) {
             if ($arrayLicenses['status'] == "Active") {
+                
+                $renovation = "";
+                $acumRenovation = 0;
+                if (isset($arrayLicenses['renovation'])) {
+                    $renovation = $arrayLicenses['renovation'];
+                    foreach ($renovation as $renovation) {
+                        $acumRenovation = $acumRenovation + $renovation['amount'];
+                    }
+                } else {
+                    $renovation = "";
+                }
+                
                 $licensesData = $this->get('doctrine_mongodb')->getRepository('AppBundle:License')->find($arrayLicenses['license_id']);
-                $acumLicenses = $acumLicenses + $licensesData->getAmount();
+                $acumLicenses = $acumLicenses + $acumRenovation + $licensesData->getAmount();
             }
         }
 
@@ -213,6 +243,247 @@ class PaymentsController extends Controller {
     }
 
     /**
+     * @Route("/licensePayment/create/{id}", name="license_payment_create")
+     * @Method({"GET", "POST"})
+     */
+    public function createLicenseAction($id, Request $request) {
+
+        $form = $this->createFormBuilder()->getForm();
+        $form->handleRequest($request);
+        $fechaNow = new \MongoDate();
+        $user = $this->getUser()->getId();
+        $countLicenses = $request->request->get("countLicenses");
+        $countPayments = $request->request->get("countPayments");
+        $medicalcenter = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->find($id);
+
+        if (($countPayments != "") || ($countLicenses != "")) {
+
+            $medicalcenter = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->find($id);
+            $arrayLicenses = $medicalcenter->getLicenses();
+            $arrayPayments = $medicalcenter->getPayments();
+
+            for ($i = 0; $i < $countLicenses; $i++) {
+
+                $days = $request->request->get("durationTime_" . $i);
+                $fecha = date('Y-m-d h:i:s');
+                $nuevafecha = strtotime('+' . $days . 'day', strtotime($fecha));
+                $nuevafecha = date('Y-m-d h:i:s', $nuevafecha);
+                $fecha_expiration = new \MongoDate(strtotime($nuevafecha));
+
+                ////////////////////////////////////////////////////////////////
+                $GeneralConfiguration = $this->get('doctrine_mongodb')->getRepository('AppBundle:GeneralConfiguration')->find("5ae08f86c5dfa106dc92610a");
+                $arrayModules = $GeneralConfiguration->getModules();
+                $license = $this->get('doctrine_mongodb')->getRepository('AppBundle:License')->find($request->request->get("licenseId_" . $i));
+                $modules = $license->getModules();
+                $acum = 0;
+
+                foreach ($arrayModules as $arrayModule) {
+
+                    foreach ($modules as $module) {
+                        if ($arrayModule["_id"] == $module) {
+                            $arrayModulesInsert[] = array(
+                                "name" => $arrayModule["name"],
+                                "controller" => $arrayModule["controller"],
+                                "permits" => $arrayModule["permits"]);
+                        }
+                    }
+                }
+                ////////////////////////////////////////////////////////////////
+
+                $arrayLicenses[] = array(
+                    "license_id" => $request->request->get("licenseId_" . $i),
+                    "expiration_date" => $fecha_expiration,
+                    "status" => "Active",
+                    "modules" => $arrayModulesInsert,
+                    "created_at" => $fechaNow,
+                    "created_by" => $user,
+                    "updated_at" => $fechaNow,
+                    "updated_by" => $user);
+
+                unset($arrayModulesInsert);
+            }
+
+            $medicalcenter->setLicenses($arrayLicenses);
+
+            for ($i = 0; $i < $countPayments; $i++) {
+
+                $arrayPayments[] = array(
+                    "waytopay" => $request->request->get("waytopay_" . $i),
+                    "daystopay" => $request->request->get("daystopay_" . $i),
+                    "amount" => doubleval($request->request->get("amount_" . $i)),
+                    "issuingbank" => $request->request->get("issuingbank_" . $i),
+                    "receivingbank" => $request->request->get("receivingbank_" . $i),
+                    "cardholder" => $request->request->get("cardholder_" . $i),
+                    "cardnumber" => $request->request->get("cardnumber_" . $i),
+                    "expiration" => $request->request->get("expiration_" . $i),
+                    "cvv" => $request->request->get("cvv_" . $i),
+                    "files4" => $request->request->get("files4_" . $i),
+                    "operationnumber" => $request->request->get("operationnumber_" . $i),
+                    "status" => true);
+            }
+            $amountTotal = $request->request->get("amountTotal");
+            $total = $request->request->get("total");
+            if ($amountTotal == $total) {
+                $estatusPayments = "Paid out";
+            } else {
+                $estatusPayments = "To paid";
+            }
+
+            $medicalcenter->setPayments($arrayPayments);
+            $medicalcenter->setPaymentstatus($estatusPayments);
+
+            $medicalcenter->setUpdatedAt($fechaNow);
+            $medicalcenter->setUpdatedBy($user);
+
+            $dm = $this->get('doctrine_mongodb')->getManager();
+            $dm->persist($medicalcenter);
+            $dm->flush();
+
+            $this->addFlash('notice', 'Registered License');
+            return $this->redirectToRoute('payments_details', array('id' => $id));
+        }
+
+        $countries = $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->findBy(array('provinces.name' => array('$exists' => true), 'active' => true));
+        $medicalcenterData = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->find($id);
+        $country_id = $medicalcenterData->getCountryid();
+        $acumPayments = 0;
+        $acumLicenses = 0;
+        $acumRemaining = 0;
+
+        $arrayLicenses = $medicalcenterData->getLicenses();
+
+        foreach ($arrayLicenses as $arrayLicenses) {
+            if ($arrayLicenses['status'] == "Active") {
+                $licensesData = $this->get('doctrine_mongodb')->getRepository('AppBundle:License')->find($arrayLicenses['license_id']);
+                $acumLicenses = $acumLicenses + $licensesData->getAmount();
+            }
+        }
+
+
+        foreach ($medicalcenterData->getPayments() as $arrayPayments) {
+            if ($arrayPayments['status'] == true) {
+                $acumPayments = $acumPayments + $arrayPayments['amount'];
+            }
+        }
+
+        $acumRemaining = $acumLicenses - $acumPayments;
+        return $this->render('@App/payments/createLicense.html.twig', array('country_id' => $country_id, 'id' => $id, 'acumRemaining' => $acumRemaining, 'acumPayments' => $acumPayments, 'acumLicenses' => $acumLicenses));
+    }
+
+    /**
+     * @Route("/licenseRenovate/renovate/{id}/{licenseId}/{position}", name="license_renovate")
+     * @Method({"GET", "POST"})
+     */
+    public function renovateLicenseAction($id, $licenseId, $position, Request $request) {
+
+        $form = $this->createFormBuilder()->getForm();
+        $form->handleRequest($request);
+        $fechaNow = new \MongoDate();
+        $user = $this->getUser()->getId();
+
+        $countPayments = $request->request->get("countPayments");
+        $amountData = $request->request->get("amountData");
+        $dueDateData = $request->request->get("dueDateData");
+        $dueDateDataFormat = date($request->request->get("dueDateData"));
+        $dueDateDataMongo = new \MongoDate(strtotime($dueDateDataFormat));
+        $durationData = $request->request->get("durationData");
+        $medicalcenter = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->find($id);
+
+        if ($countPayments != "") {
+
+            $medicalcenter = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->find($id);
+            $arrayLicenses = $medicalcenter->getLicenses();
+            $arrayPayments = $medicalcenter->getPayments();
+
+            $fecha = date($dueDateData);
+            $nuevafecha = strtotime('+' . $durationData . 'day', strtotime($fecha));
+            $nuevafecha = date('Y-m-d h:i:s', $nuevafecha);
+            $fecha_expiration = new \MongoDate(strtotime($nuevafecha));
+
+            $arrayRenovation[] = array(
+                "previous_amount" => doubleval($amountData),
+                "amount" => doubleval($amountData),
+                "previous_due_date" => $dueDateDataMongo,
+                "due_date" => $fecha_expiration,
+                "created_at" => $fechaNow,
+                "created_by" => $user);
+
+            $arrayLicenses[$position]["expiration_date"] = $fecha_expiration;
+            $arrayLicenses[$position]["renovation"] = $arrayRenovation;
+
+            $medicalcenter->setLicenses($arrayLicenses);
+
+            for ($i = 0; $i < $countPayments; $i++) {
+
+                $arrayPayments[] = array(
+                    "waytopay" => $request->request->get("waytopay_" . $i),
+                    "daystopay" => $request->request->get("daystopay_" . $i),
+                    "amount" => doubleval($request->request->get("amount_" . $i)),
+                    "issuingbank" => $request->request->get("issuingbank_" . $i),
+                    "receivingbank" => $request->request->get("receivingbank_" . $i),
+                    "cardholder" => $request->request->get("cardholder_" . $i),
+                    "cardnumber" => $request->request->get("cardnumber_" . $i),
+                    "expiration" => $request->request->get("expiration_" . $i),
+                    "cvv" => $request->request->get("cvv_" . $i),
+                    "files4" => $request->request->get("files4_" . $i),
+                    "operationnumber" => $request->request->get("operationnumber_" . $i),
+                    "status" => true);
+            }
+            $amountTotal = $request->request->get("amountTotal");
+            $total = $request->request->get("total");
+            if ($amountTotal == $total) {
+                $estatusPayments = "Paid out";
+            } else {
+                $estatusPayments = "To paid";
+            }
+
+            $medicalcenter->setPayments($arrayPayments);
+            $medicalcenter->setPaymentstatus($estatusPayments);
+
+            $medicalcenter->setUpdatedAt($fechaNow);
+            $medicalcenter->setUpdatedBy($user);
+
+            $dm = $this->get('doctrine_mongodb')->getManager();
+            $dm->persist($medicalcenter);
+            $dm->flush();
+//
+            $this->addFlash('notice', 'Renewed License');
+            return $this->redirectToRoute('payments_details', array('id' => $id));
+        }
+
+        $countries = $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->findBy(array('provinces.name' => array('$exists' => true), 'active' => true));
+        $medicalcenterData = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->find($id);
+        $country_id = $medicalcenterData->getCountryid();
+        $acumPayments = 0;
+        $acumLicenses = 0;
+        $acumRemaining = 0;
+
+        $arrayLicenses = $medicalcenterData->getLicenses();
+
+        $licenseMedical = $medicalcenterData->getLicenses();
+        $expiratinLicense = $licenseMedical[$position]["expiration_date"];
+        $licensesInfo = $this->get('doctrine_mongodb')->getRepository('AppBundle:License')->find($licenseId);
+
+        foreach ($arrayLicenses as $arrayLicenses) {
+            if ($arrayLicenses['status'] == "Active") {
+
+                $licensesData = $this->get('doctrine_mongodb')->getRepository('AppBundle:License')->find($arrayLicenses['license_id']);
+                $acumLicenses = $acumLicenses + $licensesData->getAmount();
+            }
+        }
+
+
+        foreach ($medicalcenterData->getPayments() as $arrayPayments) {
+            if ($arrayPayments['status'] == true) {
+                $acumPayments = $acumPayments + $arrayPayments['amount'];
+            }
+        }
+
+        $acumRemaining = $acumLicenses - $acumPayments;
+        return $this->render('@App/payments/renovateLicense.html.twig', array('country_id' => $country_id, 'id' => $id, 'acumRemaining' => $acumRemaining, 'acumPayments' => $acumPayments, 'acumLicenses' => $acumLicenses, 'arrayLicenses' => $arrayLicenses, 'licensesInfo' => $licensesInfo, 'position' => $position, 'expiratinLicense' => $expiratinLicense));
+    }
+
+    /**
      * @Route("/payments/details/{id}", name="payments_details")
      * @Method("GET")
      */
@@ -221,16 +492,29 @@ class PaymentsController extends Controller {
         $arrayLicenses = $medicalcenter->getLicenses();
 
         foreach ($arrayLicenses as $arrayLicenses) {
-            if ($arrayLicenses['status'] == "Active") {
-                $licensesData = $this->get('doctrine_mongodb')->getRepository('AppBundle:License')->find($arrayLicenses['license_id']);
-
-                $arrayLicenseData[] = array("license" => $licensesData->getLicense(),
-                    "usersquantity" => $licensesData->getUsersquantity(),
-                    "numberclients" => $licensesData->getNumberclients(),
-                    "numberexams" => $licensesData->getNumberexams(),
-                    "durationtime" => $licensesData->getDurationtime(),
-                    "amount" => $licensesData->getAmount());
+//            if ($arrayLicenses['status'] == "Active") {
+//            var_dump(isset($arrayLicenses['renovation']));
+            $renovation = "";
+            if (isset($arrayLicenses['renovation'])) {
+                $renovation = $arrayLicenses['renovation'];
+            } else {
+                $renovation = "";
             }
+
+            $licensesData = $this->get('doctrine_mongodb')->getRepository('AppBundle:License')->find($arrayLicenses['license_id']);
+
+            $arrayLicenseData[] = array(
+                "idLicense" => $licensesData->getId(),
+                "license" => $licensesData->getLicense(),
+                "usersquantity" => $licensesData->getUsersquantity(),
+                "numberclients" => $licensesData->getNumberclients(),
+                "numberexams" => $licensesData->getNumberexams(),
+                "durationtime" => $licensesData->getDurationtime(),
+                "statusLicense" => $arrayLicenses['status'],
+                "expiration_date" => $arrayLicenses['expiration_date'],
+                "renovation" => $renovation,
+                "amount" => $licensesData->getAmount());
+//            }
         }
 
         $countries = $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->findBy(array('provinces.name' => array('$exists' => true), 'active' => true));
@@ -258,7 +542,7 @@ class PaymentsController extends Controller {
     }
 
     /**
-     * @Route("/payments/guevo", name="guevo")
+     * @Route("/payments/loadPayments", name="load_payments")
      * @Method({"GET", "POST"})
      */
     public function LoadSelectPayments(Request $request) {
@@ -283,6 +567,20 @@ class PaymentsController extends Controller {
                 $country = $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->find($country_id);
                 $receivingbank = $country->getReceivingbank();
                 return $this->render('@App/payments/loadPayments.html.twig', array('receivingbank' => $receivingbank, 'opcion' => $opcion, 'receivingbankEdit' => $receivingbankEdit, 'daystopayEdit' => $daystopayEdit));
+            } else if ($opcion == 4) {
+                $licensecountry = $this->get('doctrine_mongodb')->getRepository('AppBundle:License')->findBy(array('countries' => $country_id));
+                return $this->render('@App/payments/loadPayments.html.twig', array('licensecountry' => $licensecountry, 'opcion' => $opcion, 'daystopayEdit' => $daystopayEdit));
+            } else if ($opcion == 5) {
+                $valor_country = $request->request->get('valor_country');
+                $country = $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->find($valor_country);
+                $license = $this->get('doctrine_mongodb')->getRepository('AppBundle:License')->find($country_id);
+                return $this->render('@App/payments/loadPayments.html.twig', array('license' => $license, 'country' => $country, 'opcion' => $opcion, 'daystopayEdit' => $daystopayEdit));
+            } else if ($opcion == 6) {
+                $value = $country_id;
+                $expression = "/^$value/";
+                $regex = new \MongoRegex($expression);
+                $medicalcenter = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->findBy(array('name' => $regex));
+                return $this->render('@App/payments/loadPayments.html.twig', array('medicalcenter' => $medicalcenter, 'opcion' => $opcion, 'daystopayEdit' => $daystopayEdit));
             }
         }
         return new Response('Unauthorized Request, No es XmlHttpRequest', Response::HTTP_UNAUTHORIZED);

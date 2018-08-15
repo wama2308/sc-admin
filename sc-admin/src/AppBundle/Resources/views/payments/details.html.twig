@@ -31,6 +31,8 @@
     {% set acumAmountLicense = 0 %}   
     {% set acumAmountPayments = 0 %}   
     {% set acumRemaining = 0 %}   
+    {% set renovation = "" %}       
+    {% set totalAmountLicense = 0 %}   
     {% if medicalcenter.paymentstatus == "Paid out" %}
         {% set status =  medicalcenter.paymentstatus %}             
         {% set class = "badge badge-success" %}   
@@ -55,7 +57,7 @@
                 </table>  
 
                 <div align="center" id="labelLicense" style="display: block"><h4 style="background-color: silver; align-items: center">Licenses</h4></div>
-                <a class="btn btn-primary btn-sm" href="" title="Add License" role="button"><i class="fas fa-plus-circle"></i> </a>&nbsp;&nbsp;&nbsp;&nbsp;          
+                <a class="btn btn-primary btn-sm" href="{{ path('license_payment_create', { 'id': id }) }}" title="Add License" role="button"><i class="fas fa-plus-circle"></i> </a>&nbsp;&nbsp;&nbsp;&nbsp;          
                 <br>                
                 <table id="tablelicenses" class="table table-responsive-sm table-bordered table-striped table-sm" style="display: table; width: 100%">
                     <tr align="center" style="background-color: silver;">
@@ -65,20 +67,44 @@
                         <th align="center">Number of Exams</th>                            
                         <th align="center">Duration Time</th>                            
                         <th align="center">Amount</th>   
+                        <th align="center">Due Date</th>   
                         <th align="center">Action</th>
                     </tr>
+                    {% set amountLicense = 0 %} 
+                    {% set amountRenovation = 0 %} 
+                    {% set amountLicenseRenovation = 0 %} 
+                    {% set totalAmountLicense = 0 %} 
+                    
                     {% for arrayLicenseData in arrayLicenseData %}
-                        {% set acumAmountLicense = acumAmountLicense + arrayLicenseData.amount %} 
+                         
+                        {% if arrayLicenseData.statusLicense == "Active" %}
+                        
+                        {% if arrayLicenseData.renovation is empty %}
+                           {% set totalAmountLicense = arrayLicenseData.amount %} 
+                           
+                        {% else %}    
+                            {% for renovationLicense in arrayLicenseData.renovation %}  
+                                {% set amountRenovation = amountRenovation + renovationLicense.amount %} 
+                            {% endfor %}
+
+                            {% set amountLicenseRenovation = arrayLicenseData.amount %} 
+                            {% set totalAmountLicense = amountLicenseRenovation + amountRenovation %} 
+                            
+                        {% endif %}
+                        
+                        {% set acumAmountLicense = acumAmountLicense + totalAmountLicense %} 
                         <tr align="center" id="trlicense_{{ loop.index-1 }}">
                             <td align="center">{{ arrayLicenseData.license }}</td>                            
                             <td align="center">{{ arrayLicenseData.usersquantity }}</td>                            
                             <td align="center">{{ arrayLicenseData.numberclients }}</td>                            
                             <td align="center">{{ arrayLicenseData.numberexams }}</td>                            
                             <td align="center">{{ arrayLicenseData.durationtime }}</td>
-                            <td align="center">{{ arrayLicenseData.amount }}</td>
-                            <td align="center"><a title="Renovate" href="" class="btn btn-info btn-sm "><i class="fas fa-reply"></i> </a></td>
+                            <td align="center">{{ totalAmountLicense }}</td>
+                            <td align="center">{{ arrayLicenseData.expiration_date.toDateTime|date('Y-m-d') }}</td>
+                            <td align="center"><a title="Renovate" href="{{ path('license_renovate', { 'id':id, 'licenseId':arrayLicenseData.idLicense, 'position':loop.index-1 }) }}" class="btn btn-info btn-sm "><i class="fas fa-reply"></i> </a></td>
                         </tr>
-
+                        {% endif %}
+                        
                     {% endfor %}
                 </table>
                 <div id="divAmount" align="right" style="display: block"><b>Total to pay:</b>&nbsp;&nbsp;<input readonly="" name="amountTotal" id="amountTotal" type="text" value="{{ acumAmountLicense }}" placeholder="" class="" style=" width: 15%;padding: 1px 45px;margin: 5px 0;box-sizing: border-box;border: none;border-bottom: 2px solid black;"><label id="labelAmountCurrentSymbol"><b></b></label></div>                    

@@ -23,6 +23,9 @@ class CountryController extends Controller {
      */
     public function listAction(Request $request) {
 
+//        PARA RECORRER UN ARRAY CON FINDBY
+//        var_dump($medicalcenter1[0]->getName());
+//        
 //        $m = $this->container->get('doctrine_mongodb.odm.default_connection');
 //        $db = $m->selectDatabase('smart_clinic');
 //        $collection = $db->createCollection('Country');

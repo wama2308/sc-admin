@@ -1,0 +1,823 @@
+{% extends '@App/base.html.twig' %}
+
+{% block ol %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{{ path('homepage') }}">Home</a>
+        </li>
+        <li class="breadcrumb-item active">
+            <a href="{{ path('payments_list') }}">Payments</a>
+        </li>
+        <li class="breadcrumb-item active">Create</li>
+        <!-- Breadcrumb Menu-->
+        <li class="breadcrumb-menu d-md-down-none">
+            {#<div class="btn-group" role="group" aria-label="Button group">
+                <a class="btn" href="#">
+                    <i class="icon-speech"></i>
+                </a>
+                <a class="btn" href="./">
+                    <i class="icon-graph"></i>  Dashboard</a>
+                <a class="btn" href="#">
+                    <i class="icon-settings"></i>  Settings</a>
+            </div>#}
+        </li>
+    </ol>        
+{% endblock %}
+
+{% block body %}
+    <div class="card">
+        <div class="card-header">
+            <strong>Register License</strong>            
+        </div>
+        <div class="card-body">
+            <div class="panel panel-body">
+                <form action="" method="post" id="formid" enctype="multipart/form-data">  
+                    <div class="form-group">         
+                        <label>Licenses</label>
+                        <div id="div-licenses">
+                            <select class="form-control select-licenses" style="width: 100%" name="license" id="license" onchange="loadAjax('license', 'divLicenses', 5);
+                                    loadInfoLicense();">
+                                <option value="">Select...</option>                                                    
+                            </select>
+                        </div>
+                    </div>               
+                    <div class="form-group">      
+                        <br>
+                        <div align="center" id="labelLicense" style="display: none"><h2 style="background-color: silver; align-items: center">Licenses</h2></div>
+                        <input name="countLicenses" id="countLicenses" type="hidden" value="0">
+                        <table id="tablelicenses" class="table table-bordered table-hover" style="display: none; width: 100%">
+                            <tr align="center" style="background-color: silver;">
+                                <th align="center">License</th>                            
+                                <th align="center">Users Quantity</th>                            
+                                <th align="center">Number of Clients</th>                            
+                                <th align="center">Number of Exams</th>                            
+                                <th align="center">Duration Time</th>                            
+                                <th align="center">Amount</th>   
+                                <th align="center">Action</th>
+                            </tr>
+                        </table>
+                        <div id="divAmount" align="right" style="display: none"><b>Total to pay:</b>&nbsp;&nbsp;<input readonly="" name="amountTotal" id="amountTotal" type="text" value="0" placeholder="" class="" style=" width: 15%;padding: 1px 45px;margin: 5px 0;box-sizing: border-box;border: none;border-bottom: 2px solid black;"><label id="labelAmountCurrentSymbol"><b></b></label></div>                    
+                    </div>
+                    <div align="center" id="labelPayments" style="display: none"><h2 style="background-color: silver; align-items: center">Payments</h2></div>
+                    <div id="payment" style="display: none">
+                        <div class="row">
+                            <div class="form-group col-sm-6">         
+                                <label>Way to pay</label>
+                                <div id="divWayToPay">
+                                    <select class="form-control select-waytopay" style="width: 100%" name="waytopay" id="waytopay" onchange="wayToPayOperation();">
+                                        <option value="">Select...</option>                                  
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group col-sm-6">         
+                                <label>Payment type</label>
+                                <div id="divWayToPay">
+                                    <select class="form-control select-paymenttype" style="width: 100%" name="paymenttype" id="paymenttype" onchange="paymentType();">
+                                        <option value="">Select...</option>                                  
+                                        <option value="full">Full</option>                                  
+                                        <option value="partial">Partial</option>                                  
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-sm-6" id="divDaystopay" style="display: none">       
+                                <label id="labelDaystopay">Days to pay</label>
+                                <input name="daystopay" id="daystopay" type="text" value="0" placeholder="Days to pay" class="form-control" onkeypress="">                    
+                            </div>
+                            <div class="form-group col-sm-6">  
+                                <label>Amount</label>
+                                <input name="amount" id="amount" type="text" value="" placeholder="Amount" class="form-control" onkeypress="">                    
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-sm-6">         
+                                <label>Issuing bank</label>
+                                <div id="divIssuingBank">
+                                    <select class="form-control select-issuingbank" style="width: 100%" name="issuingbank" id="issuingbank" onchange="">
+                                        <option value="">Select...</option>                                  
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group col-sm-6">         
+                                <label>Receiving bank</label>
+                                <div id="divReceivingBank">
+                                    <select class="form-control select-receivingbank" style="width: 100%" name="receivingbank" id="receivingbank" onchange="">
+                                        <option value="">Select...</option>                                  
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="divInfoTarjetas" style="display: none">
+                            <div class="row">
+                                <div class="form-group col-sm-6">    
+                                    <label>Card holder</label>
+                                    <input name="cardholder" id="cardholder" type="text" value="" placeholder="Cardholder" class="form-control">    
+                                </div>
+                                <div class="form-group col-sm-6">    
+                                    <label>Card number</label>
+                                    <input name="cardnumber" id="cardnumber" type="text" value="" placeholder="Card number" class="form-control">    
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-6">    
+                                    <label>Expiration</label>
+                                    <input name="expiration" id="expiration" type="text" value="" placeholder="Expiration" class="form-control">    
+                                </div>
+                                <div class="form-group col-sm-6">    
+                                    <label>CVV</label>
+                                    <input name="cvv" id="cvv" type="text" value="" placeholder="CVV" class="form-control">    
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-sm-6" id="divNumCheck" style="display: none">
+                                <label>Check number</label>
+                                <input name="operationnumber" id="operationnumber" type="text" value="" placeholder="Check Number" class="form-control" disabled="">                    
+                            </div>
+                            <div class="form-group col-sm-6" id="divProofTransfer"  style="display: none">
+                                <label>Proof transfer</label>
+                                <input type="file" id="files4" name="files4" onchange="base64File4(this);" class="form-control"/>
+                                <input name="inputFile4Base64" id="inputFile4Base64" type="hidden" value="">
+                                <br>
+                                <output id="list4"></output>
+                            </div>
+                        </div>
+                        <div class="form-group">  
+                            <input type="button" value="Add" class="btn btn-primary" id="addButtonPayments" onclick="addPayments();">&nbsp;&nbsp;&nbsp;                                                                                                                                             
+                        </div>  
+                        <div class="form-group">      
+                            <br>
+                            <input name="countPayments" id="countPayments" type="hidden" value="0">
+                            <table id="tablePayments" class="table table-bordered table-hover" style="display: table; width: 100%">
+                                <tr align="center" style="background-color: silver;">
+                                    <th align="center">Way to pay</th>                            
+                                    <th align="center">Amount</th>                            
+                                    <th align="center">Issuing bank</th>                            
+                                    <th align="center">Receiving bank</th>                            
+                                    <th align="center">Operation number</th>                            
+                                    <th align="center">Action</th>
+                                </tr>
+                            </table>                        
+                        </div>
+                        <div class="form-group">  
+                            <label>Remaining</label>
+                            <input name="remaining" id="remaining" type="text" value="0" placeholder="Remaining" class="form-control" readonly="">                    
+                        </div>
+                        <div class="form-group">  
+                            <label>Total</label>
+                            <input name="total" id="total" type="text" value="0" placeholder="Total" class="form-control" readonly="">                    
+                        </div>
+                    </div>
+                    <br>
+                    <div class="form-group">         
+                        <input type="submit" value="Save" class="btn btn-primary" id="saveone" onclick="">&nbsp;&nbsp;&nbsp;
+                        <a class="btn btn-primary" style="color: #ffffff" href="{{ path('payments_details', { 'id': id }) }}">Return</a>
+                    </div>
+                    {#/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////#}                            
+                    <div id="licenseModal" class="mascara">
+                        <div class="contenido" style="">
+                            <span class="close" onclick="$('#licenseModal').hide();">&times;</span><br><br>
+                            <div class="form-group" style="" id="divLicenses"></div>
+                            <div class="form-group">  
+                                <input type="button" value="Add" class="btn btn-primary" id="addButtonLicenses" onclick="agregarLicenses();">&nbsp;&nbsp;&nbsp;                                                        
+                            </div>   
+                        </div>
+                    </div>
+                    {#////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////#}   
+                </form> 
+            </div>
+        </div>
+    </div>
+
+    <style type="text/css">      
+
+        .thumb{
+            height: 150px;
+            border: 1px solid #000;
+            margin: 10px 5px 0 0;
+        }
+
+        .mascara {
+            display: none; 
+            position: fixed; 
+            z-index: 1; 
+            padding-top: 100px; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgb(0,0,0); 
+            background-color: rgba(0,0,0,0.4); 
+            -webkit-transition: opacity 400ms ease-in;
+            -moz-transition: opacity 400ms ease-in;
+            transition: opacity 400ms ease-in;
+            pointer-events: auto;
+        }
+        .mascara > div {
+            width: 500px;
+            top: -25%;
+            position: relative;
+            margin: 10% auto;
+            padding: 5px 20px 13px 20px;
+            border-radius: 10px;
+            background: #ffffff;  /* fallback for old browsers */
+            {#background: -webkit-linear-gradient(to left, #FFFFFF, #FFEFBA);  /* Chrome 10-25, Safari 5.1-6 */
+            background: linear-gradient(to left, #FFFFFF, #FFEFBA); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+            -webkit-transition: opacity 400ms ease-in;
+            -moz-transition: opacity 400ms ease-in;#}
+            transition: opacity 400ms ease-in;
+        }
+        .contenido {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 50%;  
+            height: auto;
+            overflow-y: auto;
+            {#-webkit-animation-name: animatetop;
+            -webkit-animation-duration: 0.4s;#}
+            {# animation-name: animatetop;
+             animation-duration: 0.4s#}
+        }
+        /* Add Animation */
+        {#@-webkit-keyframes animatetop {
+            from {top:-300px; opacity:0} 
+            to {top:0; opacity:1}
+        }
+
+        @keyframes animatetop {
+            from {top:-300px; opacity:0}
+            to {top:0; opacity:1}
+        }#}
+        {#.close {
+            background: #000;
+            color: #FFFFFF;
+            line-height: 25px;
+            position: absolute;
+            right: -12px;
+            text-align: center;
+            top: -10px;
+            width: 24px;
+            text-decoration: none;
+            font-weight: bold;
+            -webkit-border-radius: 12px;
+            -moz-border-radius: 12px;
+            border-radius: 12px;
+            -moz-box-shadow: 1px 1px 3px #000;
+            -webkit-box-shadow: 1px 1px 3px #000;
+            box-shadow: 1px 1px 3px #000;
+        }
+        .close:hover { background: #00d9ff; }
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }#}
+        /* The Close Button */
+        .close {
+            color: #000;
+            float: end;
+            font-size: 30px;
+            font-weight: bold;
+            background: #000;
+            color: #FFFFFF;
+            line-height: 25px;
+            position: absolute;
+            right: 20px;
+            text-align: center;
+            top: 10px;
+            width: 34px;
+            text-decoration: none;
+            font-weight: bold;
+            -webkit-border-radius: 12px;
+            -moz-border-radius: 12px;
+            border-radius: 12px;
+            -moz-box-shadow: 1px 1px 3px #000;
+            -webkit-box-shadow: 1px 1px 3px #000;
+            box-shadow: 1px 1px 3px #000;
+
+        }
+        .close:hover { background: #00d9ff; }
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style> 
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            loadAjax("{{ country_id }}", 'div-licenses', 4);
+            loadAjax("{{ country_id }}", 'divWayToPay', 1);
+            loadAjax("{{ country_id }}", 'divIssuingBank', 2);
+            loadAjax("{{ country_id }}", 'divReceivingBank', 3);
+
+            var licenseModal = document.getElementById('licenseModal');
+
+            window.onclick = function (event) {
+                if (event.target === licenseModal) {
+
+                    licenseModal.style.display = "none";
+
+                }
+            }
+
+            $('#expiration').mask("99/99");
+            $('#cvv').mask("9999");
+            $('#daystopay').mask("99999");
+            $('#amount').mask('000000000.00', {reverse: true});
+        {#            $('#amountTotal').mask('000000000.00', {reverse: true});#}
+
+                $(".select-licenses").chosen({
+                    placeholder_text_single: "Select the license"
+                });
+
+                $(".select-waytopay").chosen({
+                    placeholder_text_single: "Select the way to pay",
+                    width: "100%"
+                });
+
+                $(".select-issuingbank").chosen({
+                    placeholder_text_single: "Select the issuing bank",
+                    width: "100%"
+                });
+
+                $(".select-receivingbank").chosen({
+                    placeholder_text_single: "Select the receiving bank",
+                    width: "100%"
+                });
+
+                $(".select-paymenttype").chosen({
+                    placeholder_text_single: "Select the payment type",
+                    width: "100%"
+                });
+
+
+                $("#countPayments").val(0);
+                $("#countLicenses").val(0);
+
+                $("#saveone").click(function () {
+                    $(".error").remove();
+
+                    if ($("#countLicenses").val() === "0") {
+                        alert("You must enter the license");
+                        return false;                
+                        
+                    } else if ($("#countPayments").val() === "0") {
+                        alert("You must enter the license payment");
+                        return false;                
+                    }
+
+                });
+
+            });
+
+
+            function loadAjax(valor, div, opcion, country_id)
+            {
+                var valor_id = valor;
+                var valor_country = "{{ country_id }}";
+                if (valor_id !== "")
+                {
+                    $.ajax({
+                        type: 'POST',
+                        url: "{{ path('load_payments') }}",
+                        data: {valor_id: valor_id, opcion: opcion, valor_country: valor_country},
+                        success: function (html) {
+                            $("#" + div).html(html);
+                        }
+                    });
+                }
+            }
+
+            function wayToPayOperation()
+            {
+                if (($("#waytopay").val() === "") || ($("#waytopay").val() === "EFECTIVO"))
+                {
+                    $("#divInfoTarjetas").hide();
+                    $("#divNumCheck").hide();
+                    $("#divProofTransfer").hide();
+
+                    $("#cardholder").val("");
+                    $("#cardnumber").val("");
+                    $("#expiration").val("");
+                    $("#cvv").val("");
+                    $("#operationnumber").val("");
+                    $("#files4").val("");
+                    $("#inputFile4Base64").val("");
+                    $("#list4").html("");
+
+                    $("#receivingbank").attr('disabled', true).trigger("chosen:updated");
+                    $("#issuingbank").attr('disabled', true).trigger("chosen:updated");
+                    $("#operationnumber").prop("disabled", true);
+
+                } else if (($("#waytopay").val() === "TDD") || ($("#waytopay").val() === "TDC"))
+                {
+                    $("#divInfoTarjetas").show();
+                    $("#divNumCheck").show();
+                    $("#divProofTransfer").hide();
+
+                    $("#operationnumber").val("");
+                    $("#files4").val("");
+                    $("#inputFile4Base64").val("");
+                    $("#list4").html("");
+
+                    $("#receivingbank").attr('disabled', false).trigger("chosen:updated");
+                    $("#issuingbank").attr('disabled', false).trigger("chosen:updated");
+                    $("#operationnumber").prop("disabled", false);
+
+                } else if ($("#waytopay").val() === "CHEQUE")
+                {
+                    $("#divInfoTarjetas").hide();
+                    $("#divNumCheck").show();
+                    $("#divProofTransfer").hide();
+
+                    $("#cardholder").val("");
+                    $("#cardnumber").val("");
+                    $("#expiration").val("");
+                    $("#cvv").val("");
+                    $("#files4").val("");
+                    $("#inputFile4Base64").val("");
+                    $("#list4").html("");
+                    $("#operationnumber").val("");
+
+                    $("#receivingbank").attr('disabled', false).trigger("chosen:updated");
+                    $("#issuingbank").attr('disabled', false).trigger("chosen:updated");
+                    $("#operationnumber").prop("disabled", false);
+
+                } else if (($("#waytopay").val() === "TRANSFERENCIA") || ($("#waytopay").val() === "DEPOSITO"))
+                {
+                    $("#divInfoTarjetas").hide();
+                    $("#divNumCheck").show();
+                    $("#divProofTransfer").show();
+
+                    $("#cardholder").val("");
+                    $("#cardnumber").val("");
+                    $("#expiration").val("");
+                    $("#cvv").val("");
+                    $("#operationnumber").val("");
+
+                    $("#receivingbank").attr('disabled', false).trigger("chosen:updated");
+                    $("#issuingbank").attr('disabled', false).trigger("chosen:updated");
+                    $("#operationnumber").prop("disabled", false);
+                }
+            }
+
+            function paymentType()
+            {
+                if ($("#paymenttype").val() === "partial")
+                {
+                    $("#divDaystopay").show();
+                    $("#amount").val("0");
+                    $("#amount").prop("disabled", false);
+                } else
+                {
+                    $("#divDaystopay").hide();
+                    $("#daystopay").val("0");
+                    var amountTotal = $("#amountTotal").val();
+                    $("#amount").val(amountTotal);
+                    $("#amount").prop("disabled", true);
+                    var amount = parseFloat($("#amountTotal").val()) - parseFloat($("#total").val());
+                    $("#amount").val(amount);
+                }
+
+            }
+
+            function archivo4(evt) {
+                var files = evt.target.files; // FileList object
+
+                //Obtenemos la imagen del campo "file". 
+                for (var i = 0, f; f = files[i]; i++) {
+                    //Solo admitimos imágenes.
+                    if (!f.type.match('image.*')) {
+                        continue;
+                    }
+
+                    var reader = new FileReader();
+
+                    reader.onload = (function (theFile) {
+                        return function (e) {
+                            // Creamos la imagen.
+                            document.getElementById("list4").innerHTML = ['<img style="width:280px; height:170px;" class="thumb" src="', e.target.result, '" title="', escape(theFile.name), '"/>'].join('');
+                        };
+                    })(f);
+
+                    reader.readAsDataURL(f);
+                }
+            }
+
+            document.getElementById('files4').addEventListener('change', archivo4, false);
+
+            function base64File4(element) {
+                var file = element.files[0];
+                var reader = new FileReader();
+                reader.onloadend = function () {
+                    //console.log('RESULT', reader.result);
+                    $("#inputFile4Base64").val(reader.result);
+                }
+                reader.readAsDataURL(file);
+            }
+
+            function addPayments()
+            {
+                var waytopay = $("#waytopay").val();
+                var waytopay_name = $("#waytopay").children(':selected').text();
+                var paymenttype = $("#paymenttype").val();
+                var daystopay = $('#daystopay').val();
+                var amount = $('#amount').val();
+                var issuingbank = $('#issuingbank').val();
+                var receivingbank = $('#receivingbank').val();
+                var cardholder = $('#cardholder').val();
+                var cardnumber = $('#cardnumber').val();
+                var expiration = $('#expiration').val();
+                var cvv = $('#cvv').val();
+                var files4 = $('#inputFile4Base64').val();
+                var operationnumber = $('#operationnumber').val();
+                var amountTotal = parseFloat($("#amountTotal").val());
+                var total = $("#total").val();
+                var remaining;
+                var sum_amount_total;
+                var i = 0; //contador para asignar id al boton que borrara la fila
+                var counter = $("#countPayments").val();
+
+                if (waytopay === "")
+                {
+                    alert("Select the payment method");
+                    return false;
+                }
+
+                if (paymenttype === "")
+                {
+                    alert("Select the payment type");
+                    return false;
+                }
+
+                if (paymenttype === "partial")
+                {
+                    if (daystopay === "0")
+                    {
+                        alert("Enter the days to finish paying");
+                        return false;
+                    }
+                }
+
+                if (amount === "")
+                {
+                    alert("Enter the amount");
+                    return false;
+                }
+
+                if ((waytopay !== "EFECTIVO") && (issuingbank === ""))
+                {
+                    alert("Select the issuing bank");
+                    return false;
+                }
+
+                if ((waytopay !== "EFECTIVO") && (receivingbank === ""))
+                {
+                    alert("Select the receiving bank");
+                    return false;
+                }
+
+                if ((waytopay !== "EFECTIVO") && (operationnumber === ""))
+                {
+                    alert("Enter the operation number");
+                    return false;
+                }
+
+                if ((waytopay === "TDD") || (waytopay === "TDC"))
+                {
+                    if (cardholder === "")
+                    {
+                        alert("Enter the card holder");
+                        return false;
+                    }
+                    if (cardnumber === "")
+                    {
+                        alert("Enter the card number");
+                        return false;
+                    }
+                    if (expiration === "")
+                    {
+                        alert("Enter the expiration");
+                        return false;
+                    }
+                    if (cvv === "")
+                    {
+                        alert("Enter the cvv");
+                        return false;
+                    }
+                }
+
+                if ((waytopay === "TRANSFERENCIA") || (waytopay === "DEPOSITO"))
+                {
+                    if (files4 === "")
+                    {
+                        alert("Enter the Proof transfer");
+                        return false;
+                    }
+                }
+
+                if (waytopay === "CHEQUE")
+                {
+                    if (operationnumber === "")
+                    {
+                        alert("Enter the check number");
+                        return false;
+                    }
+                }
+
+                if (issuingbank === "")
+                {
+                    issuingbank = "Any";
+                } else
+                {
+                    issuingbank = $("#issuingbank").children(':selected').text();
+                }
+
+                if (receivingbank === "")
+                {
+                    receivingbank = "Any";
+                } else
+                {
+                    receivingbank = $("#receivingbank").children(':selected').text();
+                }
+
+                sum_amount_total = parseFloat(amount) + parseFloat(total);
+                remaining = amountTotal - sum_amount_total;
+
+                if (sum_amount_total > amountTotal)
+                {
+                    alert("The amount entered will exceed the amount to be paid");
+                    return false;
+                }
+
+                counter = $("#countPayments").val();
+
+
+                $("#tablePayments").show();
+                var fila = '<tr align="center" id="row' + counter + '">\n\
+                    <td align="center">' + waytopay_name + '</td>\n\
+                    <input type="hidden" id="waytopay_' + counter + '" name="waytopay_' + counter + '"  value="' + $("#waytopay").children(':selected').text() + '" />\n\
+                    <input type="hidden" id="daystopay_' + counter + '" name="daystopay_' + counter + '"  value="' + document.getElementById("daystopay").value + '" />\n\
+                    <input type="hidden" id="amount_' + counter + '" name="amount_' + counter + '"  value="' + document.getElementById("amount").value + '" />\n\
+                    <input type="hidden" id="issuingbank_' + counter + '" name="issuingbank_' + counter + '"  value="' + issuingbank + '" />\n\
+                    <input type="hidden" id="receivingbank_' + counter + '" name="receivingbank_' + counter + '"  value="' + receivingbank + '" />\n\
+                    <input type="hidden" id="cardholder_' + counter + '" name="cardholder_' + counter + '"  value="' + document.getElementById("cardholder").value + '" />\n\
+                    <input type="hidden" id="cardnumber_' + counter + '" name="cardnumber_' + counter + '"  value="' + document.getElementById("cardnumber").value + '" />\n\
+                    <input type="hidden" id="expiration_' + counter + '" name="expiration_' + counter + '"  value="' + document.getElementById("expiration").value + '" />\n\
+                    <input type="hidden" id="cvv_' + counter + '" name="cvv_' + counter + '"  value="' + document.getElementById("cvv").value + '" />\n\
+                    <input type="hidden" id="operationnumber_' + counter + '" name="operationnumber_' + counter + '"  value="' + document.getElementById("operationnumber").value + '" />\n\
+                    <input type="hidden"  id="files4_' + counter + '" name="files4_' + counter + '"  value="' + document.getElementById("inputFile4Base64").value + '" />\n\
+                    <td align="center">' + amount + '</td>\n\
+                    <td align="center">' + issuingbank + '</td>\n\
+                    <td align="center">' + receivingbank + '</td>\n\
+                    <td align="center">' + operationnumber + '</td>\n\
+                    <td><button type="button" name="remove" id="' + counter + '" onclick="$(this).parent().parent().remove(); restaPayments(' + amount + ')" class="btn btn-danger" style=""><i class="fas fa-minus-circle"></i></button></td>\n\
+                </tr>';
+
+                counter++;
+
+                $("#total").val(sum_amount_total);
+                $("#remaining").val(remaining);
+
+                $("#countPayments").val(counter);
+
+                $('#tablePayments tr:first').after(fila);
+                var nFilas = $("#tablePayments tr").length;
+                $('#waytopay').val("").trigger('chosen:updated');
+                $('#paymenttype').val("").trigger('chosen:updated');
+                $('#daystopay').val("0");
+                $('#divDaystopay').hide();
+                $('#amount').val("");
+                $("#amount").prop("disabled", false);
+                $('#operationnumber').val("");
+                $('#files4').val("");
+                $('#list4').empty();
+                $('#issuingbank').val("").trigger('chosen:updated');
+                $('#receivingbank').val("").trigger('chosen:updated');
+                $("#divInfoTarjetas").hide();
+                $("#divNumCheck").hide();
+                $("#divProofTransfer").hide();
+            }
+
+            function restaPayments(amountCelda)
+            {
+                var valor = $("#countPayments").val();
+                var valor1 = 1;
+                var resultado = valor - valor1;
+                $("#countPayments").val(resultado);
+
+                var valorAmountCelda = amountCelda;
+                var valorTotal = $("#total").val();
+                var valorRemaining = $("#remaining").val();
+
+                var totalPayments = parseFloat(valorTotal) - parseFloat(valorAmountCelda);
+                var restaPayments = parseFloat(valorAmountCelda) + parseFloat(valorRemaining);
+                $("#total").val(totalPayments);
+                $("#remaining").val(restaPayments);
+
+                if (resultado === 0)
+                {
+
+                }
+            }
+
+            function loadInfoLicense()
+            {
+                var valor_id = $("#license").val();
+                if (valor_id !== "")
+                {
+                    var licenseModal = document.getElementById('licenseModal');
+                    licenseModal.style.display = "block";
+                }
+            }
+
+            function agregarLicenses()
+            {
+                var license = $("#license").val();
+                var inputLicense = $('#inputLicense').val();
+                var inputUsersQuantity = $('#inputUsersQuantity').val();
+                var inputNumberClients = $('#inputNumberClients').val();
+                var inputNumberExams = $('#inputNumberExams').val();
+                var inputDurationTime = $('#inputDurationTime').val();
+                var inputAmount = $('#inputAmount').val();
+                var inputCurrentSymbol = $('#inputCurrentSymbol').val();
+                var i = 0; //contador para asignar id al boton que borrara la fila
+                var counter = $("#countLicenses").val();
+                var acumAmount = $("#amountTotal").val();
+                var amount = 0;
+
+                if (counter !== "0") {
+                    for (i = 0; i <= counter; i++) {
+                        if ($("#licenseId_" + i).val() === license) {
+                            alert("This license is already in the table");
+                            $("#fields").val("");
+                            return false;
+                        }
+                    }
+                }
+
+                counter = $("#countLicenses").val();
+                acumAmount = $("#amountTotal").val();
+
+                $("#tablelicenses").show();
+                var fila = '<tr align="center" id="row' + counter + '">\n\
+            <td align="center">' + inputLicense + '</td>\n\
+            <input type="hidden" id="licenseId_' + counter + '" name="licenseId_' + counter + '"  value="' + document.getElementById("licenseid").value + '" />\n\
+            <input type="hidden" id="durationTime_' + counter + '" name="durationTime_' + counter + '"  value="' + document.getElementById("inputDurationTime").value + '" />\n\
+            <td align="center">' + inputUsersQuantity + '</td>\n\
+            <td align="center">' + inputNumberClients + '</td>\n\
+            <td align="center">' + inputNumberExams + '</td>\n\
+            <td align="center">' + inputDurationTime + '</td>\n\
+            <td align="center">' + inputAmount + ' ' + inputCurrentSymbol + '</td>\n\
+            <td><button type="button" name="remove" id="' + counter + '" onclick="$(this).parent().parent().remove(); restaLicenses(' + inputAmount + ')" class="btn btn-danger" style=""><i class="fas fa-minus-circle"></i></button></td>\n\
+        </tr>';
+                counter++;
+                amount = parseFloat(acumAmount) + parseFloat(inputAmount);
+                $("#countLicenses").val(counter);
+                $("#amountTotal").val(amount);
+                $("#remaining").val(amount);
+                //$("#amountTotal").val(new Intl.NumberFormat("es-PE").format(amount));
+
+                //$("#total").val(amount);
+                $('#tablelicenses tr:first').after(fila);
+                var nFilas = $("#tablelicenses tr").length;
+                $('#license').val("").trigger('chosen:updated');
+                $('#licenseModal').hide();
+                $('#divAmount').show();
+                $('#labelPayments').show();
+                $('#payment').show();
+                $('#labelLicense').show();
+                $('#labelAmountCurrentSymbol').text(inputCurrentSymbol);
+                $('#labelAmountCurrentSymbol').css("font-weight", "bold");
+
+            }
+
+            function restaLicenses(amountCelda)
+            {
+                var valor = $("#countLicenses").val();
+                var valor1 = 1;
+                var resultado = valor - valor1;
+                $("#countLicenses").val(resultado);
+
+                var valorAmountCelda = amountCelda;
+                var valorAmount = $("#amountTotal").val();
+                var resultadoAmount = valorAmount - valorAmountCelda;
+                $("#amountTotal").val(resultadoAmount);
+
+                if (resultado === 0)
+                {
+                    $("#tablelicenses").hide();
+                    $("#divAmount").hide();
+                    $('#labelPayments').hide();
+                    $('#payment').hide();
+                    $('#labelLicense').hide();
+                }
+            }
+
+    </script>  
+{% endblock %}

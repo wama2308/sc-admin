@@ -325,7 +325,7 @@
                 {
                     $.ajax({
                         type: 'POST',
-                        url: "{{ path('guevo') }}",
+                        url: "{{ path('load_payments') }}",
                         data: {valor_id: valor_id, opcion: opcion, waytopay: waytopay, issuingbank: issuingbank, receivingbank: receivingbank, daystopay: daystopay},
                         success: function (html) {
                             $("#" + div).html(html);

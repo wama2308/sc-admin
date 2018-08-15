@@ -27,131 +27,167 @@
 {% block body %}
     <div class="card">
         <div class="card-header">
-            <strong>Register Payment</strong>            
+            <strong>Renovate License</strong>            
         </div>
         <div class="card-body">
             <div class="panel panel-body">
                 <form action="" method="post" id="formid" enctype="multipart/form-data">  
-                    {#////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////#}
-                    <div class="row">
-                        <div class="form-group col-sm-6">         
-                            <label>Way to pay</label>
-                            <div id="divWayToPay">
-                                <select class="form-control select-waytopay" style="width: 100%" name="waytopay" id="waytopay" onchange="wayToPayOperation();">
-                                    <option value="">Select...</option>                                  
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-group col-sm-6">         
-                            <label>Payment type</label>
-                            <div id="divWayToPay">
-                                <select class="form-control select-paymenttype" style="width: 100%" name="paymenttype" id="paymenttype" onchange="paymentType();">
-                                    <option value="">Select...</option>                                  
-                                    <option value="full">Full</option>                                  
-                                    <option value="partial">Partial</option>                                  
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="form-group col-sm-6" id="divDaystopay" style="display: none">       
-                            <label id="labelDaystopay">Days to pay</label>
-                            <input name="daystopay" id="daystopay" type="text" value="0" placeholder="Days to pay" class="form-control" onkeypress="">                    
-                        </div>
-                        <div class="form-group col-sm-6">  
-                            <label>Amount</label>
-                            <input name="amount" id="amount" type="text" value="" placeholder="Amount" class="form-control" onkeypress="">                    
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="form-group col-sm-6">         
-                            <label>Issuing bank</label>
-                            <div id="divIssuingBank">
-                                <select class="form-control select-issuingbank" style="width: 100%" name="issuingbank" id="issuingbank" onchange="">
-                                    <option value="">Select...</option>                                  
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-group col-sm-6">         
-                            <label>Receiving bank</label>
-                            <div id="divReceivingBank">
-                                <select class="form-control select-receivingbank" style="width: 100%" name="receivingbank" id="receivingbank" onchange="">
-                                    <option value="">Select...</option>                                  
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="divInfoTarjetas" style="display: none">
+                    <table class="table table-responsive-sm table-bordered table-striped table-sm">
+                        <tr> 
+                            <td align = "justify" style="width: 90px"><b>License</b>
+                                <input readonly="" name="amountData" id="amountData" type="hidden" value="{{ licensesInfo.amount }}">
+                                <input readonly="" name="dueDateData" id="dueDateData" type="hidden" value="{{ expiratinLicense.toDateTime|date('Y-m-d H:i:s') }}">
+                                <input readonly="" name="durationData" id="durationData" type="hidden" value="{{ licensesInfo.durationtime }}">
+                            </td>
+                            <td align = "justify" style="width: 100px">{{ licensesInfo.license }}</td>
+                        </tr>    
+                        <tr>
+                            <td align = "justify" style="width: 50px"><b>Users Quantity</b></td>
+                            <td align = "justify" style="width: 100px">{{ licensesInfo.usersquantity }}</td>
+                        </tr>
+                        <tr>
+                            <td align = "justify" style="width: 50px"><b>Number of Clients</b></td>
+                            <td align = "justify" style="width: 100px">{{ licensesInfo.numberclients }}</td>
+                        </tr>
+                        <tr>
+                            <td align = "justify" style="width: 50px"><b>Number of Exams</b></td>
+                            <td align = "justify" style="width: 100px">{{ licensesInfo.numberexams }}</td>
+                        </tr>
+                        <tr>
+                            <td align = "justify" style="width: 50px"><b>Duration Time</b></td>
+                            <td align = "justify" style="width: 100px">{{ licensesInfo.durationtime }}</td>
+                        </tr>
+                        <tr>
+                            <td align = "justify" style="width: 50px"><b>Amount</b></td>
+                            <td align = "justify" style="width: 100px">{{ licensesInfo.amount }}</td>
+                        </tr>
+                        <tr>
+                            <td align = "justify" style="width: 50px"><b>Due Date</b></td>
+                            <td align = "justify" style="width: 100px">{{ expiratinLicense.toDateTime|date('Y-m-d') }}</td>           
+                        </tr>  
+                    </table>   
+                    <input readonly="" name="amountTotal" id="amountTotal" type="hidden" value="{{ licensesInfo.amount }}" placeholder="" class="" style="">
+                    <div align="center" id="labelPayments" style=""><h2 style="background-color: silver; align-items: center">Payments</h2></div>
+                    <div id="payment" style="">
                         <div class="row">
-                            <div class="form-group col-sm-6">    
-                                <label>Card holder</label>
-                                <input name="cardholder" id="cardholder" type="text" value="" placeholder="Cardholder" class="form-control">    
+                            <div class="form-group col-sm-6">         
+                                <label>Way to pay</label>
+                                <div id="divWayToPay">
+                                    <select class="form-control select-waytopay" style="width: 100%" name="waytopay" id="waytopay" onchange="wayToPayOperation();">
+                                        <option value="">Select...</option>                                  
+                                    </select>
+                                </div>
                             </div>
-                            <div class="form-group col-sm-6">    
-                                <label>Card number</label>
-                                <input name="cardnumber" id="cardnumber" type="text" value="" placeholder="Card number" class="form-control">    
+                            <div class="form-group col-sm-6">         
+                                <label>Payment type</label>
+                                <div id="divWayToPay">
+                                    <select class="form-control select-paymenttype" style="width: 100%" name="paymenttype" id="paymenttype" onchange="paymentType();">
+                                        <option value="">Select...</option>                                  
+                                        <option value="full">Full</option>                                  
+                                        <option value="partial">Partial</option>                                  
+                                    </select>
+                                </div>
                             </div>
                         </div>
                         <div class="row">
-                            <div class="form-group col-sm-6">    
-                                <label>Expiration</label>
-                                <input name="expiration" id="expiration" type="text" value="" placeholder="Expiration" class="form-control">    
+                            <div class="form-group col-sm-6" id="divDaystopay" style="display: none">       
+                                <label id="labelDaystopay">Days to pay</label>
+                                <input name="daystopay" id="daystopay" type="text" value="0" placeholder="Days to pay" class="form-control" onkeypress="">                    
                             </div>
-                            <div class="form-group col-sm-6">    
-                                <label>CVV</label>
-                                <input name="cvv" id="cvv" type="text" value="" placeholder="CVV" class="form-control">    
+                            <div class="form-group col-sm-6">  
+                                <label>Amount</label>
+                                <input name="amount" id="amount" type="text" value="" placeholder="Amount" class="form-control" onkeypress="">                    
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="form-group col-sm-6" id="divNumCheck" style="display: none">
-                            <label>Operation number</label>
-                            <input name="operationnumber" id="operationnumber" type="text" value="" placeholder="Operation Number" class="form-control" disabled="">                    
+                        <div class="row">
+                            <div class="form-group col-sm-6">         
+                                <label>Issuing bank</label>
+                                <div id="divIssuingBank">
+                                    <select class="form-control select-issuingbank" style="width: 100%" name="issuingbank" id="issuingbank" onchange="">
+                                        <option value="">Select...</option>                                  
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group col-sm-6">         
+                                <label>Receiving bank</label>
+                                <div id="divReceivingBank">
+                                    <select class="form-control select-receivingbank" style="width: 100%" name="receivingbank" id="receivingbank" onchange="">
+                                        <option value="">Select...</option>                                  
+                                    </select>
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group col-sm-6" id="divProofTransfer"  style="display: none">
-                            <label>Proof transfer</label>
-                            <input type="file" id="files4" name="files4" onchange="base64File4(this);" class="form-control"/>
-                            <input name="inputFile4Base64" id="inputFile4Base64" type="hidden" value="">
+                        <div id="divInfoTarjetas" style="display: none">
+                            <div class="row">
+                                <div class="form-group col-sm-6">    
+                                    <label>Card holder</label>
+                                    <input name="cardholder" id="cardholder" type="text" value="" placeholder="Cardholder" class="form-control">    
+                                </div>
+                                <div class="form-group col-sm-6">    
+                                    <label>Card number</label>
+                                    <input name="cardnumber" id="cardnumber" type="text" value="" placeholder="Card number" class="form-control">    
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-6">    
+                                    <label>Expiration</label>
+                                    <input name="expiration" id="expiration" type="text" value="" placeholder="Expiration" class="form-control">    
+                                </div>
+                                <div class="form-group col-sm-6">    
+                                    <label>CVV</label>
+                                    <input name="cvv" id="cvv" type="text" value="" placeholder="CVV" class="form-control">    
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-sm-6" id="divNumCheck" style="display: none">
+                                <label>Check number</label>
+                                <input name="operationnumber" id="operationnumber" type="text" value="" placeholder="Check Number" class="form-control" disabled="">                    
+                            </div>
+                            <div class="form-group col-sm-6" id="divProofTransfer"  style="display: none">
+                                <label>Proof transfer</label>
+                                <input type="file" id="files4" name="files4" onchange="base64File4(this);" class="form-control"/>
+                                <input name="inputFile4Base64" id="inputFile4Base64" type="hidden" value="">
+                                <br>
+                                <output id="list4"></output>
+                            </div>
+                        </div>
+                        <div class="form-group">  
+                            <input type="button" value="Add" class="btn btn-primary" id="addButtonPayments" onclick="addPayments();">&nbsp;&nbsp;&nbsp;                                                                                                                                             
+                        </div>  
+                        <div class="form-group">      
                             <br>
-                            <output id="list4"></output>
-
+                            <input name="countPayments" id="countPayments" type="hidden" value="0">
+                            <table id="tablePayments" class="table table-bordered table-hover" style="display: table; width: 100%">
+                                <tr align="center" style="background-color: silver;">
+                                    <th align="center">Way to pay</th>                            
+                                    <th align="center">Amount</th>                            
+                                    <th align="center">Issuing bank</th>                            
+                                    <th align="center">Receiving bank</th>                            
+                                    <th align="center">Operation number</th>                            
+                                    <th align="center">Action</th>
+                                </tr>
+                            </table>                        
+                        </div>
+                        <div class="form-group">  
+                            <label>Remaining</label>
+                            <input name="remaining" id="remaining" type="text" value="{{ licensesInfo.amount }}" placeholder="Remaining" class="form-control" readonly="">                    
+                        </div>
+                        <div class="form-group">  
+                            <label>Total</label>
+                            <input name="total" id="total" type="text" value="0" placeholder="Total" class="form-control" readonly="">                    
                         </div>
                     </div>
-                    <div class="form-group">  
-                        <input type="button" value="Add" class="btn btn-primary" id="addButtonPayments" onclick="addPayments();">&nbsp;&nbsp;&nbsp;                                                                                                                                             
-                    </div>  
-                    <div class="form-group">      
-                        <br>
-                        <input name="countPayments" id="countPayments" type="hidden" value="0">
-                        <table id="tablePayments" class="table table-bordered table-hover" style="display: table; width: 100%">
-                            <tr align="center" style="background-color: silver;">
-                                <th align="center">Way to pay</th>                            
-                                <th align="center">Amount</th>                            
-                                <th align="center">Issuing bank</th>                            
-                                <th align="center">Receiving bank</th>                            
-                                <th align="center">Operation number</th>                            
-                                <th align="center">Action</th>
-                            </tr>
-                        </table>                        
-                    </div>
-                    <div class="form-group">  
-                        <label>Remaining</label>
-                        <input name="amountTotal" id="amountTotal" type="hidden" value="{{ acumLicenses }}" class="form-control" readonly="">                    
-                        <input name="remaining" id="remaining" type="text" value="{{ acumRemaining }}" placeholder="Remaining" class="form-control" readonly="">                    
-                    </div>
-                    <div class="form-group">  
-                        <label>Total</label>
-                        <input name="total" id="total" type="text" value="{{ acumPayments }}" placeholder="Total" class="form-control" readonly="">                    
-                    </div>                    
                     <br>
                     <div class="form-group">         
                         <input type="submit" value="Save" class="btn btn-primary" id="saveone" onclick="">&nbsp;&nbsp;&nbsp;
                         <a class="btn btn-primary" style="color: #ffffff" href="{{ path('payments_details', { 'id': id }) }}">Return</a>
                     </div>
+
                 </form> 
             </div>
         </div>
-    </div>
+    </div>    
 
     <script type="text/javascript">
         $(document).ready(function () {
@@ -193,23 +229,24 @@
 
                     if ($("#countPayments").val() === "0") {
                         alert("You must enter the license payment");
-                                    return false;                
-                            }
-                    
+                        return false;                
+                    }
+
                 });
 
             });
 
 
-            function loadAjax(valor, div, opcion)
+            function loadAjax(valor, div, opcion, country_id)
             {
                 var valor_id = valor;
+                var valor_country = "{{ country_id }}";
                 if (valor_id !== "")
                 {
                     $.ajax({
                         type: 'POST',
                         url: "{{ path('load_payments') }}",
-                        data: {valor_id: valor_id, opcion: opcion},
+                        data: {valor_id: valor_id, opcion: opcion, valor_country: valor_country},
                         success: function (html) {
                             $("#" + div).html(html);
                         }
@@ -546,11 +583,7 @@
 
                 if (resultado === 0)
                 {
-        {#$("#tablelicenses").hide();
-        $("#divAmount").hide();
-        $('#labelPayments').hide();
-        $('#payment').hide();
-        $('#labelLicense').hide();#}
+
                 }
             }
 
