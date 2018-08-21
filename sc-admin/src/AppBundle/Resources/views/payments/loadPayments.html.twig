@@ -90,7 +90,7 @@
                 <th>Status Payment</th>                            
             </tr> 
         </thead> 
-        <tbody> 
+        <tbody id="tablePaymentsBody"> 
             {% for medicalcenter in medicalcenter %}
                 {% if medicalcenter.paymentstatus == "Paid out" %}
                     {% set status =  medicalcenter.paymentstatus %}             
@@ -107,6 +107,117 @@
             {% endfor %}
         </tbody> 
     </table>    
+{% elseif opcion == 7 %}   
+    
+    {% set NameLanguaje = '' %}  
+    {% set status = "" %}             
+    {% set class = "" %}    
+    {% set acumAmountLicense = 0 %}   
+    {% set acumAmountPayments = 0 %}   
+    {% set acumRemaining = 0 %}   
+    {% set renovation = "" %}       
+    {% set totalAmountLicense = 0 %}   
+    {% if medicalcenter.paymentstatus == "Paid out" %}
+        {% set status =  medicalcenter.paymentstatus %}             
+        {% set class = "badge badge-success" %}   
+    {% else %}    
+        {% set status = medicalcenter.paymentstatus %}
+        {% set class = "badge badge-danger" %}   
+    {% endif %}    
+    <table class="table table-responsive-sm table-bordered table-striped table-sm">
+        <tr>
+            <td align = "justify" style="width: 80px"><b>Status Payment</b></td>
+            <td align = "justify" style="width: 100px"><span class = "{{class}}">{{status}}</span></td>                        
+        </tr>                                                         
+    </table>  
+
+    <div align="center" id="labelLicense" style="display: block"><h4 style="background-color: silver; align-items: center">Licenses</h4></div>
+    <a class="btn btn-primary btn-sm" href="{{ path('license_payment_create', { 'id': id }) }}" title="Add License" role="button"><i class="fas fa-plus-circle"></i> </a>&nbsp;&nbsp;&nbsp;&nbsp;          
+    <br>                
+    <table id="tablelicenses" class="table table-responsive-sm table-bordered table-striped table-sm" style="display: table; width: 100%">
+        <tr align="center" style="background-color: silver;">
+            <th align="center">License</th>                            
+            <th align="center">Users Quantity</th>                            
+            <th align="center">Number of Clients</th>                            
+            <th align="center">Number of Exams</th>                            
+            <th align="center">Duration Time</th>                            
+            <th align="center">Amount</th>   
+            <th align="center">Due Date</th>   
+            <th align="center">Action</th>
+        </tr>
+        {% set amountLicense = 0 %} 
+        {% set amountRenovation = 0 %} 
+        {% set amountLicenseRenovation = 0 %} 
+        {% set totalAmountLicense = 0 %} 
+
+        {% for arrayLicenseData in arrayLicenseData %}
+
+            {% if arrayLicenseData.statusLicense == "Active" %}
+
+                {% if arrayLicenseData.renovation is empty %}
+                    {% set totalAmountLicense = arrayLicenseData.amount %} 
+
+                {% else %}    
+                    {% for renovationLicense in arrayLicenseData.renovation %}  
+                        {% set amountRenovation = amountRenovation + renovationLicense.amount %} 
+                    {% endfor %}
+
+                    {% set amountLicenseRenovation = arrayLicenseData.amount %} 
+                    {% set totalAmountLicense = amountLicenseRenovation + amountRenovation %} 
+
+                {% endif %}
+
+                {% set acumAmountLicense = acumAmountLicense + totalAmountLicense %} 
+                <tr align="center" id="trlicense_{{ loop.index-1 }}">
+                    <td align="center">{{ arrayLicenseData.license }}</td>                            
+                    <td align="center">{{ arrayLicenseData.usersquantity }}</td>                            
+                    <td align="center">{{ arrayLicenseData.numberclients }}</td>                            
+                    <td align="center">{{ arrayLicenseData.numberexams }}</td>                            
+                    <td align="center">{{ arrayLicenseData.durationtime }}</td>
+                    <td align="center">{{ totalAmountLicense }}</td>
+                    <td align="center">{{ arrayLicenseData.expiration_date.toDateTime|date('Y-m-d') }}</td>
+                    <td align="center"><a title="Renovate" href="{{ path('license_renovate', { 'id':id, 'licenseId':arrayLicenseData.idLicense, 'position':loop.index-1 }) }}" class="btn btn-info btn-sm "><i class="fas fa-reply"></i> </a></td>
+                </tr>
+            {% endif %}
+
+        {% endfor %}
+    </table>
+    <div id="divAmount" align="right" style="display: block"><b>Total to pay:</b>&nbsp;&nbsp;<input readonly="" name="amountTotal" id="amountTotal" type="text" value="{{ acumAmountLicense }}" placeholder="" class="" style=" width: 15%;padding: 1px 45px;margin: 5px 0;box-sizing: border-box;border: none;border-bottom: 2px solid black;"><label id="labelAmountCurrentSymbol"><b></b></label></div>                    
+    <br>
+    <br>
+    <div align="center" id="labelLicense" style="display: block"><h4 style="background-color: silver; align-items: center">Payments</h4></div>
+    <a class="btn btn-primary btn-sm" href="{{ path('payment_create', { 'id': id }) }}" title="Add Payment" role="button"><i class="fas fa-plus-circle"></i> </a>&nbsp;&nbsp;&nbsp;&nbsp;          
+    <table id="tablelicenses" class="table table-responsive-sm table-bordered table-striped table-sm" style="display: table; width: 100%">
+        <tr align="center" style="background-color: silver;">
+            <th align="center">Way to pay</th>                            
+            <th align="center">Operation number</th>                            
+            <th align="center">Issuing bank</th>                            
+            <th align="center">Receiving bank</th>                            
+            <th align="center">Amount</th>                            
+            <th align="center">Action</th>
+        </tr>
+        {% for payments in medicalcenter.payments %}
+            {% if payments.status == 1 %}
+                {% set acumAmountPayments = acumAmountPayments + payments.amount %} 
+                <tr align="center" id="trlicense_{{ loop.index-1 }}">
+                    <td align="center">{{ payments.waytopay }}</td>                            
+                    <td align="center">{{ payments.operationnumber }}</td>                            
+                    <td align="center">{{ payments.issuingbank }}</td>                            
+                    <td align="center">{{ payments.receivingbank }}</td>                            
+                    <td align="center">{{ payments.amount }}</td>                            
+                    <td align="center">
+                        <a title="Edit Payment" href="{{ path('payment_edit', { 'id' : id, 'position' : loop.index-1 }) }}" class="btn btn-info btn-sm "><i class="fas fa-edit"></i> </a>
+                        <a title="Delete Payment" href="{{ path('payments_delete', { 'id' : id, 'position' : loop.index-1 }) }}" class="btn btn-danger btn-sm " onclick="return confirm('¿Be sure to eliminate the payment?');"><i class="fas fa-minus-circle"></i> </a>
+                    </td>
+
+                </tr>
+            {% endif %}    
+        {% endfor %}
+    </table>
+    {% set acumRemaining = acumAmountLicense - acumAmountPayments %} 
+    <div id="divRemaining" align="right" style="display: block"><b>Remaining:</b>&nbsp;&nbsp;<input readonly="" name="remaining" id="remaining" type="text" value="{{ acumRemaining }}" placeholder="" class="" style=" width: 15%;padding: 1px 45px;margin: 5px 0;box-sizing: border-box;border: none;border-bottom: 2px solid black;"><label id="labelAmountCurrentSymbol"><b></b></label></div>
+    <div id="divTotalPayment" align="right" style="display: block"><b>Total to pay:</b>&nbsp;&nbsp;<input readonly="" name="total" id="total" type="text" value="{{ acumAmountPayments }}" placeholder="" class="" style=" width: 15%;padding: 1px 45px;margin: 5px 0;box-sizing: border-box;border: none;border-bottom: 2px solid black;"><label id="labelAmountCurrentSymbol"><b></b></label></div>
+    
 {% endif %}    
 
 <script type="text/javascript">
@@ -203,21 +314,21 @@
             }
     {#alert({{ daystopayEdit|number_format }});
     alert({{ daystopayEdit}});#}
-                    if ("{{ daystopayEdit }}" === "")
-                    {
+            if ("{{ daystopayEdit }}" === "")
+            {
 
 
-                    } else if ("{{ daystopayEdit|number_format }}" === "0")
-                    {
-                        $('#paymenttype').val("full").trigger('chosen:updated');
-                        $("#divDaystopay").hide();
-                    } else if ("{{ daystopayEdit|number_format }}" > 0)
-                    {
-                        $('#paymenttype').val("partial").trigger('chosen:updated');
-                        $("#divDaystopay").show();
-                        $("#amount").prop("disabled", false);
-                    }
+            } else if ("{{ daystopayEdit|number_format }}" === "0")
+            {
+                $('#paymenttype').val("full").trigger('chosen:updated');
+                $("#divDaystopay").hide();
+            } else if ("{{ daystopayEdit|number_format }}" > 0)
+            {
+                $('#paymenttype').val("partial").trigger('chosen:updated');
+                $("#divDaystopay").show();
+                $("#amount").prop("disabled", false);
+            }
 
-                });
+        });
 
 </script>

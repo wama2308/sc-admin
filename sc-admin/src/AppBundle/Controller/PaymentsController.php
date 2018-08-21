@@ -32,10 +32,13 @@ class PaymentsController extends Controller {
 //        $medicalcenter1 = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->findBy(array('name' => $a));
 //        var_dump($medicalcenter1);
         $medicalcenter = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->findByActive(true);
-        $countries = $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->findAll();
         //var_dump($countries);
-
-        return $this->render('@App/payments/index.html.twig', array('countries' => $countries, 'medicalcenter' => $medicalcenter));
+        foreach ($medicalcenter as $medicalcenter) {
+            $arrayMedicalCenter[] = $medicalcenter->getName();
+        }
+//        var_dump($arrayMedicalCenter);
+        $medicalcenter_ = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->findByActive(true);
+        return $this->render('@App/payments/index.html.twig', array('medicalcenter_' => $medicalcenter_, 'arrayMedicalCenter' => $arrayMedicalCenter));
     }
 
     /**
@@ -116,7 +119,7 @@ class PaymentsController extends Controller {
                 }
 
                 $licensesData = $this->get('doctrine_mongodb')->getRepository('AppBundle:License')->find($arrayLicenses['license_id']);
-                
+
                 $acumLicenses = $acumLicenses + $acumRenovation + $licensesData->getAmount();
             }
         }
@@ -213,7 +216,7 @@ class PaymentsController extends Controller {
 
         foreach ($arrayLicenses as $arrayLicenses) {
             if ($arrayLicenses['status'] == "Active") {
-                
+
                 $renovation = "";
                 $acumRenovation = 0;
                 if (isset($arrayLicenses['renovation'])) {
@@ -224,7 +227,7 @@ class PaymentsController extends Controller {
                 } else {
                     $renovation = "";
                 }
-                
+
                 $licensesData = $this->get('doctrine_mongodb')->getRepository('AppBundle:License')->find($arrayLicenses['license_id']);
                 $acumLicenses = $acumLicenses + $acumRenovation + $licensesData->getAmount();
             }
@@ -538,7 +541,8 @@ class PaymentsController extends Controller {
 
         $this->addFlash('error', 'Payment Removed');
 
-        return $this->redirectToRoute('payments_details', array('id' => $id));
+//        return $this->redirectToRoute('payments_details', array('id' => $id));
+        return $this->redirectToRoute('payments_list');
     }
 
     /**
@@ -577,9 +581,91 @@ class PaymentsController extends Controller {
                 return $this->render('@App/payments/loadPayments.html.twig', array('license' => $license, 'country' => $country, 'opcion' => $opcion, 'daystopayEdit' => $daystopayEdit));
             } else if ($opcion == 6) {
                 $value = $country_id;
-                $expression = "/^$value/";
+                $expression = "/$value/i";
                 $regex = new \MongoRegex($expression);
                 $medicalcenter = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->findBy(array('name' => $regex));
+
+                return $this->render('@App/payments/loadPayments.html.twig', array('medicalcenter' => $medicalcenter, 'opcion' => $opcion, 'daystopayEdit' => $daystopayEdit));
+            } else if ($opcion == 7) {
+
+                $medicalcenterData = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->findBy(array('name' => $country_id));
+                
+                $medicalcenter = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->find($medicalcenterData[0]->getId());
+                $arrayLicenses = $medicalcenter->getLicenses();
+
+                foreach ($arrayLicenses as $arrayLicenses) {
+//            if ($arrayLicenses['status'] == "Active") {
+//            var_dump(isset($arrayLicenses['renovation']));
+                    $renovation = "";
+                    if (isset($arrayLicenses['renovation'])) {
+                        $renovation = $arrayLicenses['renovation'];
+                    } else {
+                        $renovation = "";
+                    }
+
+                    $licensesData = $this->get('doctrine_mongodb')->getRepository('AppBundle:License')->find($arrayLicenses['license_id']);
+
+                    $arrayLicenseData[] = array(
+                        "idLicense" => $licensesData->getId(),
+                        "license" => $licensesData->getLicense(),
+                        "usersquantity" => $licensesData->getUsersquantity(),
+                        "numberclients" => $licensesData->getNumberclients(),
+                        "numberexams" => $licensesData->getNumberexams(),
+                        "durationtime" => $licensesData->getDurationtime(),
+                        "statusLicense" => $arrayLicenses['status'],
+                        "expiration_date" => $arrayLicenses['expiration_date'],
+                        "renovation" => $renovation,
+                        "amount" => $licensesData->getAmount());
+//            }
+                }
+
+                $countries = $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->findBy(array('provinces.name' => array('$exists' => true), 'active' => true));
+                return $this->render('@App/payments/loadPayments.html.twig', array('id' => $medicalcenterData[0]->getId(), 'medicalcenter' => $medicalcenter, 'countries' => $countries, 'arrayLicenseData' => $arrayLicenseData, 'opcion' => $opcion, 'daystopayEdit' => $daystopayEdit));
+            }
+        }
+        return new Response('Unauthorized Request, No es XmlHttpRequest', Response::HTTP_UNAUTHORIZED);
+    }
+
+    /**
+     * @Route("/payments/searchPayments", name="search_payments")
+     * @Method({"GET", "POST"})
+     */
+    public function searchPayments(Request $request) {
+
+        if ($request->isXmlHttpRequest()) {
+            $country_id = $request->request->get('valor_id');
+            $opcion = $request->request->get('opcion');
+            $waytopayEdit = $request->request->get('waytopay');
+            $issuingbankEdit = $request->request->get('issuingbank');
+            $receivingbankEdit = $request->request->get('receivingbank');
+            $daystopayEdit = $request->request->get('daystopay');
+
+            if ($opcion == 1) {
+                $country = $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->find($country_id);
+                $waytopay = $country->getWaytopay();
+                return $this->render('@App/payments/loadPayments.html.twig', array('waytopay' => $waytopay, 'opcion' => $opcion, 'waytopayEdit' => $waytopayEdit, 'daystopayEdit' => $daystopayEdit));
+            } else if ($opcion == 2) {
+                $country = $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->find($country_id);
+                $issuingbank = $country->getIssuingbank();
+                return $this->render('@App/payments/loadPayments.html.twig', array('issuingbank' => $issuingbank, 'opcion' => $opcion, 'issuingbankEdit' => $issuingbankEdit, 'daystopayEdit' => $daystopayEdit));
+            } else if ($opcion == 3) {
+                $country = $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->find($country_id);
+                $receivingbank = $country->getReceivingbank();
+                return $this->render('@App/payments/loadPayments.html.twig', array('receivingbank' => $receivingbank, 'opcion' => $opcion, 'receivingbankEdit' => $receivingbankEdit, 'daystopayEdit' => $daystopayEdit));
+            } else if ($opcion == 4) {
+                $licensecountry = $this->get('doctrine_mongodb')->getRepository('AppBundle:License')->findBy(array('countries' => $country_id));
+                return $this->render('@App/payments/loadPayments.html.twig', array('licensecountry' => $licensecountry, 'opcion' => $opcion, 'daystopayEdit' => $daystopayEdit));
+            } else if ($opcion == 5) {
+                $valor_country = $request->request->get('valor_country');
+                $country = $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->find($valor_country);
+                $license = $this->get('doctrine_mongodb')->getRepository('AppBundle:License')->find($country_id);
+                return $this->render('@App/payments/loadPayments.html.twig', array('license' => $license, 'country' => $country, 'opcion' => $opcion, 'daystopayEdit' => $daystopayEdit));
+            } else if ($opcion == 6) {
+                $value = $country_id;
+                $expression = "/$value/i";
+                $regex = new \MongoRegex($expression);
+                $medicalcenter = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->findBy(array('name' => $regex));
+
                 return $this->render('@App/payments/loadPayments.html.twig', array('medicalcenter' => $medicalcenter, 'opcion' => $opcion, 'daystopayEdit' => $daystopayEdit));
             }
         }

@@ -25,10 +25,10 @@ class ApiRestUserController extends Controller {
 //  enabled user_front: 0 =  inactivo, 1 = activo, 2 = bloqueado
 
     /**
-     * @Route("/api/CheckMaster")     
+     * @Route("/api/loadCountries")     
      * @Method("GET")
      */
-    public function wamaAction(Request $request) {
+    public function loadCountriesAction(Request $request) {
 
         $token = $request->headers->get('Authorization');
         if ($token == "") {
@@ -49,9 +49,46 @@ class ApiRestUserController extends Controller {
 
                     $serializer = new Serializer($normalizers, $encoders);
 
-                    $provinces = $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->findAll();
+                    $countries = $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->findBy(array('provinces.name' => array('$exists' => true), 'active' => true));
 
-                    $jsonContent = $serializer->serialize($provinces, 'json');
+                    $jsonContent = $serializer->serialize($countries, 'json');
+                    return new Response($jsonContent);
+                } else {
+                    $data = array('message' => 'Error al consultar los datos, problemas con el token');
+                    return new JsonResponse($data, 403);
+                }
+            }
+        }
+    }
+    
+    /**
+     * @Route("/api/loadGeneralConfiguration")     
+     * @Method("GET")
+     */
+    public function loadGeneralConfigurationAction(Request $request) {
+
+        $token = $request->headers->get('Authorization');
+        if ($token == "") {
+            $data = array('message' => 'Token invalido');
+            return new JsonResponse($data, 403);
+        } else {
+            $data_token = $this->get('lexik_jwt_authentication.encoder')->decode($token);
+            if ($data_token == false) {
+                $data = array('message' => 'Authentication Required');
+                return new JsonResponse($data, 403);
+            } else {
+                $user_id = $data_token["id"];
+                $user = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findOneBy(['_id' => $user_id]);
+                if ($user) {
+
+                    $encoders = array(new XmlEncoder(), new JsonEncoder());
+                    $normalizers = array(new ObjectNormalizer());
+
+                    $serializer = new Serializer($normalizers, $encoders);
+
+                    $GeneralConfiguration = $this->get('doctrine_mongodb')->getRepository('AppBundle:GeneralConfiguration')->find("5ae08f86c5dfa106dc92610a");
+
+                    $jsonContent = $serializer->serialize($GeneralConfiguration, 'json');
                     return new Response($jsonContent);
                 } else {
                     $data = array('message' => 'Error al consultar los datos, problemas con el token');
@@ -758,7 +795,7 @@ class ApiRestUserController extends Controller {
             }
         }
     }
-    
+
     /**
      * @Route("/api/UnlockUser")     
      * @Method("PUT")
@@ -795,39 +832,56 @@ class ApiRestUserController extends Controller {
             return new Response('Operacion exitosa');
         }
     }
-    
+
     /**
-     * @Route("/api/LoadModules")     
+     * @Route("/api/LoadMedicalCenter")     
      * @Method("GET")
      */
-    public function LoadModulesAction(Request $request) {
+    public function LoadMedicalCenterAction(Request $request) {
 
         $token = $request->headers->get('Authorization');
         if ($token == "") {
+
             $data = array('message' => 'Token invalido');
             return new JsonResponse($data, 403);
+            
         } else {
+            
             $data_token = $this->get('lexik_jwt_authentication.encoder')->decode($token);
+            
             if ($data_token == false) {
+                
                 $data = array('message' => 'Authentication Required');
                 return new JsonResponse($data, 403);
+                
             } else {
+                
                 $user_id = $data_token["id"];
                 $user = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findOneBy(['_id' => $user_id]);
                 if ($user) {
-
+                    
+                    $medicalCenterId = "";
+                                        
+                    foreach ($data_token['roles'] as $valor){
+                        $medicalCenterId = $valor->medical_center_id;             
+                    }
+                    
                     $encoders = array(new XmlEncoder(), new JsonEncoder());
                     $normalizers = array(new ObjectNormalizer());
 
                     $serializer = new Serializer($normalizers, $encoders);
 
-                    $provinces = $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->findAll();
-
-                    $jsonContent = $serializer->serialize($provinces, 'json');
+                    $medicalcenter = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->find($medicalCenterId);
+                    
+                    $jsonContent = $serializer->serialize($medicalcenter, 'json');
+                    
                     return new Response($jsonContent);
+                    
                 } else {
+                    
                     $data = array('message' => 'Error al consultar los datos, problemas con el token');
                     return new JsonResponse($data, 403);
+                    
                 }
             }
         }
