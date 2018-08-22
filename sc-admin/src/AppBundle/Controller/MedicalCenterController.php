@@ -47,22 +47,22 @@ class MedicalCenterController extends Controller {
         $province = $request->request->get("province");
         $name = $request->request->get("name");
         $code = $request->request->get("code");
-        $typemedicalcenter = $request->request->get("typemedicalcenter");
-        $address = $request->request->get("address");
-
-        $phone = $request->request->get("phone");
-        $arrayPhone = explode(",", $phone);
+//        $typemedicalcenter = $request->request->get("typemedicalcenter");
+//        $address = $request->request->get("address");
+//
+//        $phone = $request->request->get("phone");
+//        $arrayPhone = explode(",", $phone);
         $master = $request->request->get("master");
 
-        $contac1 = $request->request->get("contac1");
-
-        $telephonecontact1 = $request->request->get("telephonecontact1");
-        $arraytelephonecontact1 = explode(",", $telephonecontact1);
+//        $contac1 = $request->request->get("contac1");
+//
+//        $telephonecontact1 = $request->request->get("telephonecontact1");
+//        $arraytelephonecontact1 = explode(",", $telephonecontact1);
 
         $countLicenses = $request->request->get("countLicenses");
         $countPayments = $request->request->get("countPayments");
 
-        if (($country != "") && ($province != "") && ($name != "") && ($code != "") && ($typemedicalcenter != "") && ($address != "") && ($phone != "") && ($master != "") && ($contac1 != "") && ($telephonecontact1 != "") && ($countPayments != "0") && ($countLicenses != "0")) {
+        if (($country != "") && ($province != "") && ($name != "") && ($code != "") && ($master != "") && ($countPayments != "0") && ($countLicenses != "0")) {
 
             $fechaNow = new \MongoDate();
 
@@ -72,9 +72,9 @@ class MedicalCenterController extends Controller {
             $medicalcenter->setProvinceid($province);
             $medicalcenter->setName($name);
             $medicalcenter->setCode($code);
-            $medicalcenter->setType($typemedicalcenter);
-            $medicalcenter->setAddress($address);
-            $medicalcenter->setPhone($arrayPhone);
+//            $medicalcenter->setType($typemedicalcenter);
+//            $medicalcenter->setAddress($address);
+//            $medicalcenter->setPhone($arrayPhone);
 
             $arrayMaster[] = array(
                 "email" => $master,
@@ -83,8 +83,8 @@ class MedicalCenterController extends Controller {
                 "created_at" => $fechaNow);
             $medicalcenter->setMaster($arrayMaster);
 
-            $medicalcenter->setContac1($contac1);
-            $medicalcenter->setContac1phone($arraytelephonecontact1);
+//            $medicalcenter->setContac1($contac1);
+//            $medicalcenter->setContac1phone($arraytelephonecontact1);
 
             for ($i = 0; $i < $countLicenses; $i++) {
 
@@ -197,21 +197,21 @@ class MedicalCenterController extends Controller {
         $province = $request->request->get("province");
         $name = $request->request->get("name");
         $code = $request->request->get("code");
-        $typemedicalcenter = $request->request->get("typemedicalcenter");
-        $address = $request->request->get("address");
+//        $typemedicalcenter = $request->request->get("typemedicalcenter");
+//        $address = $request->request->get("address");
 
-        $phone = $request->request->get("phone");
-        $arrayPhone = explode(",", $phone);
+//        $phone = $request->request->get("phone");
+//        $arrayPhone = explode(",", $phone);
         $master = $request->request->get("master");
 
-        $contac1 = $request->request->get("contac1");
-        $telephonecontact1 = $request->request->get("telephonecontact1");
-        $arraytelephonecontact1 = explode(",", $telephonecontact1);
+//        $contac1 = $request->request->get("contac1");
+//        $telephonecontact1 = $request->request->get("telephonecontact1");
+//        $arraytelephonecontact1 = explode(",", $telephonecontact1);
 
         $countLicenses = $request->request->get("countLicenses");
         $countPayments = $request->request->get("countPayments");
 
-        if (($country != "") && ($province != "") && ($name != "") && ($code != "") && ($typemedicalcenter != "") && ($address != "") && ($phone != "") && ($master != "") && ($contac1 != "") && ($telephonecontact1 != "") && ($countPayments != "0") && ($countLicenses != "0")) {
+        if (($country != "") && ($province != "") && ($name != "") && ($code != "") && ($master != "") && ($countPayments != "0") && ($countLicenses != "0")) {
 
             $medicalcenter = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->find($id);
 
@@ -219,9 +219,9 @@ class MedicalCenterController extends Controller {
             $medicalcenter->setProvinceid($province);
             $medicalcenter->setName($name);
             $medicalcenter->setCode($code);
-            $medicalcenter->setType($typemedicalcenter);
-            $medicalcenter->setAddress($address);
-            $medicalcenter->setPhone($arrayPhone);
+//            $medicalcenter->setType($typemedicalcenter);
+//            $medicalcenter->setAddress($address);
+//            $medicalcenter->setPhone($arrayPhone);
 
             $arrayMaster[] = array(
                 "email" => $master,
@@ -230,8 +230,8 @@ class MedicalCenterController extends Controller {
                 "created_at" => $fechaNow);
             $medicalcenter->setMaster($arrayMaster);
 
-            $medicalcenter->setContac1($contac1);
-            $medicalcenter->setContac1phone($arraytelephonecontact1);
+//            $medicalcenter->setContac1($contac1);
+//            $medicalcenter->setContac1phone($arraytelephonecontact1);
 
             for ($i = 0; $i < $countLicenses; $i++) {
 

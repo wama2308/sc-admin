@@ -495,8 +495,7 @@ class PaymentsController extends Controller {
         $arrayLicenses = $medicalcenter->getLicenses();
 
         foreach ($arrayLicenses as $arrayLicenses) {
-//            if ($arrayLicenses['status'] == "Active") {
-//            var_dump(isset($arrayLicenses['renovation']));
+            
             $renovation = "";
             if (isset($arrayLicenses['renovation'])) {
                 $renovation = $arrayLicenses['renovation'];

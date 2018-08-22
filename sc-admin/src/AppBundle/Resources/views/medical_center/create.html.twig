@@ -78,7 +78,7 @@
                                 <input name="code" id="code" type="text" value="" placeholder="Code" class="form-control">
                             </div>
                         </div>
-                        <div class="row">
+                        {#<div class="row">
                             <div class="form-group col-sm-6">         
                                 <label>Type</label>
                                 <div class="selector-exam">
@@ -95,19 +95,19 @@
                                 <label>Address</label>
                                 <textarea name="address" id="address" type="text" class="form-control"></textarea>
                             </div>
-                        </div>
+                        </div>#}
                         <div class="row">
-                            <div class="form-group col-sm-6">  
-                                <label>Phone</label>
-                                <input name="phone" id="phone" type="text" value="" placeholder="Phone" class="form-control" data-role="tagsinput" >                    
-                            </div>
                             <div class="form-group col-sm-6">  
                                 <label>Master</label>
                                 <input name="master" id="master" type="text" value="" placeholder="Email" onchange="validateEmail(this.value);" class="form-control" >                    
                                 <input name="master_" id="master_" type="hidden" value="" class="form-control">
                             </div>
+                            {#<div class="form-group col-sm-6">  
+                                <label>Phone</label>
+                                <input name="phone" id="phone" type="text" value="" placeholder="Phone" class="form-control" data-role="tagsinput" >                    
+                            </div>#}
                         </div>
-                        <div class="row">
+                        {#<div class="row">
                             <div class="form-group col-sm-6">  
                                 <label>Contac 1</label>
                                 <input name="contac1" id="contac1" type="text" value="" placeholder="Contac 1" class="form-control">                    
@@ -116,7 +116,7 @@
                                 <label>Telephone contact 1</label>
                                 <input name="telephonecontact1" id="telephonecontact1" type="text" value="" placeholder="Telephone contact 1" class="form-control" data-role="tagsinput" >                    
                             </div>
-                        </div>
+                        </div>#}
                         <div class="form-group">        
                             <input type="button" value="Next" class="btn btn-primary" id="buttonnext" onclick="next();" style="">&nbsp;&nbsp;&nbsp;                    
                             <a class="btn btn-primary" style="color: #ffffff" href="{{ path('medical_center_list') }}">Return</a>
@@ -457,7 +457,7 @@
             $("#saveone").click(function () {
                 $(".error").remove();
 
-                var phonevalid = $("#phone").val();
+                {#var phonevalid = $("#phone").val();
                 var phonesplit = phonevalid.split(",");
                 var failphone = false;
                 //Recorro la lista de los correos
@@ -483,15 +483,15 @@
                         failphonecontac1 = true;
                         break;
                     }
-                }
+                }#}
 
                 var regex = /[\w-\.]{2,}@([\w-]{2,}\.)*([\w-]{2,}\.)[\w-]{2,4}/;
 
                 if ($("#country").val() === "") {
-                                $("#country").focus().after("<span class='error' style='color:#FF0000;'>Select the country</span>");
+                                $("#country_chosen").focus().after("<span class='error' style='color:#FF0000;'>Select the country</span>");
                                 return false;
                         } else if ($("#province").val() === "") {
-                                $("#province").focus().after("<span class='error' style='color:#FF0000;'>Select the province</span>");
+                                $("#province_chosen").focus().after("<span class='error' style='color:#FF0000;'>Select the province</span>");
                                 return false;            
                         } else if ($("#name").val() === "") {
                                 $("#name").focus().after("<span class='error' style='color:#FF0000;'>Enter the name</span>");
@@ -499,7 +499,7 @@
                         } else if ($("#code").val() === "") {
                                 $("#code").focus().after("<span class='error' style='color:#FF0000;'>Enter the code</span>");
                                 return false;                
-                        } else if ($("#typemedicalcenter").val() === "") {
+                        } {#else if ($("#typemedicalcenter").val() === "") {
                                 $("#typemedicalcenter").focus().after("<span class='error' style='color:#FF0000;'>Select the type medical center</span>");
                                 return false;                
                         } else if ($("#address").val() === "") {
@@ -508,13 +508,13 @@
                         } else if ($("#phone").val() === "") {
                                 $("#phone").focus().after("<span class='error' style='color:#FF0000;'>Enter the phone</span>");
                                 return false;                
-                        } else if ($("#master").val() === "") {
+                        } #}else if ($("#master").val() === "") {
                                 $("#master").focus().after("<span class='error' style='color:#FF0000;'>Enter the master email</span>");
                                 return false;                
                         } else if (!regex.test($('#master').val().trim())) {
                                 $("#master").focus().after("<span class='error' style='color:#FF0000;'>Wrong email format</span>");
                                 return false;                
-                } else if ($("#contac1").val() === "") {
+                } {#else if ($("#contac1").val() === "") {
                                 $("#contac1").focus().after("<span class='error' style='color:#FF0000;'>Enter the contac1</span>");
                                 return false;                
                         } else if ($("#telephonecontact1").val() === "") {
@@ -526,7 +526,7 @@
                 } else if (failphonecontac1 === true) {
                     $("#telephonecontact1").focus().after("<span class='error' style='color:#FF0000;'>Wrong phone contac 1 format</span>");
                     return false;
-                } else if ($("#countLicenses").val() === "0") {
+                } #}else if ($("#countLicenses").val() === "0") {
                     alert("You must enter the license");
                                 return false;                
                         } else if ($("#countPayments").val() === "0") {
@@ -534,7 +534,7 @@
                                 return false;                
                         }
 
-                $("#country, #province, #name, #code, #typemedicalcenter, #address, #phone, #master, #contac1, #telephonecontact1").keyup(function () {
+                $("#country, #province, #name, #code, #master").keyup(function () {
                             if ($(this).val() !== "") {
                                     $(".error").fadeOut();
                                     return false;
@@ -581,7 +581,7 @@
         function next() {
             $(".error").remove();
 
-            var phonevalid = $("#phone").val();
+            {#var phonevalid = $("#phone").val();
             var phonesplit = phonevalid.split(",");
             var failphone = false;
             //Recorro la lista de los correos
@@ -607,15 +607,15 @@
                     failphonecontac1 = true;
                     break;
                 }
-            }
+            }#}
 
             var regex = /[\w-\.]{2,}@([\w-]{2,}\.)*([\w-]{2,}\.)[\w-]{2,4}/;
 
             if ($("#country").val() === "") {
-                            $("#country").focus().after("<span class='error' style='color:#FF0000;'>Select the country</span>");
+                            $("#country_chosen").focus().after("<span class='error' style='color:#FF0000;'>Select the country</span>");
                             return false;
                     } else if ($("#province").val() === "") {
-                            $("#province").focus().after("<span class='error' style='color:#FF0000;'>Select the province</span>");
+                            $("#province_chosen").focus().after("<span class='error' style='color:#FF0000;'>Select the province</span>");
                             return false;            
                     } else if ($("#name").val() === "") {
                             $("#name").focus().after("<span class='error' style='color:#FF0000;'>Enter the name</span>");
@@ -623,7 +623,7 @@
                     } else if ($("#code").val() === "") {
                             $("#code").focus().after("<span class='error' style='color:#FF0000;'>Enter the code</span>");
                             return false;                
-                    } else if ($("#typemedicalcenter").val() === "") {
+                    } {#else if ($("#typemedicalcenter").val() === "") {
                             $("#typemedicalcenter").focus().after("<span class='error' style='color:#FF0000;'>Select the type medical center</span>");
                             return false;                
                     } else if ($("#address").val() === "") {
@@ -632,13 +632,13 @@
                     } else if ($("#phone").val() === "") {
                             $("#phone").focus().after("<span class='error' style='color:#FF0000;'>Enter the phone</span>");
                             return false;                
-                    } else if ($("#master").val() === "") {
+                    } #}else if ($("#master").val() === "") {
                             $("#master").focus().after("<span class='error' style='color:#FF0000;'>Enter the master email</span>");
                             return false;                
                     } else if (!regex.test($('#master').val().trim())) {
-                            $("#master").focus().after("<span class='error' style='color:#FF0000;'>Wrong email format</span>");
+                            $("#master").focus().after("<span class='error' style='color:#FF0000;'></span>");
                             return false;                
-            } else if ($("#contac1").val() === "") {
+                    } {#else if ($("#contac1").val() === "") {
                             $("#contac1").focus().after("<span class='error' style='color:#FF0000;'>Enter the contac1</span>");
                             return false;                
                     } else if ($("#telephonecontact1").val() === "") {
@@ -650,9 +650,9 @@
             } else if (failphonecontac1 === true) {
                 $("#telephonecontact1").focus().after("<span class='error' style='color:#FF0000;'>Wrong phone contac 1 format</span>");
                 return false;
-            }
+            }#}
 
-            $("#country, #province, #name, #code, #typemedicalcenter, #address, #phone, #master, #contac1, #telephonecontact1").keyup(function () {
+            $("#country, #province, #name, #code, #master").keyup(function () {
                         if ($(this).val() !== "") {
                                 $(".error").fadeOut();
                                 return false;

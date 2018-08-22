@@ -82,14 +82,14 @@
                         <td align = "justify" style="width: 50px"><b>Code</b></td>
                         <td align = "justify" style="width: 100px">{{ medicalcenter.code }}</td>
                     </tr>
-                    <tr>
+                    {#<tr>
                         <td align = "justify" style="width: 50px"><b>Type</b></td>
                         <td align = "justify" style="width: 100px">{{ type }}</td>
-                    </tr>
-                    <tr>
+                    </tr>#}
+                    {#<tr>
                         <td align = "justify" style="width: 50px"><b>Address</b></td>
                         <td align = "justify" style="width: 100px">{{ medicalcenter.address }}</td>
-                    </tr>
+                    </tr>#}
                     <tr>
                         <td align = "justify" style="width: 50px"><b>Status</b></td>
                         <td align = "justify" style="width: 100px"><span class = "{{class}}">{{status}}</span></td>           
@@ -98,7 +98,7 @@
                         <td align = "justify" style="width: 150px"><b>Email Master</b></td>
                         <td align = "justify" style="width: 100px">{{ medicalcenter.master[0]['email'] }}</td>
                     </tr>
-                    <tr>
+                    {#<tr>
                         <td align = "justify" style="width: 50px"><b>Phone</b></td>
                         <td align = "justify" style="width: 50px"><button type="button" class="clase-popover btn btn-primary btn-sm" data-container="body" data-toggle="popover" data-placement="right" title="Phone" data-content="{{ medicalcenter.phone|join(' | ') }}"><b>View</b></button></td>                                                
                     </tr>  
@@ -109,7 +109,7 @@
                     <tr>
                         <td align = "justify" style="width: 50px"><b>Phone Contac</b></td>
                         <td align = "justify" style="width: 50px"><button type="button" class="clase-popover btn btn-primary btn-sm" data-container="body" data-toggle="popover" data-placement="right" title="Phone Contac" data-content="{{ medicalcenter.contac1phone|join(' | ') }}"><b>View</b></button></td>                                                
-                    </tr>   
+                    </tr>   #}
                     <tr>
                         <td align = "justify" style="width: 50px"><b>License</b></td>
                         <td align = "justify" style="width: 50px"><button id="btnModalLicense" title="View License" class="btn btn-primary btn-sm"><b>View</b></button></td>                        
