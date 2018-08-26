@@ -99,7 +99,7 @@
                         <div class="row">
                             <div class="form-group col-sm-6">  
                                 <label>Master</label>
-                                <input name="master" id="master" type="text" value="" placeholder="Email" onchange="validateEmail(this.value);" class="form-control" >                    
+                                <input name="master" id="master" type="text" value="" placeholder="Email" onchange="verificarEmail(this.value);" class="form-control" >                    
                                 <input name="master_" id="master_" type="hidden" value="" class="form-control">
                             </div>
                             {#<div class="form-group col-sm-6">  
@@ -118,7 +118,7 @@
                             </div>
                         </div>#}
                         <div class="form-group">        
-                            <input type="button" value="Next" class="btn btn-primary" id="buttonnext" onclick="next();" style="">&nbsp;&nbsp;&nbsp;                    
+                            <input type="button" value="Next" class="btn btn-primary" id="buttonnext" onclick="setTimeout('next()', 0500);" style="">&nbsp;&nbsp;&nbsp;                    
                             <a class="btn btn-primary" style="color: #ffffff" href="{{ path('medical_center_list') }}">Return</a>
                         </div>
                     </div>
@@ -280,6 +280,13 @@
                             </div>   
                         </div>
                     </div>
+                    <div id="modalUserFront" class="mascara">
+                        <div class="contenido" style="">
+                            <span class="close_" onclick="$('#modalUserFront').hide();">&times;</span><br>
+                            <div id="emailUsersFront"></div>
+
+                        </div>
+                    </div>
                     {#////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////#}   
                 </div>
 
@@ -392,16 +399,92 @@
         li:hover {
             background-color: silver;
         }
+
+        {# OTRO00000000000000000000000000000000000 #}
+        .mascara {
+            display: none; 
+            position: fixed; 
+            z-index: 1; 
+            padding-top: 100px; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgb(0,0,0); 
+            background-color: rgba(0,0,0,0.4); 
+            -webkit-transition: opacity 400ms ease-in;
+            -moz-transition: opacity 400ms ease-in;
+            transition: opacity 400ms ease-in;
+            pointer-events: auto;
+        }
+        .mascara > div {
+            width: 700px;
+            height: 550px;
+            top: 0%;
+            position: relative;
+            margin: -3% auto;
+            padding: 5px 20px 13px 20px;
+            border-radius: 10px;
+            background: #FFFFFF;  /* fallback for old browsers */            
+            transition: opacity 400ms ease-in;
+            overflow-y: auto;
+        }
+        .contenido {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 50%;  
+            height: auto;
+            overflow-y: auto;
+            -webkit-animation-name: animatetop;
+            -webkit-animation-duration: 1.2s;
+            animation-name: animatetop;
+            animation-duration: 1.2s
+        }
+        /* Add Animation */
+        @-webkit-keyframes animatetop {
+            from {top:-300px; opacity:0} 
+            to {top:0; opacity:1}
+        }
+
+        @keyframes animatetop {
+            from {top:-300px; opacity:0}
+            to {top:0; opacity:1}
+        }       
+
+        .close_ {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close_:hover,
+        .close_:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
     </style> 
 
     <script type="text/javascript">
         $(document).ready(function () {
             $('#myTab a[href="#medicalCenter"]').tab('show');
             var myModalLicense = document.getElementById('myModalLicense');
+            var modalUserFront = document.getElementById('modalUserFront');
 
             window.onclick = function (event) {
                 if (event.target === myModalLicense) {
+
                     myModalLicense.style.display = "none";
+
+                } else if (event.target === modalUserFront) {
+
+                    modalUserFront.style.display = "none";
+
                 }
             }
 
@@ -416,8 +499,6 @@
             $(".select-type").chosen({
                 placeholder_text_single: "Select the type medical center"
             });
-
-
 
             $(".select-country").chosen({
                 placeholder_text_single: "Select the country"
@@ -457,36 +538,162 @@
             $("#saveone").click(function () {
                 $(".error").remove();
 
-                {#var phonevalid = $("#phone").val();
-                var phonesplit = phonevalid.split(",");
-                var failphone = false;
-                //Recorro la lista de los correos
-                for (var i in phonesplit) {
-                    /*Verifico que sea una dirección de correo correcta, es la misma
-                     expresión regular que usa esta librería para la regla email */
-                    if (/[^0-9\-\+]/.test(phonesplit[i].trim()) !== false) {
-                        //Si falla la verificación pongo a true esta variable y salgo del ciclo
-                        failphone = true;
-                        break;
-                    }
-                }
+        {#var phonevalid = $("#phone").val();
+        var phonesplit = phonevalid.split(",");
+        var failphone = false;
+        //Recorro la lista de los correos
+        for (var i in phonesplit) {
+            /*Verifico que sea una dirección de correo correcta, es la misma
+             expresión regular que usa esta librería para la regla email */
+            if (/[^0-9\-\+]/.test(phonesplit[i].trim()) !== false) {
+                //Si falla la verificación pongo a true esta variable y salgo del ciclo
+                failphone = true;
+                break;
+            }
+        }
 
-                var phonevalid = $("#telephonecontact1").val();
-                var phonesplit = phonevalid.split(",");
-                var failphonecontac1 = false;
-                //Recorro la lista de los correos
-                for (var i in phonesplit) {
-                    /*Verifico que sea una dirección de correo correcta, es la misma
-                     expresión regular que usa esta librería para la regla email */
-                    if (/[^0-9\-\+]/.test(phonesplit[i].trim()) !== false) {
-                        //Si falla la verificación pongo a true esta variable y salgo del ciclo
-                        failphonecontac1 = true;
-                        break;
-                    }
-                }#}
+        var phonevalid = $("#telephonecontact1").val();
+        var phonesplit = phonevalid.split(",");
+        var failphonecontac1 = false;
+        //Recorro la lista de los correos
+        for (var i in phonesplit) {
+            /*Verifico que sea una dirección de correo correcta, es la misma
+             expresión regular que usa esta librería para la regla email */
+            if (/[^0-9\-\+]/.test(phonesplit[i].trim()) !== false) {
+                //Si falla la verificación pongo a true esta variable y salgo del ciclo
+                failphonecontac1 = true;
+                break;
+            }
+        }#}
+
+                    var regex = /[\w-\.]{2,}@([\w-]{2,}\.)*([\w-]{2,}\.)[\w-]{2,4}/;
+
+                    if ($("#country").val() === "") {
+                                    $("#country_chosen").focus().after("<span class='error' style='color:#FF0000;'>Select the country</span>");
+                                    return false;
+                            } else if ($("#province").val() === "") {
+                                    $("#province_chosen").focus().after("<span class='error' style='color:#FF0000;'>Select the province</span>");
+                                    return false;            
+                            } else if ($("#name").val() === "") {
+                                    $("#name").focus().after("<span class='error' style='color:#FF0000;'>Enter the name</span>");
+                                    return false;                
+                            } else if ($("#code").val() === "") {
+                                    $("#code").focus().after("<span class='error' style='color:#FF0000;'>Enter the code</span>");
+                                    return false;                
+                            } {#else if ($("#typemedicalcenter").val() === "") {
+                        $("#typemedicalcenter").focus().after("<span class='error' style='color:#FF0000;'>Select the type medical center</span>");
+                        return false;                
+                } else if ($("#address").val() === "") {
+                        $("#address").focus().after("<span class='error' style='color:#FF0000;'>Enter the address</span>");
+                        return false;                
+                } else if ($("#phone").val() === "") {
+                        $("#phone").focus().after("<span class='error' style='color:#FF0000;'>Enter the phone</span>");
+                        return false;                
+                } #}else if ($("#master").val() === "") {
+                                    $("#master").focus().after("<span class='error' style='color:#FF0000;'>Enter the master email</span>");
+                                    return false;                
+                            } else if (!regex.test($('#master').val().trim())) {
+                                    $("#master").focus().after("<span class='error' style='color:#FF0000;'>Wrong email format</span>");
+                                    return false;                
+                    } {#else if ($("#contac1").val() === "") {
+                        $("#contac1").focus().after("<span class='error' style='color:#FF0000;'>Enter the contac1</span>");
+                        return false;                
+                } else if ($("#telephonecontact1").val() === "") {
+                        $("#telephonecontact1").focus().after("<span class='error' style='color:#FF0000;'>Enter the telephone contact 1</span>");
+                        return false;                
+                } else if (failphone === true) {
+            $("#phone").focus().after("<span class='error' style='color:#FF0000;'>Wrong phone format</span>");
+            return false;
+        } else if (failphonecontac1 === true) {
+            $("#telephonecontact1").focus().after("<span class='error' style='color:#FF0000;'>Wrong phone contac 1 format</span>");
+            return false;
+        } #}else if ($("#countLicenses").val() === "0") {
+                        alert("You must enter the license");
+                                    return false;                
+                            } else if ($("#countPayments").val() === "0") {
+                        alert("You must enter the license payment");
+                                    return false;                
+                            }
+
+                    $("#country, #province, #name, #code, #master").keyup(function () {
+                                if ($(this).val() !== "") {
+                                        $(".error").fadeOut();
+                                        return false;
+                                }
+                    });
+                });
+
+            });
+
+
+            function loadAjax(valor, div, opcion)
+            {
+                var valor_id = $("#" + valor).val();
+                var valor_country = $("#country").val();
+                if (valor_id !== "")
+                {
+                    $.ajax({
+                        type: 'POST',
+                        url: "{{ path('ajax') }}",
+                        data: {valor_id: valor_id, opcion: opcion, valor_country: valor_country},
+                        success: function (html) {
+                            $("#" + div).html(html);
+                        }
+                    });
+                }
+            }
+
+            function loadAjax2(valor, div, opcion)
+            {
+                var valor_id = $("#" + valor).val();
+                if (valor_id !== "")
+                {
+                    $.ajax({
+                        type: 'POST',
+                        url: "{{ path('ajax_') }}",
+                        data: {valor_id: valor_id, opcion: opcion},
+                        success: function (html) {
+                            $("#" + div).html(html);
+                        }
+                    });
+                }
+            }
+
+            function next() {
+                $(".error").remove();
+
+        {#var phonevalid = $("#phone").val();
+        var phonesplit = phonevalid.split(",");
+        var failphone = false;
+        //Recorro la lista de los correos
+        for (var i in phonesplit) {
+            /*Verifico que sea una dirección de correo correcta, es la misma
+             expresión regular que usa esta librería para la regla email */
+            if (/[^0-9\-\+]/.test(phonesplit[i].trim()) !== false) {
+                //Si falla la verificación pongo a true esta variable y salgo del ciclo
+                failphone = true;
+                break;
+            }
+        }
+
+        var phonevalid = $("#telephonecontact1").val();
+        var phonesplit = phonevalid.split(",");
+        var failphonecontac1 = false;
+        //Recorro la lista de los correos
+        for (var i in phonesplit) {
+            /*Verifico que sea una dirección de correo correcta, es la misma
+             expresión regular que usa esta librería para la regla email */
+            if (/[^0-9\-\+]/.test(phonesplit[i].trim()) !== false) {
+                //Si falla la verificación pongo a true esta variable y salgo del ciclo
+                failphonecontac1 = true;
+                break;
+            }
+        }#}
 
                 var regex = /[\w-\.]{2,}@([\w-]{2,}\.)*([\w-]{2,}\.)[\w-]{2,4}/;
 
+
+        {#                    alert($("#validateEmaiText").val());#}
                 if ($("#country").val() === "") {
                                 $("#country_chosen").focus().after("<span class='error' style='color:#FF0000;'>Select the country</span>");
                                 return false;
@@ -500,39 +707,36 @@
                                 $("#code").focus().after("<span class='error' style='color:#FF0000;'>Enter the code</span>");
                                 return false;                
                         } {#else if ($("#typemedicalcenter").val() === "") {
-                                $("#typemedicalcenter").focus().after("<span class='error' style='color:#FF0000;'>Select the type medical center</span>");
-                                return false;                
-                        } else if ($("#address").val() === "") {
-                                $("#address").focus().after("<span class='error' style='color:#FF0000;'>Enter the address</span>");
-                                return false;                
-                        } else if ($("#phone").val() === "") {
-                                $("#phone").focus().after("<span class='error' style='color:#FF0000;'>Enter the phone</span>");
-                                return false;                
-                        } #}else if ($("#master").val() === "") {
+                                    $("#typemedicalcenter").focus().after("<span class='error' style='color:#FF0000;'>Select the type medical center</span>");
+                                    return false;                
+                            } else if ($("#address").val() === "") {
+                                    $("#address").focus().after("<span class='error' style='color:#FF0000;'>Enter the address</span>");
+                                    return false;                
+                            } else if ($("#phone").val() === "") {
+                                    $("#phone").focus().after("<span class='error' style='color:#FF0000;'>Enter the phone</span>");
+                                    return false;                
+                            } #}else if ($("#master").val() === "") {
                                 $("#master").focus().after("<span class='error' style='color:#FF0000;'>Enter the master email</span>");
                                 return false;                
                         } else if (!regex.test($('#master').val().trim())) {
                                 $("#master").focus().after("<span class='error' style='color:#FF0000;'>Wrong email format</span>");
                                 return false;                
-                } {#else if ($("#contac1").val() === "") {
-                                $("#contac1").focus().after("<span class='error' style='color:#FF0000;'>Enter the contac1</span>");
+                } else if ($("#validateEmaiText").val() === "1") {
+                    loadInfoEmailUsersFront();
                                 return false;                
-                        } else if ($("#telephonecontact1").val() === "") {
-                                $("#telephonecontact1").focus().after("<span class='error' style='color:#FF0000;'>Enter the telephone contact 1</span>");
-                                return false;                
-                        } else if (failphone === true) {
-                    $("#phone").focus().after("<span class='error' style='color:#FF0000;'>Wrong phone format</span>");
-                    return false;
-                } else if (failphonecontac1 === true) {
-                    $("#telephonecontact1").focus().after("<span class='error' style='color:#FF0000;'>Wrong phone contac 1 format</span>");
-                    return false;
-                } #}else if ($("#countLicenses").val() === "0") {
-                    alert("You must enter the license");
-                                return false;                
-                        } else if ($("#countPayments").val() === "0") {
-                    alert("You must enter the license payment");
-                                return false;                
-                        }
+                        }{#else if ($("#contac1").val() === "") {
+                                    $("#contac1").focus().after("<span class='error' style='color:#FF0000;'>Enter the contac1</span>");
+                                    return false;                
+                            } else if ($("#telephonecontact1").val() === "") {
+                                    $("#telephonecontact1").focus().after("<span class='error' style='color:#FF0000;'>Enter the telephone contact 1</span>");
+                                    return false;                
+                            } else if (failphone === true) {
+                        $("#phone").focus().after("<span class='error' style='color:#FF0000;'>Wrong phone format</span>");
+                        return false;
+                    } else if (failphonecontac1 === true) {
+                        $("#telephonecontact1").focus().after("<span class='error' style='color:#FF0000;'>Wrong phone contac 1 format</span>");
+                        return false;
+                    }#}
 
                 $("#country, #province, #name, #code, #master").keyup(function () {
                             if ($(this).val() !== "") {
@@ -540,197 +744,88 @@
                                     return false;
                             }
                 });
-            });
 
-        });
+                $("#hlicense").removeClass("disabled");
+                $('#myTab a[href="#licenseLi"]').tab('show');
+            }
 
+            function back() {
+                $('#myTab a[href="#medicalCenter"]').tab('show');
+            }
 
-        function loadAjax(valor, div, opcion)
-        {
-            var valor_id = $("#" + valor).val();
-            var valor_country = $("#country").val();
-            if (valor_id !== "")
+            function validarTagsPhone()
             {
-                $.ajax({
-                    type: 'POST',
-                    url: "{{ path('ajax') }}",
-                    data: {valor_id: valor_id, opcion: opcion, valor_country: valor_country},
-                    success: function (html) {
-                        $("#" + div).html(html);
+                var phone = $("#phone").val();
+                var phonesplit = phone.split(",");
+                var fail = false;
+                //Recorro la lista de los correos
+                for (var i in phonesplit) {
+                    /*Verifico que sea una dirección de correo correcta, es la misma
+                     expresión regular que usa esta librería para la regla email */
+                    if (/[^0-9\-\+]/.test(phonesplit[i].trim()) !== false) {
+                        //Si falla la verificación pongo a true esta variable y salgo del ciclo
+                        fail = true;
+                        break;
                     }
-                });
-            }
-        }
-
-        function loadAjax2(valor, div, opcion)
-        {
-            var valor_id = $("#" + valor).val();
-            if (valor_id !== "")
-            {
-                $.ajax({
-                    type: 'POST',
-                    url: "{{ path('ajax_') }}",
-                    data: {valor_id: valor_id, opcion: opcion},
-                    success: function (html) {
-                        $("#" + div).html(html);
-                    }
-                });
-            }
-        }
-
-        function next() {
-            $(".error").remove();
-
-            {#var phonevalid = $("#phone").val();
-            var phonesplit = phonevalid.split(",");
-            var failphone = false;
-            //Recorro la lista de los correos
-            for (var i in phonesplit) {
-                /*Verifico que sea una dirección de correo correcta, es la misma
-                 expresión regular que usa esta librería para la regla email */
-                if (/[^0-9\-\+]/.test(phonesplit[i].trim()) !== false) {
-                    //Si falla la verificación pongo a true esta variable y salgo del ciclo
-                    failphone = true;
-                    break;
+                }
+                if (fail == true)
+                {
+                    alert('nooo');
+                    $("#phone").focus();
+                    return false;
                 }
             }
 
-            var phonevalid = $("#telephonecontact1").val();
-            var phonesplit = phonevalid.split(",");
-            var failphonecontac1 = false;
-            //Recorro la lista de los correos
-            for (var i in phonesplit) {
-                /*Verifico que sea una dirección de correo correcta, es la misma
-                 expresión regular que usa esta librería para la regla email */
-                if (/[^0-9\-\+]/.test(phonesplit[i].trim()) !== false) {
-                    //Si falla la verificación pongo a true esta variable y salgo del ciclo
-                    failphonecontac1 = true;
-                    break;
-                }
-            }#}
 
-            var regex = /[\w-\.]{2,}@([\w-]{2,}\.)*([\w-]{2,}\.)[\w-]{2,4}/;
-
-            if ($("#country").val() === "") {
-                            $("#country_chosen").focus().after("<span class='error' style='color:#FF0000;'>Select the country</span>");
-                            return false;
-                    } else if ($("#province").val() === "") {
-                            $("#province_chosen").focus().after("<span class='error' style='color:#FF0000;'>Select the province</span>");
-                            return false;            
-                    } else if ($("#name").val() === "") {
-                            $("#name").focus().after("<span class='error' style='color:#FF0000;'>Enter the name</span>");
-                            return false;                
-                    } else if ($("#code").val() === "") {
-                            $("#code").focus().after("<span class='error' style='color:#FF0000;'>Enter the code</span>");
-                            return false;                
-                    } {#else if ($("#typemedicalcenter").val() === "") {
-                            $("#typemedicalcenter").focus().after("<span class='error' style='color:#FF0000;'>Select the type medical center</span>");
-                            return false;                
-                    } else if ($("#address").val() === "") {
-                            $("#address").focus().after("<span class='error' style='color:#FF0000;'>Enter the address</span>");
-                            return false;                
-                    } else if ($("#phone").val() === "") {
-                            $("#phone").focus().after("<span class='error' style='color:#FF0000;'>Enter the phone</span>");
-                            return false;                
-                    } #}else if ($("#master").val() === "") {
-                            $("#master").focus().after("<span class='error' style='color:#FF0000;'>Enter the master email</span>");
-                            return false;                
-                    } else if (!regex.test($('#master').val().trim())) {
-                            $("#master").focus().after("<span class='error' style='color:#FF0000;'></span>");
-                            return false;                
-                    } {#else if ($("#contac1").val() === "") {
-                            $("#contac1").focus().after("<span class='error' style='color:#FF0000;'>Enter the contac1</span>");
-                            return false;                
-                    } else if ($("#telephonecontact1").val() === "") {
-                            $("#telephonecontact1").focus().after("<span class='error' style='color:#FF0000;'>Enter the telephone contact 1</span>");
-                            return false;                
-                    } else if (failphone === true) {
-                $("#phone").focus().after("<span class='error' style='color:#FF0000;'>Wrong phone format</span>");
-                return false;
-            } else if (failphonecontac1 === true) {
-                $("#telephonecontact1").focus().after("<span class='error' style='color:#FF0000;'>Wrong phone contac 1 format</span>");
-                return false;
-            }#}
-
-            $("#country, #province, #name, #code, #master").keyup(function () {
-                        if ($(this).val() !== "") {
-                                $(".error").fadeOut();
-                                return false;
-                        }
-            });
-            $("#hlicense").removeClass("disabled");
-            $('#myTab a[href="#licenseLi"]').tab('show');
-        }
-
-        function back() {
-            $('#myTab a[href="#medicalCenter"]').tab('show');
-        }
-
-        function validarTagsPhone()
-        {
-            var phone = $("#phone").val();
-            var phonesplit = phone.split(",");
-            var fail = false;
-            //Recorro la lista de los correos
-            for (var i in phonesplit) {
-                /*Verifico que sea una dirección de correo correcta, es la misma
-                 expresión regular que usa esta librería para la regla email */
-                if (/[^0-9\-\+]/.test(phonesplit[i].trim()) !== false) {
-                    //Si falla la verificación pongo a true esta variable y salgo del ciclo
-                    fail = true;
-                    break;
+            function loadInfoLicense()
+            {
+                var valor_id = $("#license").val();
+                if (valor_id !== "")
+                {
+                    var modal = document.getElementById('myModalLicense');
+                    modal.style.display = "block";
                 }
             }
-            if (fail == true)
-            {
-                alert('nooo');
-                $("#phone").focus();
-                return false;
-            }
-        }
 
-
-        function loadInfoLicense()
-        {
-            var valor_id = $("#license").val();
-            if (valor_id !== "")
+            function loadInfoEmailUsersFront()
             {
-                var modal = document.getElementById('myModalLicense');
+
+                var modal = document.getElementById('modalUserFront');
                 modal.style.display = "block";
+
             }
-        }
 
 
-        function agregarLicenses()
-        {
-            var license = $("#license").val();
-            var inputLicense = $('#inputLicense').val();
-            var inputUsersQuantity = $('#inputUsersQuantity').val();
-            var inputNumberClients = $('#inputNumberClients').val();
-            var inputNumberExams = $('#inputNumberExams').val();
-            var inputDurationTime = $('#inputDurationTime').val();
-            var inputAmount = $('#inputAmount').val();
-            var inputCurrentSymbol = $('#inputCurrentSymbol').val();
-            var i = 0; //contador para asignar id al boton que borrara la fila
-            var counter = $("#countLicenses").val();
-            var acumAmount = $("#amountTotal").val();
-            var amount = 0;
+            function agregarLicenses()
+            {
+                var license = $("#license").val();
+                var inputLicense = $('#inputLicense').val();
+                var inputUsersQuantity = $('#inputUsersQuantity').val();
+                var inputNumberClients = $('#inputNumberClients').val();
+                var inputNumberExams = $('#inputNumberExams').val();
+                var inputDurationTime = $('#inputDurationTime').val();
+                var inputAmount = $('#inputAmount').val();
+                var inputCurrentSymbol = $('#inputCurrentSymbol').val();
+                var i = 0; //contador para asignar id al boton que borrara la fila
+                var counter = $("#countLicenses").val();
+                var acumAmount = $("#amountTotal").val();
+                var amount = 0;
 
-            if (counter !== "0") {
-                for (i = 0; i <= counter; i++) {
-                    if ($("#licenseId_" + i).val() === license) {
-                        alert("This license is already in the table");
-                        $("#fields").val("");
-                        return false;
+                if (counter !== "0") {
+                    for (i = 0; i <= counter; i++) {
+                        if ($("#licenseId_" + i).val() === license) {
+                            alert("This license is already in the table");
+                            $("#fields").val("");
+                            return false;
+                        }
                     }
                 }
-            }
 
-            counter = $("#countLicenses").val();
-            acumAmount = $("#amountTotal").val();
+                counter = $("#countLicenses").val();
+                acumAmount = $("#amountTotal").val();
 
-            $("#tablelicenses").show();
-            var fila = '<tr align="center" id="row' + counter + '">\n\
+                $("#tablelicenses").show();
+                var fila = '<tr align="center" id="row' + counter + '">\n\
             <td align="center">' + inputLicense + '</td>\n\
             <input type="hidden" id="licenseId_' + counter + '" name="licenseId_' + counter + '"  value="' + document.getElementById("licenseid").value + '" />\n\
             <input type="hidden" id="durationTime_' + counter + '" name="durationTime_' + counter + '"  value="' + document.getElementById("inputDurationTime").value + '" />\n\
@@ -741,218 +836,218 @@
             <td align="center">' + inputAmount + ' ' + inputCurrentSymbol + '</td>\n\
             <td><button type="button" name="remove" id="' + counter + '" onclick="$(this).parent().parent().remove(); restaLicenses(' + inputAmount + ')" class="btn btn-danger" style=""><i class="fas fa-minus-circle"></i></button></td>\n\
         </tr>';
-            counter++;
-            amount = parseFloat(acumAmount) + parseFloat(inputAmount);
-            $("#countLicenses").val(counter);
-            $("#amountTotal").val(amount);
-            $("#remaining").val(amount);
-            //$("#amountTotal").val(new Intl.NumberFormat("es-PE").format(amount));
+                counter++;
+                amount = parseFloat(acumAmount) + parseFloat(inputAmount);
+                $("#countLicenses").val(counter);
+                $("#amountTotal").val(amount);
+                $("#remaining").val(amount);
+                //$("#amountTotal").val(new Intl.NumberFormat("es-PE").format(amount));
 
-            //$("#total").val(amount);
-            $('#tablelicenses tr:first').after(fila);
-            var nFilas = $("#tablelicenses tr").length;
-            $('#license').val("").trigger('chosen:updated');
-            $('#myModalLicense').hide();
-            $('#divAmount').show();
-            $('#labelPayments').show();
-            $('#payment').show();
-            $('#labelLicense').show();
-            $('#labelAmountCurrentSymbol').text(inputCurrentSymbol);
-            $('#labelAmountCurrentSymbol').css("font-weight", "bold");
+                //$("#total").val(amount);
+                $('#tablelicenses tr:first').after(fila);
+                var nFilas = $("#tablelicenses tr").length;
+                $('#license').val("").trigger('chosen:updated');
+                $('#myModalLicense').hide();
+                $('#divAmount').show();
+                $('#labelPayments').show();
+                $('#payment').show();
+                $('#labelLicense').show();
+                $('#labelAmountCurrentSymbol').text(inputCurrentSymbol);
+                $('#labelAmountCurrentSymbol').css("font-weight", "bold");
 
-        }
-
-        function restaLicenses(amountCelda)
-        {
-            var valor = $("#countLicenses").val();
-            var valor1 = 1;
-            var resultado = valor - valor1;
-            $("#countLicenses").val(resultado);
-
-            var valorAmountCelda = amountCelda;
-            var valorAmount = $("#amountTotal").val();
-            var resultadoAmount = valorAmount - valorAmountCelda;
-            $("#amountTotal").val(resultadoAmount);
-
-            if (resultado === 0)
-            {
-                $("#tablelicenses").hide();
-                $("#divAmount").hide();
-                $('#labelPayments').hide();
-                $('#payment').hide();
-                $('#labelLicense').hide();
-            }
-        }
-
-
-
-        function paymentType()
-        {
-            if ($("#paymenttype").val() === "partial")
-            {
-                $("#divDaystopay").show();
-                $("#amount").val("0");
-                $("#amount").prop("disabled", false);
-            } else
-            {
-                $("#divDaystopay").hide();
-                $("#daystopay").val("0");
-                var amountTotal = $("#amountTotal").val();
-                $("#amount").val(amountTotal);
-                $("#amount").prop("disabled", true);
-                var amount = parseFloat($("#amountTotal").val()) - parseFloat($("#total").val());
-                $("#amount").val(amount);
             }
 
-        }
-
-        function wayToPayOperation()
-        {
-            if (($("#waytopay").val() === "") || ($("#waytopay").val() === "0"))
+            function restaLicenses(amountCelda)
             {
-                $("#divInfoTarjetas").hide();
-                $("#divNumCheck").hide();
-                $("#divProofTransfer").hide();
+                var valor = $("#countLicenses").val();
+                var valor1 = 1;
+                var resultado = valor - valor1;
+                $("#countLicenses").val(resultado);
 
-                $("#cardholder").val("");
-                $("#cardnumber").val("");
-                $("#expiration").val("");
-                $("#cvv").val("");
-                $("#operationnumber").val("");
-                $("#files4").val("");
-                $("#inputFile4Base64").val("");
-                $("#list4").html("");
+                var valorAmountCelda = amountCelda;
+                var valorAmount = $("#amountTotal").val();
+                var resultadoAmount = valorAmount - valorAmountCelda;
+                $("#amountTotal").val(resultadoAmount);
 
-                $("#receivingbank").attr('disabled', true).trigger("chosen:updated");
-                $("#issuingbank").attr('disabled', true).trigger("chosen:updated");
-                $("#operationnumber").prop("disabled", true);
-
-            } else if (($("#waytopay").val() === "1") || ($("#waytopay").val() === "2"))
-            {
-                $("#divInfoTarjetas").show();
-                $("#divNumCheck").hide();
-                $("#divProofTransfer").hide();
-
-                $("#operationnumber").val("");
-                $("#files4").val("");
-                $("#inputFile4Base64").val("");
-                $("#list4").html("");
-
-                $("#receivingbank").attr('disabled', false).trigger("chosen:updated");
-                $("#issuingbank").attr('disabled', false).trigger("chosen:updated");
-                $("#operationnumber").prop("disabled", false);
-
-            } else if ($("#waytopay").val() === "3")
-            {
-                $("#divInfoTarjetas").hide();
-                $("#divNumCheck").show();
-                $("#divProofTransfer").hide();
-
-                $("#cardholder").val("");
-                $("#cardnumber").val("");
-                $("#expiration").val("");
-                $("#cvv").val("");
-                $("#files4").val("");
-                $("#inputFile4Base64").val("");
-                $("#list4").html("");
-
-                $("#receivingbank").attr('disabled', false).trigger("chosen:updated");
-                $("#issuingbank").attr('disabled', false).trigger("chosen:updated");
-                $("#operationnumber").prop("disabled", false);
-
-            } else if (($("#waytopay").val() === "4") || ($("#waytopay").val() === "5"))
-            {
-                $("#divInfoTarjetas").hide();
-                $("#divNumCheck").hide();
-                $("#divProofTransfer").show();
-
-                $("#cardholder").val("");
-                $("#cardnumber").val("");
-                $("#expiration").val("");
-                $("#cvv").val("");
-                $("#operationnumber").val("");
-
-                $("#receivingbank").attr('disabled', false).trigger("chosen:updated");
-                $("#issuingbank").attr('disabled', false).trigger("chosen:updated");
-                $("#operationnumber").prop("disabled", false);
-            }
-        }
-
-        function invento() {
-            var formData = new FormData($("#formid")[0]);
-
-            $.ajax({
-                type: 'POST',
-                url: "{{ path('images') }}",
-                data: formData,
-                contentType: false,
-                processData: false,
-                success: function (html) {
-                    $('#tablePayments tr:first').after(html);
-                }
-            });
-        }
-
-        function addPayments()
-        {
-            var waytopay = $("#waytopay").val();
-            var waytopay_name = $("#waytopay").children(':selected').text();
-            var paymenttype = $("#paymenttype").val();
-            var daystopay = $('#daystopay').val();
-            var amount = $('#amount').val();
-            var issuingbank = $('#issuingbank').val();
-            var receivingbank = $('#receivingbank').val();
-            var cardholder = $('#cardholder').val();
-            var cardnumber = $('#cardnumber').val();
-            var expiration = $('#expiration').val();
-            var cvv = $('#cvv').val();
-            var files4 = $('#inputFile4Base64').val();
-            var operationnumber = $('#operationnumber').val();
-            var amountTotal = parseFloat($("#amountTotal").val());
-            var total = $("#total").val();
-            var remaining;
-            var sum_amount_total;
-            var i = 0; //contador para asignar id al boton que borrara la fila
-            var counter = $("#countPayments").val();
-
-            if (waytopay === "")
-            {
-                alert("Select the payment method");
-                return false;
-            }
-
-            if (paymenttype === "")
-            {
-                alert("Select the payment type");
-                return false;
-            }
-
-            if (paymenttype === "partial")
-            {
-                if (daystopay === "0")
+                if (resultado === 0)
                 {
-                    alert("Enter the days to finish paying");
+                    $("#tablelicenses").hide();
+                    $("#divAmount").hide();
+                    $('#labelPayments').hide();
+                    $('#payment').hide();
+                    $('#labelLicense').hide();
+                }
+            }
+
+
+
+            function paymentType()
+            {
+                if ($("#paymenttype").val() === "partial")
+                {
+                    $("#divDaystopay").show();
+                    $("#amount").val("0");
+                    $("#amount").prop("disabled", false);
+                } else
+                {
+                    $("#divDaystopay").hide();
+                    $("#daystopay").val("0");
+                    var amountTotal = $("#amountTotal").val();
+                    $("#amount").val(amountTotal);
+                    $("#amount").prop("disabled", true);
+                    var amount = parseFloat($("#amountTotal").val()) - parseFloat($("#total").val());
+                    $("#amount").val(amount);
+                }
+
+            }
+
+            function wayToPayOperation()
+            {
+                if (($("#waytopay").val() === "") || ($("#waytopay").val() === "0"))
+                {
+                    $("#divInfoTarjetas").hide();
+                    $("#divNumCheck").hide();
+                    $("#divProofTransfer").hide();
+
+                    $("#cardholder").val("");
+                    $("#cardnumber").val("");
+                    $("#expiration").val("");
+                    $("#cvv").val("");
+                    $("#operationnumber").val("");
+                    $("#files4").val("");
+                    $("#inputFile4Base64").val("");
+                    $("#list4").html("");
+
+                    $("#receivingbank").attr('disabled', true).trigger("chosen:updated");
+                    $("#issuingbank").attr('disabled', true).trigger("chosen:updated");
+                    $("#operationnumber").prop("disabled", true);
+
+                } else if (($("#waytopay").val() === "1") || ($("#waytopay").val() === "2"))
+                {
+                    $("#divInfoTarjetas").show();
+                    $("#divNumCheck").hide();
+                    $("#divProofTransfer").hide();
+
+                    $("#operationnumber").val("");
+                    $("#files4").val("");
+                    $("#inputFile4Base64").val("");
+                    $("#list4").html("");
+
+                    $("#receivingbank").attr('disabled', false).trigger("chosen:updated");
+                    $("#issuingbank").attr('disabled', false).trigger("chosen:updated");
+                    $("#operationnumber").prop("disabled", false);
+
+                } else if ($("#waytopay").val() === "3")
+                {
+                    $("#divInfoTarjetas").hide();
+                    $("#divNumCheck").show();
+                    $("#divProofTransfer").hide();
+
+                    $("#cardholder").val("");
+                    $("#cardnumber").val("");
+                    $("#expiration").val("");
+                    $("#cvv").val("");
+                    $("#files4").val("");
+                    $("#inputFile4Base64").val("");
+                    $("#list4").html("");
+
+                    $("#receivingbank").attr('disabled', false).trigger("chosen:updated");
+                    $("#issuingbank").attr('disabled', false).trigger("chosen:updated");
+                    $("#operationnumber").prop("disabled", false);
+
+                } else if (($("#waytopay").val() === "4") || ($("#waytopay").val() === "5"))
+                {
+                    $("#divInfoTarjetas").hide();
+                    $("#divNumCheck").hide();
+                    $("#divProofTransfer").show();
+
+                    $("#cardholder").val("");
+                    $("#cardnumber").val("");
+                    $("#expiration").val("");
+                    $("#cvv").val("");
+                    $("#operationnumber").val("");
+
+                    $("#receivingbank").attr('disabled', false).trigger("chosen:updated");
+                    $("#issuingbank").attr('disabled', false).trigger("chosen:updated");
+                    $("#operationnumber").prop("disabled", false);
+                }
+            }
+
+            function invento() {
+                var formData = new FormData($("#formid")[0]);
+
+                $.ajax({
+                    type: 'POST',
+                    url: "{{ path('images') }}",
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (html) {
+                        $('#tablePayments tr:first').after(html);
+                    }
+                });
+            }
+
+            function addPayments()
+            {
+                var waytopay = $("#waytopay").val();
+                var waytopay_name = $("#waytopay").children(':selected').text();
+                var paymenttype = $("#paymenttype").val();
+                var daystopay = $('#daystopay').val();
+                var amount = $('#amount').val();
+                var issuingbank = $('#issuingbank').val();
+                var receivingbank = $('#receivingbank').val();
+                var cardholder = $('#cardholder').val();
+                var cardnumber = $('#cardnumber').val();
+                var expiration = $('#expiration').val();
+                var cvv = $('#cvv').val();
+                var files4 = $('#inputFile4Base64').val();
+                var operationnumber = $('#operationnumber').val();
+                var amountTotal = parseFloat($("#amountTotal").val());
+                var total = $("#total").val();
+                var remaining;
+                var sum_amount_total;
+                var i = 0; //contador para asignar id al boton que borrara la fila
+                var counter = $("#countPayments").val();
+
+                if (waytopay === "")
+                {
+                    alert("Select the payment method");
                     return false;
                 }
-            }
 
-            if (amount === "")
-            {
-                alert("Enter the amount");
-                return false;
-            }
+                if (paymenttype === "")
+                {
+                    alert("Select the payment type");
+                    return false;
+                }
 
-            if ((waytopay !== "0") && (issuingbank === ""))
-            {
-                alert("Select the issuing bank");
-                return false;
-            }
+                if (paymenttype === "partial")
+                {
+                    if (daystopay === "0")
+                    {
+                        alert("Enter the days to finish paying");
+                        return false;
+                    }
+                }
 
-            if ((waytopay !== "0") && (receivingbank === ""))
-            {
-                alert("Select the receiving bank");
-                return false;
-            }
+                if (amount === "")
+                {
+                    alert("Enter the amount");
+                    return false;
+                }
+
+                if ((waytopay !== "0") && (issuingbank === ""))
+                {
+                    alert("Select the issuing bank");
+                    return false;
+                }
+
+                if ((waytopay !== "0") && (receivingbank === ""))
+                {
+                    alert("Select the receiving bank");
+                    return false;
+                }
 
         {#if ((waytopay !== "0") && (operationnumber === ""))
         {
@@ -1159,13 +1254,33 @@
                 $.ajax({
                     type: 'POST',
                     url: "{{ path('validateEmail') }}",
-                    data: {email: email,opcion: opcion},
+                    data: {email: email, opcion: opcion},
                     success: function (html) {
-                         $("#master").focus().after(html);
-{#                        $("#master").focus().after("<span class='error' style='color:#FF0000;'>Enter the master email</span>");#}
+                        $("#master").focus().after(html);
+                    }
+                });
+            }
+
+            function verificarEmail() {
+
+                var email = $("#master").val();
+                var opcion = 61;
+                $.ajax({
+                    type: 'POST',
+                    url: "{{ path('validateEmailUserFront') }}",
+                    data: {email: email, opcion: opcion},
+                    success: function (html) {
+                        $("#emailUsersFront").html(html);
                     }
                 });
 
+            }
+
+            function insertUsersFront() {
+                $("#insertFrontUser").val("1");
+                $('#modalUserFront').hide();
+                $("#hlicense").removeClass("disabled");
+                $('#myTab a[href="#licenseLi"]').tab('show');
             }
 
 

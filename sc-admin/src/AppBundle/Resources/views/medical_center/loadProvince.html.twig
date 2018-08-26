@@ -101,8 +101,74 @@
         {% endfor %}
     </select>
 {% elseif opcion == 60 %}   
+
     {% set answerG = answer %}         
 
+{% elseif opcion == 61 %}   
+    {% if valorCampo == 1 %}    
+        <input name="validateEmaiText" id="validateEmaiText" type="hidden" value="{{valorCampo}}" >     
+        <input name="insertFrontUser" id="insertFrontUser" type="hidden" value="0" >     
+        <table class="table table-responsive-sm table-striped scrolled-wrapper"> 
+            <tr>
+                <td align="center" colspan="2"><b>Este email ya esta en uso, de la siguiente manera:</b></td>                                                                                       
+            </tr>            
+            {% for medicalCenter in medicalCenter %}
+                <tr>
+                    <td align="center" colspan="2"><b>Centro medico</b></td>                                                                                       
+                </tr>
+                <tr>
+                    <td align="center" colspan="2">{{ medicalCenter.name }}</td>                                                                                       
+                </tr>
+                <tr>
+                    <td align="center"><b>Sucursal</b></td>                                                                                       
+                    <td align="center"><b>Roles</b></td>                                                                                       
+                </tr>
+
+                {% for branchOficces in medicalCenter.branch_office %}
+                    {% set permisos = "" %}  
+                    {% for permission in branchOficces.permission %}
+                        {% set permisos = permisos ~ " " ~ permission._id  %}  
+                    {% endfor %}
+
+                    <tr>
+                        <td align="center">{{ branchOficces.name }}</td>                                                                                       
+                        <td align="center">{{ permisos }}</td>                                                                                       
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+            {#{% set status = "" %}    
+            {% for payments in medicalcenter.payments %}
+                {% if payments.status == 1 %}
+                    {% set status = "Active" %}   
+                    {% set class = "badge badge-success" %}   
+                {% else %}    
+                    {% set status = "Inactive" %}   
+                    {% set class = "badge badge-danger" %}   
+                {% endif %}
+
+                <tr> 
+                    <td align="center">{{ payments.waytopay }}</td>                                                                       
+                    <td align="center">{{ payments.amount }} {{ coin }}</td>                                                                       
+                    <td align="center">{{ payments.issuingbank }}</td>                                                                       
+                    <td align="center">{{ payments.receivingbank }}</td>                                                                       
+                    <td align="center"><span class = "{{class}}">{{status}}</span></td>                                                                       
+                </tr> 
+            {% endfor %}#}
+        </table>     
+
+        <div align="left">
+            <h6><b>¿Desea utilizar nuevamente este correo?</b></h6>
+            <button type="button" class="btn btn-primary" onclick="insertUsersFront();">Accept</button>&nbsp;&nbsp;
+            <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="$('#modalUserFront').hide();">Cancel</button>
+        </div>    
+        
+            
+
+        
+    {% else %}    
+        <input name="validateEmaiText" id="validateEmaiText" type="text" value="0" >      
+        <input name="insertFrontUser" id="insertFrontUser" type="hidden" value="0" >    
+    {% endif %}    
 {% elseif opcion == 30 %}    
 {% elseif opcion == 40 %}    
 {% elseif opcion == 50 %}    
@@ -130,73 +196,75 @@
 </style> 
 
 <script type="text/javascript">
-        $(document).ready(function () {
-            var myModalLicense = document.getElementById('myModalLicense');
-            var span = document.getElementsByClassName("close")[0];
-            span.onclick = function () {
-                myModalLicense.style.display = "none";
-                $('#license').val("").trigger('chosen:updated');
-            }
+    $(document).ready(function () {
+        var myModalLicense = document.getElementById('myModalLicense');
+        var span = document.getElementsByClassName("close")[0];
+        span.onclick = function () {
+            myModalLicense.style.display = "none";
+            $('#license').val("").trigger('chosen:updated');
+        }
 
-            $(".select-province").chosen({
-                placeholder_text_single: "Select the province",
-                width: "100%"
-            });
+        $(".select-province").chosen({
+            placeholder_text_single: "Select the province",
+            width: "100%"
+        });
 
-            $(".select-licenses").chosen({
-                placeholder_text_single: "Select the license",
-                width: "100%"
-            });
+        $(".select-licenses").chosen({
+            placeholder_text_single: "Select the license",
+            width: "100%"
+        });
 
-            $(".select-waytopay").chosen({
-                placeholder_text_single: "Select the way to pay",
-                width: "100%"
-            });
+        $(".select-waytopay").chosen({
+            placeholder_text_single: "Select the way to pay",
+            width: "100%"
+        });
 
-            $(".select-issuingbank").chosen({
-                placeholder_text_single: "Select the way to pay",
-                width: "100%"
-            });
+        $(".select-issuingbank").chosen({
+            placeholder_text_single: "Select the way to pay",
+            width: "100%"
+        });
 
-            $(".select-receivingbank").chosen({
-                placeholder_text_single: "Select the way to pay",
-                width: "100%"
-            });    
+        $(".select-receivingbank").chosen({
+            placeholder_text_single: "Select the way to pay",
+            width: "100%"
+        });
 
-            if ("{{ opcion }}" === "60") {
+        if ("{{ opcion }}" === "60") {
 
-                if ("{{ answerG }}" === '1') {
-                    var master = $("#master").val();
-                    var master_ = $("#master_").val();
-                    if (master === master_) {
-                        $("#divEmail").html("");
-                    } else {
-                        $("#divEmail").html("");
-                        $("#master").focus().after("<div id='divEmail'><span class='error' style='color:#FF0000;'>This email already registered</span></div>");
-                        $("#master").val("");
-                    }
-
-                } else {
-
+            if ("{{ answerG }}" === '1') {
+                var master = $("#master").val();
+                var master_ = $("#master_").val();
+                if (master === master_) {
                     $("#divEmail").html("");
-                    var regex = /[\w-\.]{2,}@([\w-]{2,}\.)*([\w-]{2,}\.)[\w-]{2,4}/;
-                    if (!regex.test($('#master').val().trim())) {
-
-                        $("#divEmail").html("");
-                                $("#master").focus().after("<div id='divEmail'><span class='error' style='color:#FF0000;'>Wrong email format</span></div>");
-                                $("#master").val("");
-                                return false;                
-                    } else {
-
-                        $("#divEmail").html("");
-                                return false;                
-                    }
-
+                } else {
+                    $("#divEmail").html("");
+                    $("#master").focus().after("<div id='divEmail'><span class='error' style='color:#FF0000;'>This email already registered</span></div>");
+                    $("#master").val("");
                 }
 
             } else {
+
+                $("#divEmail").html("");
+                var regex = /[\w-\.]{2,}@([\w-]{2,}\.)*([\w-]{2,}\.)[\w-]{2,4}/;
+                if (!regex.test($('#master').val().trim())) {
+
+                    $("#divEmail").html("");
+                            $("#master").focus().after("<div id='divEmail'><span class='error' style='color:#FF0000;'>Wrong email format</span></div>");
+                            $("#master").val("");
+                            return false;                
+                } else {
+
+                    $("#divEmail").html("");
+                            return false;                
+                }
+
             }
 
-        });
-       
+        } else {
+        }
+
+
+
+    });
+
 </script>

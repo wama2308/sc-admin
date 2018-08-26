@@ -41,7 +41,7 @@ class UsersFront {
     /**
      * @MongoDB\Field(type="collection")
      */
-    protected $roles;
+    protected $medical_center;
     
     /**
      * @MongoDB\Field(type="collection")
@@ -209,28 +209,6 @@ class UsersFront {
     public function getPassword()
     {
         return $this->password;
-    }
-
-    /**
-     * Set roles
-     *
-     * @param collection $roles
-     * @return $this
-     */
-    public function setRoles($roles)
-    {
-        $this->roles = $roles;
-        return $this;
-    }
-
-    /**
-     * Get roles
-     *
-     * @return collection $roles
-     */
-    public function getRoles()
-    {
-        return $this->roles;
     }
 
     /**
@@ -539,5 +517,27 @@ class UsersFront {
     public function getUnlockUser()
     {
         return $this->unlock_user;
+    }
+
+    /**
+     * Set medicalCenter
+     *
+     * @param collection $medicalCenter
+     * @return $this
+     */
+    public function setMedicalCenter($medicalCenter)
+    {
+        $this->medical_center = $medicalCenter;
+        return $this;
+    }
+
+    /**
+     * Get medicalCenter
+     *
+     * @return collection $medicalCenter
+     */
+    public function getMedicalCenter()
+    {
+        return $this->medical_center;
     }
 }

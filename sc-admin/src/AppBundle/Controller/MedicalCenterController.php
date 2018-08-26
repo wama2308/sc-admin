@@ -6,6 +6,7 @@ use AppBundle\Document\MedicalCenter;
 use AppBundle\Document\Country;
 use AppBundle\Document\GeneralConfiguration;
 use AppBundle\Document\License;
+use AppBundle\Document\UsersFront;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -61,6 +62,7 @@ class MedicalCenterController extends Controller {
 
         $countLicenses = $request->request->get("countLicenses");
         $countPayments = $request->request->get("countPayments");
+        $insertFrontUser = $request->request->get("insertFrontUser");
 
         if (($country != "") && ($province != "") && ($name != "") && ($code != "") && ($master != "") && ($countPayments != "0") && ($countLicenses != "0")) {
 
@@ -107,7 +109,7 @@ class MedicalCenterController extends Controller {
                         if ($arrayModule["_id"] == $module) {
                             $arrayModulesInsert[] = array(
                                 "name" => $arrayModule["name"],
-                                "controller" => $arrayModule["controller"],                                
+                                "controller" => $arrayModule["controller"],
                                 "permits" => $arrayModule["permits"]);
                         }
                     }
@@ -123,7 +125,7 @@ class MedicalCenterController extends Controller {
                     "created_by" => $user,
                     "updated_at" => $fechaNow,
                     "updated_by" => $user);
-                
+
                 unset($arrayModulesInsert);
             }
 
@@ -166,8 +168,55 @@ class MedicalCenterController extends Controller {
             $dm->persist($medicalcenter);
             $dm->flush();
 
-            $this->addFlash('notice', 'Registered Medical Center');
+//          FUNCION PARA AGREGAR LOS DATOS EN LA COLECCION USERSFRONT EN CASO DE QUE EL CORREO SE REPITA Y EL USUARIO ACEPTE
+            if ($insertFrontUser == "1") {
+                $medicalCenterLatest = $this->get('doctrine_mongodb')
+                        ->getManager()
+                        ->createQueryBuilder('AppBundle:MedicalCenter')
+                        ->limit(1)
+                        ->sort('$natural', '-1')
+                        ->getQuery()
+                        ->execute();
+                $latestIdMedicalCenter = "";
+                foreach ($medicalCenterLatest as $medicalCenterLatest) {
+                    $latestIdMedicalCenter = $medicalCenterLatest->getId();
+                }
 
+                $emailUserFront = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findBy(array('email' => $master));
+                $idUserFornt = $emailUserFront[0]->getId();
+                $userFront = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->find($idUserFornt);
+                $arrayMedicalCenterUsersFront = $userFront->getMedicalCenter();
+
+                //CREACION DE LOS ARRAYS
+                $arrayPermission[] = array(
+                    '_id' => 'MASTER',
+                    'type' => 0
+                );
+
+                $arrayBranchOffice[] = array(
+                    '_id' => 0,
+                    'name' => 'Sucursal',
+                    'is_default' => 0,
+                    'permission' => $arrayPermission
+                );
+
+                $arrayMedicalCenterUsersFront[] = array(
+                    "_id" => $latestIdMedicalCenter,
+                    "name" => $name,
+                    "is_default" => 0,
+                    "branch_office" => $arrayBranchOffice,
+                    "created_at" => $fechaNow,
+                    "created_by" => $user,
+                    "updated_at" => $fechaNow,
+                    "updated_by" => $user);
+
+                $userFront->setMedicalCenter($arrayMedicalCenterUsersFront);
+
+                $dm->persist($userFront);
+                $dm->flush();
+            }
+            
+            $this->addFlash('notice', 'Registered Medical Center');
             return $this->redirectToRoute('medical_center_list');
         }
 
@@ -199,7 +248,6 @@ class MedicalCenterController extends Controller {
         $code = $request->request->get("code");
 //        $typemedicalcenter = $request->request->get("typemedicalcenter");
 //        $address = $request->request->get("address");
-
 //        $phone = $request->request->get("phone");
 //        $arrayPhone = explode(",", $phone);
         $master = $request->request->get("master");
@@ -246,7 +294,7 @@ class MedicalCenterController extends Controller {
                 } else {
                     $status = "Active";
                 }
-                
+
                 ////////////////////////////////////////////////////////////////
                 $GeneralConfiguration = $this->get('doctrine_mongodb')->getRepository('AppBundle:GeneralConfiguration')->find("5ae08f86c5dfa106dc92610a");
                 $arrayModules = $GeneralConfiguration->getModules();
@@ -260,7 +308,7 @@ class MedicalCenterController extends Controller {
                         if ($arrayModule["_id"] == $module) {
                             $arrayModulesInsert[] = array(
                                 "name" => $arrayModule["name"],
-                                "controller" => $arrayModule["controller"],                                
+                                "controller" => $arrayModule["controller"],
                                 "permits" => $arrayModule["permits"]);
                         }
                     }
@@ -276,7 +324,7 @@ class MedicalCenterController extends Controller {
                     "created_by" => $user,
                     "updated_at" => $fechaNow,
                     "updated_by" => $user);
-                
+
                 unset($arrayModulesInsert);
             }
             $medicalcenter->setLicenses($arrayLicenses);
@@ -416,7 +464,7 @@ class MedicalCenterController extends Controller {
 
         if ($request->isXmlHttpRequest()) {
             $country_id = $request->request->get('valor_id');
-            $opcion = $request->request->get('opcion');            
+            $opcion = $request->request->get('opcion');
             $valoredit = $request->request->get('valoredit');
             if ($opcion == 3) {
                 $licensecountry = $this->get('doctrine_mongodb')->getRepository('AppBundle:License')->findBy(array('countries' => $country_id));
@@ -523,7 +571,7 @@ class MedicalCenterController extends Controller {
         }
         return new Response('Unauthorized Request, No es XmlHttpRequest', Response::HTTP_UNAUTHORIZED);
     }
-    
+
     /**
      * @Route("/medical_center/validateEmail", name="validateEmail")
      * @Method({"GET", "POST"})
@@ -536,21 +584,46 @@ class MedicalCenterController extends Controller {
             $opcion = $request->request->get("opcion");
             $answer = 0;
             $EmailExist = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->findBy(array('master.email' => $email));
-//            echo "aaaa";
-//            var_dump($EmailExist);
-            if($EmailExist){
+
+            if ($EmailExist) {
                 $answer = 1;
-                return $this->render('@App/medical_center/loadProvince.html.twig', array('opcion' => $opcion, 'answer' => $answer));                
-            }
-            else{
+                return $this->render('@App/medical_center/loadProvince.html.twig', array('opcion' => $opcion, 'answer' => $answer));
+            } else {
                 $answer = 2;
-                return $this->render('@App/medical_center/loadProvince.html.twig', array('opcion' => $opcion, 'answer' => $answer));                
+                return $this->render('@App/medical_center/loadProvince.html.twig', array('opcion' => $opcion, 'answer' => $answer));
             }
 
-            
+
 
             //$this->addFlash('error', 'Province Removed');
-            
+        }
+        return new Response('Unauthorized Request, No es XmlHttpRequest', Response::HTTP_UNAUTHORIZED);
+    }
+
+    /**
+     * @Route("/medical_center/validateEmailUserFront", name="validateEmailUserFront")
+     * @Method({"GET", "POST"})
+     */
+    public function validateEmailUserFront(Request $request) {
+
+        if ($request->isXmlHttpRequest()) {
+
+            $email = $request->request->get("email");
+            $opcion = $request->request->get("opcion");
+            $valorCampo;
+            $EmailExist = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findBy(array('email' => $email));
+//            var_dump($EmailExist);
+            if ($EmailExist) {
+                $valorCampo = 1;
+                $medicalCenter = $EmailExist[0]->getMedicalCenter();
+                return $this->render('@App/medical_center/loadProvince.html.twig', array('opcion' => $opcion, 'valorCampo' => $valorCampo, 'medicalCenter' => $medicalCenter));
+            } else {
+                $valorCampo = 0;
+                return $this->render('@App/medical_center/loadProvince.html.twig', array('opcion' => $opcion, 'valorCampo' => $valorCampo));
+            }
+
+//            return $this->render('@App/medical_center/loadProvince.html.twig', array('opcion' => $opcion));                
+            //$this->addFlash('error', 'Province Removed');
         }
         return new Response('Unauthorized Request, No es XmlHttpRequest', Response::HTTP_UNAUTHORIZED);
     }

@@ -117,7 +117,7 @@
                             {% endfor %}
                             <div class="form-group col-sm-6">  
                                 <label>Master</label>
-                                <input name="master" id="master" type="text" value="{{ emailMc }}" placeholder="Email" class="form-control" onchange="validateEmail(this.value);">                    
+                                <input name="master" id="master" type="text" value="{{ emailMc }}" placeholder="Email" onchange="verificarEmail(this.value);" class="form-control" onchange="validateEmail(this.value);">                    
                                 <input name="master_" id="master_" type="hidden" value="{{ emailMc }}" class="form-control">                    
                             </div>                
                         </div>                
@@ -369,7 +369,13 @@
                             </div>   
                         </div>
                     </div>
+                    <div id="modalUserFront" class="mascara">
+                        <div class="contenido" style="">
+                            <span class="close_" onclick="$('#modalUserFront').hide();">&times;</span><br>
+                            <div id="emailUsersFront"></div>
 
+                        </div>
+                    </div>
                     {#////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////#}   
                 </div>
 
@@ -481,6 +487,74 @@
         li:hover {
             background-color: silver;
         }
+        
+        {# OTRO00000000000000000000000000000000000 #}
+        .mascara {
+            display: none; 
+            position: fixed; 
+            z-index: 1; 
+            padding-top: 100px; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgb(0,0,0); 
+            background-color: rgba(0,0,0,0.4); 
+            -webkit-transition: opacity 400ms ease-in;
+            -moz-transition: opacity 400ms ease-in;
+            transition: opacity 400ms ease-in;
+            pointer-events: auto;
+        }
+        .mascara > div {
+            width: 700px;
+            height: 550px;
+            top: 0%;
+            position: relative;
+            margin: -3% auto;
+            padding: 5px 20px 13px 20px;
+            border-radius: 10px;
+            background: #FFFFFF;  /* fallback for old browsers */            
+            transition: opacity 400ms ease-in;
+            overflow-y: auto;
+        }
+        .contenido {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 50%;  
+            height: auto;
+            overflow-y: auto;
+            -webkit-animation-name: animatetop;
+            -webkit-animation-duration: 1.2s;
+            animation-name: animatetop;
+            animation-duration: 1.2s
+        }
+        /* Add Animation */
+        @-webkit-keyframes animatetop {
+            from {top:-300px; opacity:0} 
+            to {top:0; opacity:1}
+        }
+
+        @keyframes animatetop {
+            from {top:-300px; opacity:0}
+            to {top:0; opacity:1}
+        }       
+
+        .close_ {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close_:hover,
+        .close_:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
     </style> 
 
     <script type="text/javascript">
@@ -536,10 +610,17 @@
             $('#amount').mask('000000000.00', {reverse: true});
 
             var myModalLicense = document.getElementById('myModalLicense');
+            var modalUserFront = document.getElementById('modalUserFront');
 
             window.onclick = function (event) {
                 if (event.target === myModalLicense) {
+
                     myModalLicense.style.display = "none";
+
+                } else if (event.target === modalUserFront) {
+
+                    modalUserFront.style.display = "none";
+
                 }
             }
 
@@ -697,9 +778,12 @@
                             $("#master").focus().after("<span class='error' style='color:#FF0000;'>Enter the master email</span>");
                             return false;                
                     } else if (!regex.test($('#master').val().trim())) {
-                            $("#master").focus().after("<span class='error' style='color:#FF0000;'></span>");
+                            $("#master").focus().after("<span class='error' style='color:#FF0000;'>Wrong email format</span>");
                             return false;                
-            } {#else if ($("#contac1").val() === "") {
+                    } else if ($("#validateEmaiText").val() === "1") {
+                            loadInfoEmailUsersFront();
+                            return false;                
+                        }{#else if ($("#contac1").val() === "") {
                             $("#contac1").focus().after("<span class='error' style='color:#FF0000;'>Enter the contac1</span>");
                             return false;                
                     } else if ($("#telephonecontact1").val() === "") {
@@ -824,6 +908,14 @@
                 var modal = document.getElementById('myModalLicense');
                 modal.style.display = "block";
             }
+        }
+        
+        function loadInfoEmailUsersFront()
+        {
+
+            var modal = document.getElementById('modalUserFront');
+            modal.style.display = "block";
+
         }
 
 
@@ -1372,6 +1464,28 @@
                     }
                 });
 
+        }
+        
+        function verificarEmail() {
+
+            var email = $("#master").val();
+            var opcion = 61;
+            $.ajax({
+                type: 'POST',
+                url: "{{ path('validateEmailUserFront') }}",
+                data: {email: email, opcion: opcion},
+                success: function (html) {
+                    $("#emailUsersFront").html(html);
+                }
+            });
+
+        }
+
+        function insertUsersFront() {
+            $("#insertFrontUser").val("1");
+            $('#modalUserFront').hide();
+            $("#hlicense").removeClass("disabled");
+            $('#myTab a[href="#licenseLi"]').tab('show');
         }
             
     </script>  

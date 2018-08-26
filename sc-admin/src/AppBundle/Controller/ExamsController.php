@@ -16,7 +16,7 @@ class ExamsController extends Controller {
      * @Method("GET")
      */
     public function listAction(Request $request) {
-
+        
         $exams = $this->get('doctrine_mongodb')->getRepository('AppBundle:Exams')->findAll();
         //var_dump($exams);
         $GeneralConfiguration = $this->get('doctrine_mongodb')->getRepository('AppBundle:GeneralConfiguration')->find("5ae08f86c5dfa106dc92610a");
@@ -39,7 +39,7 @@ class ExamsController extends Controller {
         $fields = $request->request->get("fields");
         $format = $request->request->get("format");
         $arrayFields = explode(",", $fields);
-        
+
 
         if (($examName != "") && ($category != "") && ($fields != "") && ($format != "")) {
 
@@ -84,14 +84,14 @@ class ExamsController extends Controller {
         $exam->setName($exam->getName());
         $exam->setCategory($exam->getCategory());
         $exam->setFields($exam->getFields());
-        $exam->setFormat($exam->getFormat());        
+        $exam->setFormat($exam->getFormat());
 
         $examName = $request->request->get("exam");
         $category = $request->request->get("category");
         $fields = $request->request->get("fields");
         $format = $request->request->get("format");
         $arrayFields = explode(",", $fields);
-        
+
         if (($examName != "") && ($category != "") && ($fields != "") && ($format != "")) {
 
             $dm = $this->get('doctrine_mongodb')->getManager();
@@ -100,7 +100,7 @@ class ExamsController extends Controller {
             $exam->setName($examName);
             $exam->setCategory($category);
             $exam->setFields($arrayFields);
-            $exam->setFormat($format);            
+            $exam->setFormat($format);
             $exam->setUpdatedAt($fechaNow);
             $exam->setUpdatedBy($user);
 
@@ -110,13 +110,13 @@ class ExamsController extends Controller {
 
             return $this->redirectToRoute('exams_details', array('id' => $id));
         }
-        
-        
+
+
         $GeneralConfiguration = $this->get('doctrine_mongodb')->getRepository('AppBundle:GeneralConfiguration')->find("5ae08f86c5dfa106dc92610a");
         $ArrayCategoryExams = $GeneralConfiguration->getCategoryexams();
         return $this->render('@App/exams/edit.html.twig', array('exam' => $exam, 'ArrayCategoryExams' => $ArrayCategoryExams));
     }
-    
+
     /**
      * @Route("/exams/details/{id}", name="exams_details")
      * @Method("GET")
