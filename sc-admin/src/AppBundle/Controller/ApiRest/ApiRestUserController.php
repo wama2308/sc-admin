@@ -166,21 +166,37 @@ class ApiRestUserController extends Controller {
         } else {
 
             $medical_center_id = $check_mail[0]->getId();
+            $name = $check_mail[0]->getName();
 
-            $arrayRol[] = array(
-                "rol" => "Master",
-                "medical_center_id" => $medical_center_id,
-                "branch_office_id" => "0",
+            //CREACION DE LOS ARRAYS
+            $arrayPermission[] = array(
+                '_id' => 'MASTER',
+                'type' => 0
+            );
+
+            $arrayBranchOffice[] = array(
+                '_id' => 0,
+                'name' => 'Sucursal',
+                'is_default' => 0,
+                'permission' => $arrayPermission
+            );
+
+            $arrayMedicalCenter[] = array(
+                "_id" => $medical_center_id,
+                "name" => $name,
+                "is_default" => 0,
+                "branch_office" => $arrayBranchOffice,
+                "active" => true,
                 "created_at" => $fechaNow,
                 "created_by" => "0",
                 "updated_at" => $fechaNow,
                 "updated_by" => "0");
-
+            
             $userFront = new UsersFront();
             $userFront->setEmail($email);
             $userFront->setEnabled(1);
             $userFront->setPassword($passwordEnc);
-            $userFront->setRoles($arrayRol);
+            $userFront->setMedicalCenter($arrayMedicalCenter);
             $userFront->setSecretQuestion1($secret_question1);
             $userFront->setSecretQuestion2($secret_question2);
             $userFront->setSecretQuestion3($secret_question3);
@@ -377,7 +393,7 @@ class ApiRestUserController extends Controller {
         }
 //        return new Response('HOLA');
         $token = $this->get('lexik_jwt_authentication.encoder')
-                ->encode(['username' => $user->getEmail(), 'id' => $user->getId(), 'roles' => $user->getRoles()]);
+                ->encode(['username' => $user->getEmail(), 'id' => $user->getId(), 'medical_center' => $user->getMedicalCenter()]);
 
         return new JsonResponse(['token' => $token]);
     }
@@ -860,8 +876,8 @@ class ApiRestUserController extends Controller {
 
                     $medicalCenterId = "";
 
-                    foreach ($data_token['roles'] as $valor) {
-                        $medicalCenterId = $valor->medical_center_id;
+                    foreach ($data_token['medical_center'] as $valor) {
+                        $medicalCenterId = $valor->_id;
                     }
 
                     $encoders = array(new XmlEncoder(), new JsonEncoder());
@@ -910,8 +926,8 @@ class ApiRestUserController extends Controller {
 
                     $medicalCenterId = "";
 
-                    foreach ($data_token['roles'] as $valor) {
-                        $medicalCenterId = $valor->medical_center_id;
+                    foreach ($data_token['medical_center'] as $valor) {
+                        $medicalCenterId = $valor->_id;
                     }
 
                     $encoders = array(new XmlEncoder(), new JsonEncoder());

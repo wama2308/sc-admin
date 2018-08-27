@@ -353,7 +353,7 @@
                         </div>
                         <br>
                         <div class="form-group">       
-                            <input type="button" value="Back" class="btn btn-primary" id="buttonback1" onclick="back1();">&nbsp;&nbsp;&nbsp;                       
+                            <input type="button" value="Back" class="btn btn-primary" id="buttonback1" onclick="back();">&nbsp;&nbsp;&nbsp;                       
                             <input type="submit" value="Save" class="btn btn-primary" id="saveone" onclick="">&nbsp;&nbsp;&nbsp;
                             <a class="btn btn-primary" style="color: #ffffff" href="{{ path('medical_center_details', { 'id': medicalcenter.id }) }}">Return</a>
                         </div>
@@ -566,6 +566,8 @@
             loadAjax('country', 'divWayToPay', 5);
             loadAjax('country', 'divIssuingBank', 6);
             loadAjax('country', 'divReceivingBank', 7);
+            
+            verificarEmail("{{emailMc}}");
 
             $(".select-type").chosen({
                 placeholder_text_single: "Select the type medical center"
