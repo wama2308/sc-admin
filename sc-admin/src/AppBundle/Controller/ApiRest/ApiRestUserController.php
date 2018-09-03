@@ -31,6 +31,7 @@ class ApiRestUserController extends Controller {
     public function loadCountriesAction(Request $request) {
 
         $token = $request->headers->get('Authorization');
+
         if ($token == "") {
             $data = array('message' => 'Token invalido');
             return new JsonResponse($data, 403);
@@ -117,17 +118,36 @@ class ApiRestUserController extends Controller {
     }
 
     /**
+     * @Route("/api/prueba/")     
+     * @Method("GET")
+     */
+    public function wamaAction() {
+
+        $encoders = array(new XmlEncoder(), new JsonEncoder());
+        $normalizers = array(new ObjectNormalizer());
+
+        $serializer = new Serializer($normalizers, $encoders);
+
+        $provinces = $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->findAll();
+
+        $jsonContent = $serializer->serialize($provinces, 'json');
+
+        return new Response($jsonContent);
+    }
+
+    /**
      * @Route("/api/CheckMaster")     
      * @Method("POST")
      */
     public function saveAction(Request $request) {
 
         $data = $request->request->get("name");
+        var_dump($data);
         $country = new Country();
         $country->setName($data);
         $dm = $this->get('doctrine_mongodb')->getManager();
-        $dm->persist($country);
-        $dm->flush();
+//        $dm->persist($country);
+//        $dm->flush();
 
         return new Response('BELLO');
     }
@@ -191,7 +211,7 @@ class ApiRestUserController extends Controller {
                 "created_by" => "0",
                 "updated_at" => $fechaNow,
                 "updated_by" => "0");
-            
+
             $userFront = new UsersFront();
             $userFront->setEmail($email);
             $userFront->setEnabled(1);
@@ -966,6 +986,73 @@ class ApiRestUserController extends Controller {
                     $jsonContent = $serializer->serialize($arrayLicenseData, 'json');
 
                     return new Response($jsonContent);
+                } else {
+
+                    $data = array('message' => 'Error al consultar los datos, problemas con el token');
+                    return new JsonResponse($data, 403);
+                }
+            }
+        }
+    }
+
+    /**
+     * @Route("/api/editMedicalCenter")     
+     * @Method("PUT")
+     */
+    public function editMedicalCenterAction(Request $request) {
+
+        $fechaNow = new \MongoDate();
+        
+        $token = $request->headers->get('Authorization');
+        if ($token == "") {
+
+            $data = array('message' => 'Token invalido');
+            return new JsonResponse($data, 403);
+        } else {
+
+            $data_token = $this->get('lexik_jwt_authentication.encoder')->decode($token);
+
+            if ($data_token == false) {
+
+                $data = array('message' => 'Authentication Required');
+                return new JsonResponse($data, 403);
+            } else {
+
+                $user_id = $data_token["id"];
+                $user = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findOneBy(['_id' => $user_id]);
+                if ($user) {
+
+                    $medicalCenterId = "";
+
+                    foreach ($data_token['medical_center'] as $valor) {
+                        $medicalCenterId = $valor->_id;
+                    }
+//                  AQUI EMPIEZA LA LOGICA DEL EDIT  
+                    $country = $request->request->get("country");
+                    $province = $request->request->get("province");
+                    $name = $request->request->get("name");
+                    $code = $request->request->get("code");
+
+                    if (($country != "") && ($province != "") && ($name != "") && ($code != "")) {
+
+                        $medicalcenter = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->find($medicalCenterId);
+                        $medicalcenter->setCountryid($country);
+                        $medicalcenter->setProvinceid($province);
+                        $medicalcenter->setName($name);
+                        $medicalcenter->setCode($code);
+
+                        $medicalcenter->setUpdatedAt($fechaNow);
+                        $medicalcenter->setUpdatedBy($user_id);
+
+                        $dm = $this->get('doctrine_mongodb')->getManager();
+                        //$dm->persist($medicalcenter);
+                        $dm->flush();
+
+                        return new Response('Operacion exitosa');
+                    } else {
+
+                        return new Response('Campos vacios');
+                    }
                 } else {
 
                     $data = array('message' => 'Error al consultar los datos, problemas con el token');
