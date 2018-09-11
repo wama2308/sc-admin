@@ -766,11 +766,12 @@
             {
                 var deleteModal = document.getElementById('deleteModal');
                 deleteModal.style.display = "block";
-
-                $("#buttonAccept").click(function () {
+                
+                var boton = document.getElementById("buttonAccept");
+                boton.onclick = function(e) {
                     $("#" + idTr + posicion).remove();
                     deleteModal.style.display = "none";
-                    if(opcion == 1)
+                    if(opcion === 1)
                     {
                         restaLicenses(amount);
                     }
@@ -778,11 +779,15 @@
                     {
                         restaPayments(amount);
                     }
-                });
+                    
+                }       
             }
 
             function agregarLicenses()
             {
+                $("#span0").text("");
+
+                
                 var license = $("#license").val();
                 var inputLicense = $('#inputLicense').val();
                 var inputUsersQuantity = $('#inputUsersQuantity').val();
@@ -802,7 +807,7 @@
                     for (i = 0; i <= counter; i++) {
                         if ($("#licenseId_" + i).val() === license) {
         {#                            alert("This license is already in the table");#}
-                            $("#tablelicenses_").focus().after("<span class='error' style='color:#FF0000; text-align: center;'>This license is already in the table</span>");
+                            $("#tablelicenses_").focus().after("<span id = 'span0' class='error' style='color:#FF0000; text-align: center;'>This license is already in the table</span>");
                             $("#fields").val("");
                             return false;
                         }
@@ -858,7 +863,8 @@
                 var valorAmountCelda = amountCelda;
                 var valorAmount = $("#amountTotal").val();
                 var resultadoAmount = valorAmount - valorAmountCelda;
-                var amountFormat = number_format(resultadoAmount, 2);
+                var amountFormat = number_format(resultadoAmount, 2);                
+                
                 $("#amountTotal").val(resultadoAmount);
                 $("#amountTotalShow").val(amountFormat);
 
@@ -868,14 +874,7 @@
                 $("#remaining").val(resultRemaining);
                 $("#remainingShow").val(resultRemainingFormat);
 
-        {#var total = $("#total").val();
-        alert(total);
-        if (total != "0") {
-            var resultTotal = valorAmountCelda - total;
-            var resultRemainingFormat = number_format(resultRemaining, 2);
-            $("#remaining").val(resultRemaining);
-            $("#remainingShow").val(resultRemainingFormat);
-        }#}
+        
 
                         if (resultado === 0)
                         {
@@ -1016,6 +1015,20 @@
 
             function addPayments()
             {
+                $("#span1").text("");
+                $("#span2").text("");
+                $("#span3").text("");
+                $("#span4").text("");
+                $("#span5").text("");
+                $("#span6").text("");
+                $("#span7").text("");
+                $("#span8").text("");
+                $("#span9").text("");
+                $("#span10").text("");
+                $("#span11").text("");
+                $("#span12").text("");
+                $("#span13").text("");
+                
                 var simboloMoneda = $("#simboloMoneda").val();
                 var waytopay = $("#waytopay").val();
                 var waytopay_name = $("#waytopay").children(':selected').text();
@@ -1040,13 +1053,13 @@
 
                 if (waytopay === "")
                 {
-                    $("#waytopay_chosen").focus().after("<span class='error' style='color:#FF0000;'>Select the payment method</span>");
+                    $("#waytopay_chosen").focus().after("<span id='span1' class='error' style='color:#FF0000;'>Select the payment method</span>");
                     return false;
                 }
 
                 if (paymenttype === "")
                 {
-                    $("#paymenttype_chosen").focus().after("<span class='error' style='color:#FF0000;'>Select the payment type</span>");
+                    $("#paymenttype_chosen").focus().after("<span id='span2' class='error' style='color:#FF0000;'>Select the payment type</span>");
                     return false;
                 }
 
@@ -1054,32 +1067,32 @@
                 {
                     if (daystopay === "0")
                     {
-                        $("#daystopay").focus().after("<span class='error' style='color:#FF0000;'>Enter the days to finish paying</span>");
+                        $("#daystopay").focus().after("<span id='span3' class='error' style='color:#FF0000;'>Enter the days to finish paying</span>");
                         return false;
                     }
                 }
 
                 if (amount === "")
                 {
-                    $("#amount").focus().after("<span class='error' style='color:#FF0000;'>Enter the amount</span>");
+                    $("#amount").focus().after("<span id='span4' class='error' style='color:#FF0000;'>Enter the amount</span>");
                     return false;
                 }
 
                 if ((waytopay !== "EFECTIVO") && (issuingbank === ""))
                 {
-                    $("#issuingbank_chosen").focus().after("<span class='error' style='color:#FF0000;'>Select the issuing bank</span>");
+                    $("#issuingbank_chosen").focus().after("<span id='span5' class='error' style='color:#FF0000;'>Select the issuing bank</span>");
                     return false;
                 }
 
                 if ((waytopay !== "EFECTIVO") && (receivingbank === ""))
                 {
-                    $("#receivingbank_chosen").focus().after("<span class='error' style='color:#FF0000;'>Select the receiving bank</span>");
+                    $("#receivingbank_chosen").focus().after("<span id='span6' class='error' style='color:#FF0000;'>Select the receiving bank</span>");
                     return false;
                 }
 
                 if ((waytopay !== "EFECTIVO") && (operationnumber === ""))
                 {
-                    $("#operationnumber").focus().after("<span class='error' style='color:#FF0000;'>Enter the operation number</span>");
+                    $("#operationnumber").focus().after("<span id='span7' class='error' style='color:#FF0000;'>Enter the operation number</span>");
                     return false;
                 }
 
@@ -1087,22 +1100,22 @@
                 {
                     if (cardholder === "")
                     {
-                        $("#cardholder").focus().after("<span class='error' style='color:#FF0000;'>Enter the card holder</span>");
+                        $("#cardholder").focus().after("<span id='span8' class='error' style='color:#FF0000;'>Enter the card holder</span>");
                         return false;
                     }
                     if (cardnumber === "")
                     {
-                        $("#cardnumber").focus().after("<span class='error' style='color:#FF0000;'>Enter the card number</span>");
+                        $("#cardnumber").focus().after("<span id='span9' class='error' style='color:#FF0000;'>Enter the card number</span>");
                         return false;
                     }
                     if (expiration === "")
                     {
-                        $("#expiration").focus().after("<span class='error' style='color:#FF0000;'>Enter the expiration</span>");
+                        $("#expiration").focus().after("<span id='span10' class='error' style='color:#FF0000;'>Enter the expiration</span>");
                         return false;
                     }
                     if (cvv === "")
                     {
-                        $("#cvv").focus().after("<span class='error' style='color:#FF0000;'>Enter the cvv</span>");
+                        $("#cvv").focus().after("<span id='span11' class='error' style='color:#FF0000;'>Enter the cvv</span>");
                         return false;
                     }
                 }
@@ -1111,7 +1124,7 @@
                 {
                     if (files4 === "")
                     {
-                        $("#files4").focus().after("<span class='error' style='color:#FF0000;'>Enter the Proof transfer</span>");
+                        $("#files4").focus().after("<span id='span12' class='error' style='color:#FF0000;'>Enter the Proof transfer</span>");
                         return false;
                     }
                 }
@@ -1120,7 +1133,7 @@
                 {
                     if (operationnumber === "")
                     {
-                        $("#operationnumber").focus().after("<span class='error' style='color:#FF0000;'>Enter the check number</span>");
+                        $("#operationnumber").focus().after("<span id='span13' class='error' style='color:#FF0000;'>Enter the check number</span>");
                         return false;
                     }
                 }
@@ -1146,7 +1159,7 @@
 
                 if (sum_amount_total > amountTotal)
                 {
-                    $("#amount").focus().after("<span class='error' style='color:#FF0000;'>The amount entered will exceed the amount to be paid</span>");
+                    $("#amount").focus().after("<span id='span4' class='error' style='color:#FF0000;'>The amount entered will exceed the amount to be paid</span>");
                     return false;
                 }
 

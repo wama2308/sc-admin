@@ -191,7 +191,7 @@
                     <td align="center">{{ arrayLicenseData.durationtime }}</td>
                     <td align="center">{{ totalAmountLicense|number_format(2, '.', ',') }} {{ currentSymbol }}</td>
                     <td align="center">{{ arrayLicenseData.expiration_date.toDateTime|date('Y-m-d') }}</td>
-                    <td align="center"><a title="Delete" onclick="loadDeleteModal('trlicense_', {{loop.index-1}}, {{ totalAmountLicense }});" class=""><img src="{{ asset('img/delete.png') }}" alt="Delete" width="18px" height="18px"/></a></td>
+                    <td align="center"><a title="Delete" onclick="loadDeleteModal('trlicense_', {{loop.index-1}}, {{ totalAmountLicense }}, 1);" class=""><img src="{{ asset('img/delete.png') }}" alt="Delete" width="18px" height="18px"/></a></td>
                 </tr>
             {% endif %}
 
