@@ -498,6 +498,150 @@ class PaymentsController extends Controller {
     }
 
     /**
+     * @Route("/payments/LicensePayment", name="license_payment")
+     * @Method({"GET", "POST"})
+     */
+    public function createLicensePaymentAction(Request $request) {
+
+        $form = $this->createFormBuilder()->getForm();
+        $fechaNow = new \MongoDate();
+        $user = $this->getUser()->getId();
+
+        $form->handleRequest($request);
+
+        $countLicenses = $request->request->get("countLicenses");
+        $countPayments = $request->request->get("countPayments");
+        $medicalCenterId = $request->request->get("medicalCenterId");
+
+        if (($countPayments != "0") && ($countLicenses != "0")) {
+//        if ($countLicenses != "0") {
+
+            $medicalcenter = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->find($medicalCenterId);
+            $arrayLicenses = $medicalcenter->getLicenses();
+            $arrayPayments = $medicalcenter->getPayments();
+
+            for ($i = 0; $i < $countLicenses; $i++) {
+
+                $register = $request->request->get("register_" . $i);
+                $days = $request->request->get("durationTime_" . $i);
+
+                if ($register == "1") {
+
+                    $amountData = $request->request->get("amountLic_" . $i);
+                    $dueDateData = $request->request->get("dueDate_" . $i);
+                    $dueDateDataFormat = date($request->request->get("dueDate_" . $i));
+                    $dueDateDataMongo = new \MongoDate(strtotime($dueDateDataFormat));
+                    $durationData = $request->request->get("durationTime_" . $i);
+
+                    $fecha = date($dueDateData);
+                    $nuevafecha = strtotime('+' . $durationData . 'day', strtotime($fecha));
+                    $nuevafecha = date('Y-m-d h:i:s', $nuevafecha);
+                    $fecha_expiration = new \MongoDate(strtotime($nuevafecha));
+                    
+                    $arrayRenovation[] = array(
+                        "previous_amount" => doubleval($amountData),
+                        "amount" => doubleval($amountData),
+                        "previous_due_date" => $dueDateDataMongo,
+                        "due_date" => $fecha_expiration,
+                        "created_at" => $fechaNow,
+                        "created_by" => $user);
+                    
+                    $arrayLicenses[$i]["expiration_date"] = $fecha_expiration;
+                    $arrayLicenses[$i]["renovation"] = $arrayRenovation;
+
+                    $medicalcenter->setLicenses($arrayLicenses);
+
+                    $dm = $this->get('doctrine_mongodb')->getManager();
+                    $dm->flush();
+                    
+                } else {
+
+
+                    $fecha = date('Y-m-d h:i:s');
+                    $nuevafecha = strtotime('+' . $days . 'day', strtotime($fecha));
+                    $nuevafecha = date('Y-m-d h:i:s', $nuevafecha);
+                    $fecha_expiration = new \MongoDate(strtotime($nuevafecha));
+                    $status = "Active";
+
+                    ////////////////////////////////////////////////////////////////
+                    $GeneralConfiguration = $this->get('doctrine_mongodb')->getRepository('AppBundle:GeneralConfiguration')->find("5ae08f86c5dfa106dc92610a");
+                    $arrayModules = $GeneralConfiguration->getModules();
+                    $license = $this->get('doctrine_mongodb')->getRepository('AppBundle:License')->find($request->request->get("licenseId_" . $i));
+                    $modules = $license->getModules();
+                    $acum = 0;
+
+                    foreach ($arrayModules as $arrayModule) {
+
+                        foreach ($modules as $module) {
+                            if ($arrayModule["_id"] == $module) {
+                                $arrayModulesInsert[] = array(
+                                    "name" => $arrayModule["name"],
+                                    "controller" => $arrayModule["controller"],
+                                    "permits" => $arrayModule["permits"]);
+                            }
+                        }
+                    }
+                    ////////////////////////////////////////////////////////////////
+
+                    $arrayLicenses[] = array(
+                        "license_id" => $request->request->get("licenseId_" . $i),
+                        "expiration_date" => $fecha_expiration,
+                        "status" => $status,
+                        "modules" => $arrayModulesInsert,
+                        "created_at" => $fechaNow,
+                        "created_by" => $user,
+                        "updated_at" => $fechaNow,
+                        "updated_by" => $user);
+
+                    unset($arrayModulesInsert);
+
+                    $medicalcenter->setLicenses($arrayLicenses);
+
+                    $dm = $this->get('doctrine_mongodb')->getManager();
+                    $dm->flush();
+                }
+            }
+
+            for ($i = 0; $i < $countPayments; $i++) {
+
+                $status = true;                
+
+                $arrayPayments[] = array(
+                    "waytopay" => $request->request->get("waytopay_" . $i),
+                    "daystopay" => $request->request->get("daystopay_" . $i),
+                    "amount" => doubleval($request->request->get("amount_" . $i)),
+                    "issuingbank" => $request->request->get("issuingbank_" . $i),
+                    "receivingbank" => $request->request->get("receivingbank_" . $i),
+                    "cardholder" => $request->request->get("cardholder_" . $i),
+                    "cardnumber" => $request->request->get("cardnumber_" . $i),
+                    "expiration" => $request->request->get("expiration_" . $i),
+                    "cvv" => $request->request->get("cvv_" . $i),
+                    "files4" => $request->request->get("files4_" . $i),
+                    "operationnumber" => $request->request->get("operationnumber_" . $i),
+                    "status" => $status);
+            }
+            $amountTotal = $request->request->get("amountTotal");
+            $total = $request->request->get("total");
+            if ($amountTotal == $total) {
+                $estatusPayments = "Paid out";
+            } else {
+                $estatusPayments = "To pay";
+            }
+
+            $medicalcenter->setPayments($arrayPayments);
+            $medicalcenter->setPaymentstatus($estatusPayments);
+
+            $medicalcenter->setUpdatedAt($fechaNow);
+            $medicalcenter->setUpdatedBy($user);
+
+            $dm = $this->get('doctrine_mongodb')->getManager();
+            $dm->flush();
+            $this->addFlash('notice', 'Registered Payment Medical Center');
+            return $this->redirectToRoute('payments_list');
+        }
+    }
+
+    /**
      * @Route("/payments/details/{id}", name="payments_details")
      * @Method("GET")
      */
@@ -607,10 +751,10 @@ class PaymentsController extends Controller {
                 $nameMedical = $porciones[0];
 
                 $medicalcenterData = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->findBy(array('name' => $nameMedical));
-                
-                $countryId = $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->find($medicalcenterData[0]->getCountryid());    
+
+                $countryId = $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->find($medicalcenterData[0]->getCountryid());
                 $currentSymbol = $countryId->getCurrencySymbol();
-                
+
                 $medicalcenter = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->find($medicalcenterData[0]->getId());
                 $arrayLicenses = $medicalcenter->getLicenses();
                 $duedate = "";

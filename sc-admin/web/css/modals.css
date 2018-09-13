@@ -16,8 +16,8 @@
     pointer-events: auto;
 }
 .mascara > div {
-    width: 550px;
-    height: 450px;
+    width: 50%;
+    height: 95%;
     top: 0%;
     position: relative;
     margin: 0% auto;
@@ -82,7 +82,8 @@
     pointer-events: auto;
 }
 .mascaraPayments > div {
-    width: 900px;
+    width: 70%;
+    height: 95%;
     top: 0%;
     position: relative;
     margin: 0% auto;
@@ -113,4 +114,110 @@
 @keyframes animatetop {
     from {top:-300px; opacity:0}
     to {top:0; opacity:1}
-}       
+}  
+
+.mascaraInfoLicense {
+    display: none; 
+    position: fixed; 
+    z-index: 1; 
+    padding-top: 100px; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow: auto; 
+    background-color: rgb(0,0,0); 
+    background-color: rgba(0,0,0,0.4); 
+    -webkit-transition: opacity 400ms ease-in;
+    -moz-transition: opacity 400ms ease-in;
+    transition: opacity 400ms ease-in;
+    pointer-events: auto;
+}
+.mascaraInfoLicense > div {
+    width: 50%;
+    height: 50%;    
+    top: 0%;
+    position: relative;
+    margin: 0% auto;
+    /*padding: 5px 20px 13px 20px;*/
+    border-radius: 10px;
+    background: #FFFFFF;  /* fallback for old browsers */            
+    transition: opacity 400ms ease-in;
+    
+}
+.contenidoInfoLicense {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 1%;
+    border: 1px solid #888;
+    width: 50%;  
+    height: auto;
+    overflow-y: auto;
+    -webkit-animation-name: animatetop;
+    -webkit-animation-duration: 0.8s;
+    animation-name: animatetop;
+    animation-duration: 0.8s
+}
+
+/* Add Animation */
+@-webkit-keyframes animatetop {
+    from {top:-300px; opacity:0} 
+    to {top:0; opacity:1}
+}
+
+@keyframes animatetop {
+    from {top:-300px; opacity:0}
+    to {top:0; opacity:1}
+}  
+
+.mascaraDelete {
+    display: none; 
+    position: fixed; 
+    z-index: 1; 
+    padding-top: 100px; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow: auto; 
+    background-color: rgb(0,0,0); 
+    background-color: rgba(0,0,0,0.4); 
+    -webkit-transition: opacity 400ms ease-in;
+    -moz-transition: opacity 400ms ease-in;
+    transition: opacity 400ms ease-in;
+    pointer-events: auto;
+}
+.mascaraDelete > div {
+    width: 40%;
+    height: 40%;
+    top: 0%;
+    position: relative;
+    margin: 0% auto;
+    padding: 5px 20px 13px 20px;
+    border-radius: 10px;
+    background: #FFFFFF;  /* fallback for old browsers */            
+    transition: opacity 400ms ease-in;
+}
+.contenidoDelete {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 50%;  
+    height: auto;
+    overflow-y: auto;
+    -webkit-animation-name: animatetop;
+    -webkit-animation-duration: 0.8s;
+    animation-name: animatetop;
+    animation-duration: 0.8s
+}
+/* Add Animation */
+@-webkit-keyframes animatetop {
+    from {top:-300px; opacity:0} 
+    to {top:0; opacity:1}
+}
+
+@keyframes animatetop {
+    from {top:-300px; opacity:0}
+    to {top:0; opacity:1}
+}   

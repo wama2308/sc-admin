@@ -147,6 +147,7 @@
     <br>                
     <br>    
     <input name="countLicenses" id="countLicenses" type="hidden" value="{{arrayLicenseData|length}}">
+    <input name="medicalCenterId" id="medicalCenterId" type="hidden" value="{{id}}">
     <table id="tablelicenses" class="table table-responsive-sm table-bordered table-hover table-sm" style="display: table; width: 100%; font-size: 14px;">
         <tr align="center" style="background-color: #f0f3f5;">
             <th align="center">License</th>                            
@@ -180,16 +181,21 @@
 
                 {% endif %}
 
-                {% set acumAmountLicense = acumAmountLicense + totalAmountLicense %} 
+                {#                {% set acumAmountLicense = acumAmountLicense + totalAmountLicense %} #}
+                {% set acumAmountLicense = acumAmountLicense + arrayLicenseData.amount %} 
                 <tr align="center" id="trlicense_{{ loop.index-1 }}">
                     <td align="center">{{ arrayLicenseData.license }}
                         <input type="hidden" id="licenseId_{{loop.index-1}}" name="licenseId_{{loop.index-1}}"  value="{{arrayLicenseData.idLicense}}" />
+                        <input type="hidden" id="durationTime_{{loop.index-1}}" name="durationTime_{{loop.index-1}}"  value="{{arrayLicenseData.durationtime}}" />
+                        <input type="hidden" id="dueDate_{{loop.index-1}}" name="dueDate_{{loop.index-1}}"  value="{{ arrayLicenseData.expiration_date.toDateTime|date('Y-m-d H:i:s') }}" />
+                        <input type="hidden" id="amountLic_{{loop.index-1}}" name="amountLic_{{loop.index-1}}"  value="{{ arrayLicenseData.amount }}" />
+                        <input type="hidden" id="register_{{loop.index-1}}" name="register_{{loop.index-1}}"  value="1" />
                     </td>                            
                     <td align="center">{{ arrayLicenseData.usersquantity }}</td>                            
                     <td align="center">{{ arrayLicenseData.numberclients }}</td>                            
                     <td align="center">{{ arrayLicenseData.numberexams }}</td>                            
                     <td align="center">{{ arrayLicenseData.durationtime }}</td>
-                    <td align="center">{{ totalAmountLicense|number_format(2, '.', ',') }} {{ currentSymbol }}</td>
+                    <td align="center">{{ arrayLicenseData.amount|number_format(2, '.', ',') }} {{ currentSymbol }}</td>
                     <td align="center">{{ arrayLicenseData.expiration_date.toDateTime|date('Y-m-d') }}</td>
                     <td align="center"><a title="Delete" onclick="loadDeleteModal('trlicense_', {{loop.index-1}}, {{ totalAmountLicense }}, 1);" class=""><img src="{{ asset('img/delete.png') }}" alt="Delete" width="18px" height="18px"/></a></td>
                 </tr>
@@ -197,15 +203,32 @@
 
         {% endfor %}
     </table>
-        <div id="divAmount" align="right" style="display: block; background: white"><b>Total to pay:</b>&nbsp;&nbsp;<input readonly="" name="amountTotal" id="amountTotal" type="hidden" value="{{ acumAmountLicense  }}" ><input readonly="" name="amountTotalShow" id="amountTotalShow" type="text" value="{{ acumAmountLicense|number_format(2, '.', ',')  }}" placeholder="" class="" style=" width: 20%;padding: 1px 45px;margin: 5px 0;box-sizing: border-box;border: none;border-bottom: 2px solid black; text-align: center"><label id="labelAmountCurrentSymbol"><b>{{ currentSymbol }}</b></label></div>                    
+    {#    <div id="divAmount" align="right" style="display: block; background: white; width: 100%"><b>Total to pay:</b>&nbsp;&nbsp;<input readonly="" name="amountTotal" id="amountTotal" type="hidden" value="{{ acumAmountLicense  }}" ><input readonly="" name="amountTotalShow" id="amountTotalShow" type="text" value="{{ acumAmountLicense|number_format(2, '.', ',')  }}" placeholder="" class="" style=" width: 25%; max-width: 50%; box-sizing: border-box;border: none;border-bottom: 2px solid black; text-align: center"><label id="labelAmountCurrentSymbol"><b>{{ currentSymbol }}</b></label></div>                        #}
+    <div class="row">
+        <div class="form-group col-sm-6"></div>
+        <div class="form-group col-sm-6">
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text"><b>Total to pay:</b></span>
+                </div>
+                <input readonly="" name="amountTotal" id="amountTotal" type="hidden" value="{{ acumAmountLicense  }}" >
+                <input type="text" name="amountTotalShow" id="amountTotalShow" class="form-control" value="{{ acumAmountLicense|number_format(2, '.', ',')  }}">
+                <div class="input-group-append">
+                    <span class="input-group-text">{{ currentSymbol }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
     <br>
     <br>
     {#<a class="btn btn-primary btn-sm" href="{{ path('payment_create', { 'id': id }) }}" title="Add Payment" role="button"><i class="fas fa-plus-circle"></i> Add Payment</a>&nbsp;&nbsp;&nbsp;&nbsp;          #}
     <div align="center" id="labelPayments" style="display: block"><h4 style="background-color:  #f0f3f5; align-items: center">Payments</h4></div>    
     {#    <a class="btn btn-primary btn-sm" onclick="loadPaymentModal();" title="Add Payment" role="button"><i class="fas fa-plus-circle"></i> Add Payment</a>&nbsp;&nbsp;&nbsp;&nbsp;          #}
     <button title="Add Payment" type="button" onclick="loadPaymentModal();" class="btn btn-primary btn-sm" style=""><i class="fas fa-plus-circle"></i> Add Payment</button>
+    <div align="center" id="labelValidaPay" style="display: block"></div>
     <br>
     <br>
+    <input name="countPayments" id="countPayments" type="hidden" value="0">
     <table id="tablePayments" class="table table-responsive-sm table-bordered table-hover table-sm" style="display: table; width: 100%; font-size: 14px;">
         <tr align="center" style="background-color: #f0f3f5;">
             <th align="center">Way to pay</th>                            
@@ -236,9 +259,35 @@
     {% set acumRemaining = acumAmountLicense - acumAmountPayments %} 
     <br>
     <br>
-    <div id="divRemaining" align="right" style="display: block"><b>Remaining:</b>&nbsp;&nbsp;<input readonly="" name="remaining" id="remaining" type="hidden" value="{{ acumRemaining  }}" ><input readonly="" name="remainingShow" id="remainingShow" type="text" value="{{ acumRemaining|number_format(2, '.', ',') }}" placeholder="" class="" style=" width: 20%;padding: 1px 45px;margin: 5px 0;box-sizing: border-box;border: none;border-bottom: 2px solid black; text-align: center"><label id="labelAmountCurrentSymbol"><b>{{ currentSymbol }}</b></label></div>
-    <div id="divTotalPayment" align="right" style="display: block"><b>Total to pay:</b>&nbsp;&nbsp;<input readonly="" name="total" id="total" type="hidden" value="{{ acumAmountPayments  }}" ><input readonly="" name="totalShow" id="totalShow" type="text" value="{{ acumAmountPayments|number_format(2, '.', ',') }}" placeholder="" class="" style=" width: 20%;padding: 1px 45px;margin: 5px 0;box-sizing: border-box;border: none;border-bottom: 2px solid black; text-align: center"><label id="labelAmountCurrentSymbol"><b>{{ currentSymbol }}</b></label></div>
-            {% elseif opcion == 8 %}    
+    {#    <div id="divRemaining" align="right" style="display: block; width: 100%"><b>Remaining:</b>&nbsp;&nbsp;<input readonly="" name="remaining" id="remaining" type="hidden" value="{{ acumRemaining  }}" ><input readonly="" name="remainingShow" id="remainingShow" type="text" value="{{ acumRemaining|number_format(2, '.', ',') }}" placeholder="" class="" style=" width: 20%; box-sizing: border-box;border: none;border-bottom: 2px solid black; text-align: center"><label id="labelAmountCurrentSymbol"><b>{{ currentSymbol }}</b></label></div>#}
+    {#    <div id="divTotalPayment" align="right" style="display: block; width: 100%"><b>Total to pay:</b>&nbsp;&nbsp;<input readonly="" name="total" id="total" type="hidden" value="{{ acumAmountPayments  }}" ><input readonly="" name="totalShow" id="totalShow" type="text" value="{{ acumAmountPayments|number_format(2, '.', ',') }}" placeholder="" class="" style=" width: 20%; box-sizing: border-box;border: none;border-bottom: 2px solid black; text-align: center"><label id="labelAmountCurrentSymbol"><b>{{ currentSymbol }}</b></label></div>#}
+    <div class="row">
+        <div class="form-group col-sm-6"></div>
+        <div class="form-group col-sm-6">
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text"><b>Remaining:</b></span>
+                </div>
+                <input readonly="" name="remaining" id="remaining" type="hidden" value="{{ acumRemaining  }}" >
+                <input type="text" name="remainingShow" id="remainingShow" class="form-control" value="{{ acumRemaining|number_format(2, '.', ',')  }}">
+                <div class="input-group-append">
+                    <span class="input-group-text">{{ currentSymbol }}</span>
+                </div>
+            </div>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text"><b>Total to pay:</b></span>
+                </div>
+                <input readonly="" name="total" id="total" type="hidden" value="{{ acumAmountPayments  }}" >
+                <input type="text" name="totalShow" id="totalShow" class="form-control" value="{{ acumAmountPayments|number_format(2, '.', ',')  }}">
+                <div class="input-group-append">
+                    <span class="input-group-text">{{ currentSymbol }}</span>
+                </div>
+            </div>
+        </div>
+    </div>    
+
+{% elseif opcion == 8 %}    
     <select class="form-control select-licenses" name="license" id="license" onchange="loadAjax(this.value, 'divLicenses', 5, '{{ country_id }}');
             loadInfoLicense();">
         <option value="">Select...</option> 
@@ -290,7 +339,7 @@
             <th align="center">Dute Date</th>                                        
         </tr>
         {% for arrayLicenseData in arrayLicenseData %}
-            
+
             <tr align="center" id="trlicense_{{ loop.index-1 }}">
                 <td align="center" style="width: 100px">{{ arrayLicenseData.license }}</td>                            
                 <td align="center" style="width: 50px">{{ arrayLicenseData.duedate }}</td>                            
@@ -301,54 +350,54 @@
 
 <script type="text/javascript">
     $(document).ready(function () {
-{#        $('#amountTotal').mask('000000000.00', {reverse: true});#}
-        $('#remainingShow').mask('000,000,000.00', {reverse: true});
-        $('#totalShow').mask('000,000,000.00', {reverse: true});
-        $(".select-licenses").chosen({
-            placeholder_text_single: "Select the license",
-            width: "100%",
-            height: "100%"
-        });
+    {#        $('#amountTotal').mask('000000000.00', {reverse: true});#}
+            $('#remainingShow').mask('000,000,000.00', {reverse: true});
+            $('#totalShow').mask('000,000,000.00', {reverse: true});
+            $(".select-licenses").chosen({
+                placeholder_text_single: "Select the license",
+                width: "100%",
+                height: "100%"
+            });
 
-        $(".select-waytopay").chosen({
-            placeholder_text_single: "Select the way to pay",
-            width: "100%"
-        });
+            $(".select-waytopay").chosen({
+                placeholder_text_single: "Select the way to pay",
+                width: "100%"
+            });
 
-        $(".select-issuingbank").chosen({
-            placeholder_text_single: "Select the way to pay",
-            width: "100%"
-        });
+            $(".select-issuingbank").chosen({
+                placeholder_text_single: "Select the way to pay",
+                width: "100%"
+            });
 
-        $(".select-receivingbank").chosen({
-            placeholder_text_single: "Select the way to pay",
-            width: "100%"
-        });
+            $(".select-receivingbank").chosen({
+                placeholder_text_single: "Select the way to pay",
+                width: "100%"
+            });
 
-        if (($("#waytopay").val() === "") || ($("#waytopay").val() === "EFECTIVO"))
-        {
-            $("#divInfoTarjetas").hide();
-            $("#divNumCheck").hide();
-            $("#divProofTransfer").hide();
+            if (($("#waytopay").val() === "") || ($("#waytopay").val() === "EFECTIVO"))
+            {
+                $("#divInfoTarjetas").hide();
+                $("#divNumCheck").hide();
+                $("#divProofTransfer").hide();
 
-            $("#cardholder").val("");
-            $("#cardnumber").val("");
-            $("#expiration").val("");
-            $("#cvv").val("");
-            $("#operationnumber").val("");
-            $("#files4").val("");
-            $("#inputFile4Base64").val("");
-            $("#list4").html("");
+                $("#cardholder").val("");
+                $("#cardnumber").val("");
+                $("#expiration").val("");
+                $("#cvv").val("");
+                $("#operationnumber").val("");
+                $("#files4").val("");
+                $("#inputFile4Base64").val("");
+                $("#list4").html("");
 
-            $("#receivingbank").attr('disabled', true).trigger("chosen:updated");
-            $("#issuingbank").attr('disabled', true).trigger("chosen:updated");
-            $("#operationnumber").prop("disabled", true);
+                $("#receivingbank").attr('disabled', true).trigger("chosen:updated");
+                $("#issuingbank").attr('disabled', true).trigger("chosen:updated");
+                $("#operationnumber").prop("disabled", true);
 
-        } else if (($("#waytopay").val() === "TDD") || ($("#waytopay").val() === "TDC"))
-        {
-            $("#divInfoTarjetas").show();
-            $("#divNumCheck").show();
-            $("#divProofTransfer").hide();
+            } else if (($("#waytopay").val() === "TDD") || ($("#waytopay").val() === "TDC"))
+            {
+                $("#divInfoTarjetas").show();
+                $("#divNumCheck").show();
+                $("#divProofTransfer").hide();
 
     {#            $("#operationnumber").val("");#}
                 $("#files4").val("");

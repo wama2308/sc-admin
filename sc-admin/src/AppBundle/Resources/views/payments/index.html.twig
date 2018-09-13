@@ -34,7 +34,7 @@
         </div>        
         <div class="card-body">
             <div class="panel panel-body" id="guevo">
-                <form autocomplete="off" action="" method="post" id="formid" enctype="multipart/form-data">  
+                <form autocomplete="off" action="{{ path('license_payment') }}" method="post" id="formid" enctype="multipart/form-data">  
                     <div class="row">
                         {#<div class="form-group col-sm-6">  
                             <input name="a" id="a" type="hidden" value="" class="form-control">                    
@@ -44,462 +44,186 @@
                             {#                            <input name="medicalCenter" id="medicalCenter" type="text" value="" placeholder="Search..." class="form-control" onKeyUp="loadAjax(this.value, 'divPaymentsMedicalCenter', 6);" style="">                    #}
                             {#                                                        <input name="medicalCenter" id="medicalCenter" type="text" value="" placeholder="Search..." class="form-control" onKeyUp="loadAjax(this.value, 'divPaymentsMedicalCenter', 6);" style="">                    #}
 
-                            <div class="autocomplete" style="width:450px;">
+                            <div class="autocomplete" style="width:100%;">
                                 <label>Medical Center</label>
-                                <input class="form-control" id="myInput" type="text" name="myInput" placeholder="Search..." on />
-                                <button title="Search" type="button" onclick="loadAjax($('#myInput').val(), 'divPaymentsMedicalCenter', 7);
-                                        loadAjax($('#myInput').val(), 'div-licenses', 8);
-                                        loadAjax($('#myInput').val(), 'divWayToPay', 9);
-                                        loadAjax($('#myInput').val(), 'divIssuingBank', 10);
-                                        loadAjax($('#myInput').val(), 'divInfoLicense', 12);
-                                        loadAjax($('#myInput').val(), 'divReceivingBank', 11);" class="btn btn-primary" style="position:absolute;top:201%;left: 123%;margin-top: -100px;margin-left: -100px;"><i class="fas fa-search"></i></button>
-                                <button title="Clean" type="button" onclick="cleanDiv();" class="btn btn-primary" style="position:absolute;top:201%;left: 133%;margin-top: -100px;margin-left: -100px;"><i class="fas fa-trash"></i></button>
-                            </div>
-                        </div>
-                    </div>                   
+                                <div class="input-group mb-3">
 
-                </form>
-                <div id="divPaymentsMedicalCenter" style="display: none">
-                    {#<table id="tablePayments" class="table table-responsive-sm table-striped"> 
-                        <thead> 
-                            <tr> 
-                                <th>Medical Center</th>    
-                                <th>Status Payment</th>                            
-                            </tr> 
-                        </thead> 
-                        <tbody> 
-                            {% for medicalcenter in medicalcenter %}
-                                {% if medicalcenter.paymentstatus == "Paid out" %}
-                                    {% set status =  medicalcenter.paymentstatus %}             
-                                    {% set class = "badge badge-success" %}   
-                                {% else %}    
-                                    {% set status = medicalcenter.paymentstatus %}
-                                    {% set class = "badge badge-danger" %}   
-                                {% endif %}                        
+                                    <input class="form-control" id="myInput" type="text" name="myInput" placeholder="Search..." on />
+                                    <div class="input-group-btn">
+
+                                        <button title="Search" class="btn btn-primary" type="button" onclick="loadAjax($('#myInput').val(), 'divPaymentsMedicalCenter', 7);
+                                                loadAjax($('#myInput').val(), 'div-licenses', 8);
+                                                loadAjax($('#myInput').val(), 'divWayToPay', 9);
+                                                loadAjax($('#myInput').val(), 'divIssuingBank', 10);
+                                                loadAjax($('#myInput').val(), 'divInfoLicense', 12);
+                                                loadAjax($('#myInput').val(), 'divReceivingBank', 11);"><i class="fas fa-search"></i></button>
+                                        <button title="Clean" type="button" onclick="cleanDiv();" class="btn btn-primary" style=""><i class="fas fa-trash"></i></button>
+                                    </div>
+                                </div>
+                            </div>                          
+                        </div>
+                    </div>                        
+
+                    <div id="divPaymentsMedicalCenter" style="display: none; width: 100%; overflow: auto;">
+                        {#<table id="tablePayments" class="table table-responsive-sm table-striped"> 
+                            <thead> 
                                 <tr> 
-                                    <td><a title="View Details" class="nav-link" href="{{ path('payments_details', { 'id': medicalcenter.id }) }}">{{medicalcenter.name}}</a></td>                                                             
-                                    <td><span class = "{{class}}">{{status}}</span></td>                                  
-                                </tr>   
-
-                            {% endfor %}
-                        </tbody> 
-                    </table>  #}
-                </div>
-                <div id="licenseModal" class="mascara">
-                    <div class="contenido" style="">
-                        <span class="close" onclick="$('#licenseModal').hide();
-                                $('#license').val('').trigger('chosen:updated');">&times;</span><br><br>
-                        <label>Licenses</label>
-                        <div id="div-licenses">
-
-                        </div>
-                        <br>
-
-                        <div class="form-group" style="display: none" id="divLicenses"></div>
-
+                                    <th>Medical Center</th>    
+                                    <th>Status Payment</th>                            
+                                </tr> 
+                            </thead> 
+                            <tbody> 
+                                {% for medicalcenter in medicalcenter %}
+                                    {% if medicalcenter.paymentstatus == "Paid out" %}
+                                        {% set status =  medicalcenter.paymentstatus %}             
+                                        {% set class = "badge badge-success" %}   
+                                    {% else %}    
+                                        {% set status = medicalcenter.paymentstatus %}
+                                        {% set class = "badge badge-danger" %}   
+                                    {% endif %}                        
+                                    <tr> 
+                                        <td><a title="View Details" class="nav-link" href="{{ path('payments_details', { 'id': medicalcenter.id }) }}">{{medicalcenter.name}}</a></td>                                                             
+                                        <td><span class = "{{class}}">{{status}}</span></td>                                  
+                                    </tr>   
+    
+                                {% endfor %}
+                            </tbody> 
+                        </table>  #}
                     </div>
-                </div>
-                <div id="infoLicenseModal" class="mascaraInfoLicense">
-                    <div class="contenidoInfoLicense" style="">
-                        <span class="close" onclick="$('#infoLicenseModal').hide();">&times;</span><br><br>
-                        <div id="divInfoLicense"></div>
-                    </div>
-                </div>
-                <div id="deleteModal" class="mascaraDelete">
-                    <div class="contenidoDelete" style="">
-                        <span class="close" onclick="$('#deleteModal').hide();">&times;</span><br><br>
-                        <div id=""  align="center">
-                            <h5>¿Sure you want to delete the record?</h5>
+                    <div id="licenseModal" class="mascara">
+                        <div class="contenido" style="">
+                            <span class="close" onclick="$('#licenseModal').hide();
+                                    $('#license').val('').trigger('chosen:updated');">&times;</span><br><br>
+                            <label>Licenses</label>
+                            <div id="div-licenses">
+
+                            </div>
                             <br>
-                            <button type="button" id="buttonAccept" class="btn btn-primary">Accept</button>
-                            <button type="button" id="buttonCancel" class="btn btn-secondary" onclick="$('#deleteModal').hide();">Cancel</button>
-                        </div>
-                    </div>
-                </div>
-                <div id="paymentModal" class="mascaraPayments">
-                    <div class="contenidoPayments" style="">
-                        <span class="close" onclick="$('#paymentModal').hide();">&times;</span><br><br>
-                        <div class="row">
-                            <div class="form-group col-sm-6">         
-                                <label>Way to pay</label>
-                                <div id="divWayToPay">
-                                    <select class="form-control select-waytopay" style="width: 100%" name="waytopay" id="waytopay" onchange="wayToPayOperation();">
-                                        <option value="">Select...</option>                                  
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="form-group col-sm-6">         
-                                <label>Payment type</label>
-                                <div id="divWayToPay">
-                                    <select class="form-control select-paymenttype" style="width: 100%" name="paymenttype" id="paymenttype" onchange="paymentType();">
-                                        <option value="">Select...</option>                                  
-                                        <option value="full">Full</option>                                  
-                                        <option value="partial">Partial</option>                                  
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="form-group col-sm-6" id="divDaystopay" style="display: none">       
-                                <label id="labelDaystopay">Days to pay</label>
-                                <input name="daystopay" id="daystopay" type="text" value="0" placeholder="Days to pay" class="form-control" onkeypress="">                    
-                            </div>
-                            <div class="form-group col-sm-6">  
-                                <label>Amount</label>
-                                <input name="amount" id="amount" type="text" value="" placeholder="Amount" class="form-control" onkeypress="">                    
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="form-group col-sm-6">         
-                                <label>Issuing bank</label>
-                                <div id="divIssuingBank">
-                                    <select class="form-control select-issuingbank" style="width: 100%" name="issuingbank" id="issuingbank" onchange="">
-                                        <option value="">Select...</option>                                  
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="form-group col-sm-6">         
-                                <label>Receiving bank</label>
-                                <div id="divReceivingBank">
-                                    <select class="form-control select-receivingbank" style="width: 100%" name="receivingbank" id="receivingbank" onchange="">
-                                        <option value="">Select...</option>                                  
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="divInfoTarjetas" style="display: none">
-                            <div class="row">
-                                <div class="form-group col-sm-6">    
-                                    <label>Card holder</label>
-                                    <input name="cardholder" id="cardholder" type="text" value="" placeholder="Cardholder" class="form-control">    
-                                </div>
-                                <div class="form-group col-sm-6">    
-                                    <label>Card number</label>
-                                    <input name="cardnumber" id="cardnumber" type="text" value="" placeholder="Card number" class="form-control">    
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="form-group col-sm-6">    
-                                    <label>Expiration</label>
-                                    <input name="expiration" id="expiration" type="text" value="" placeholder="Expiration" class="form-control">    
-                                </div>
-                                <div class="form-group col-sm-6">    
-                                    <label>CVV</label>
-                                    <input name="cvv" id="cvv" type="text" value="" placeholder="CVV" class="form-control">    
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="form-group col-sm-6" id="divNumCheck" style="display: none">
-                                <label>Operation number</label>
-                                <input name="operationnumber" id="operationnumber" type="text" value="" placeholder="Operation Number" class="form-control" disabled="">                    
-                            </div>
-                            <div class="form-group col-sm-6" id="divProofTransfer"  style="display: none">
-                                <label>Proof transfer</label>
-                                <input type="file" id="files4" name="files4" onchange="base64File4(this);" class="form-control"/>
-                                <input name="inputFile4Base64" id="inputFile4Base64" type="hidden" value="">
-                                <br>
-                                <output id="list4"></output>
 
+                            <div class="form-group" style="display: none" id="divLicenses"></div>
+
+                        </div>
+                    </div>
+                    <div id="infoLicenseModal" class="mascaraInfoLicense">
+                        <div class="contenidoInfoLicense" style="">
+                            <span class="close" onclick="$('#infoLicenseModal').hide();">&times;</span><br><br>
+                            <div id="divInfoLicense"></div>
+                        </div>
+                    </div>
+                    <div id="deleteModal" class="mascaraDelete">
+                        <div class="contenidoDelete" style="">
+                            <span class="close" onclick="$('#deleteModal').hide();">&times;</span><br><br>
+                            <div id=""  align="center">
+                                <div align="center" id="" style=""><h5 style="background-color: #f0f3f5; align-items: center">¿Sure you want to delete the record?</h5></div>
+                                <br>
+                                <button type="button" id="buttonAccept" class="btn btn-primary">Accept</button>
+                                <button type="button" id="buttonCancel" class="btn btn-secondary" onclick="$('#deleteModal').hide();">Cancel</button>
                             </div>
                         </div>
-                        <div class="form-group">  
-                            <input type="button" value="Add" class="btn btn-primary" id="addButtonPayments" onclick="addPayments();">&nbsp;&nbsp;&nbsp;                                                                                                                                                                         
-                        </div>                        
                     </div>
-                </div>
-                <div class="form-group">         
-                    <input type="submit" value="Save" class="btn btn-primary" id="saveone" onclick="" style="display: none">&nbsp;&nbsp;&nbsp;
-                    {#<a class="btn btn-primary" style="color: #ffffff" href="{{ path('payments_details', { 'id': id }) }}">Return</a>
-                    <a class="btn btn-primary" style="color: #ffffff" href="{{ path('payments_list') }}">Return</a>#}
-                </div>                
+                    <div id="paymentModal" class="mascaraPayments">
+                        <div class="contenidoPayments" style="">
+                            <span class="close" onclick="$('#paymentModal').hide();">&times;</span><br><br>
+                            <div class="row">
+                                <div class="form-group col-sm-6">         
+                                    <label>Way to pay</label>
+                                    <div id="divWayToPay">
+                                        <select class="form-control select-waytopay" style="width: 100%" name="waytopay" id="waytopay" onchange="wayToPayOperation();">
+                                            <option value="">Select...</option>                                  
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group col-sm-6">         
+                                    <label>Payment type</label>
+                                    <div id="divWayToPay">
+                                        <select class="form-control select-paymenttype" style="width: 100%" name="paymenttype" id="paymenttype" onchange="paymentType();">
+                                            <option value="">Select...</option>                                  
+                                            <option value="full">Full</option>                                  
+                                            <option value="partial">Partial</option>                                  
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-6" id="divDaystopay" style="display: none">       
+                                    <label id="labelDaystopay">Days to pay</label>
+                                    <input name="daystopay" id="daystopay" type="text" value="0" placeholder="Days to pay" class="form-control" onkeypress="">                    
+                                </div>
+                                <div class="form-group col-sm-6">  
+                                    <label>Amount</label>
+                                    <input name="amount" id="amount" type="text" value="" placeholder="Amount" class="form-control" onkeypress="">                    
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-6">         
+                                    <label>Issuing bank</label>
+                                    <div id="divIssuingBank">
+                                        <select class="form-control select-issuingbank" style="width: 100%" name="issuingbank" id="issuingbank" onchange="">
+                                            <option value="">Select...</option>                                  
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group col-sm-6">         
+                                    <label>Receiving bank</label>
+                                    <div id="divReceivingBank">
+                                        <select class="form-control select-receivingbank" style="width: 100%" name="receivingbank" id="receivingbank" onchange="">
+                                            <option value="">Select...</option>                                  
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="divInfoTarjetas" style="display: none">
+                                <div class="row">
+                                    <div class="form-group col-sm-6">    
+                                        <label>Card holder</label>
+                                        <input name="cardholder" id="cardholder" type="text" value="" placeholder="Cardholder" class="form-control">    
+                                    </div>
+                                    <div class="form-group col-sm-6">    
+                                        <label>Card number</label>
+                                        <input name="cardnumber" id="cardnumber" type="text" value="" placeholder="Card number" class="form-control">    
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group col-sm-6">    
+                                        <label>Expiration</label>
+                                        <input name="expiration" id="expiration" type="text" value="" placeholder="Expiration" class="form-control">    
+                                    </div>
+                                    <div class="form-group col-sm-6">    
+                                        <label>CVV</label>
+                                        <input name="cvv" id="cvv" type="text" value="" placeholder="CVV" class="form-control">    
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-6" id="divNumCheck" style="display: none">
+                                    <label>Operation number</label>
+                                    <input name="operationnumber" id="operationnumber" type="text" value="" placeholder="Operation Number" class="form-control" disabled="">                    
+                                </div>
+                                <div class="form-group col-sm-6" id="divProofTransfer"  style="display: none">
+                                    <label>Proof transfer</label>
+                                    <input type="file" id="files4" name="files4" onchange="base64File4(this);" class="form-control"/>
+                                    <input name="inputFile4Base64" id="inputFile4Base64" type="hidden" value="">
+                                    <br>
+                                    <output id="list4"></output>
+
+                                </div>
+                            </div>
+                            <div class="form-group">  
+                                <input type="button" value="Add" class="btn btn-primary" id="addButtonPayments" onclick="addPayments();">&nbsp;&nbsp;&nbsp;                                                                                                                                                                         
+                            </div>                        
+                        </div>
+                    </div>
+                    <div class="form-group">         
+                        <input type="submit" value="Save" class="btn btn-primary" id="saveone" onclick="" style="display: none">&nbsp;&nbsp;&nbsp;
+                        {#<a class="btn btn-primary" style="color: #ffffff" href="{{ path('payments_details', { 'id': id }) }}">Return</a>
+                        <a class="btn btn-primary" style="color: #ffffff" href="{{ path('payments_list') }}">Return</a>#}
+                    </div>   
+                </form>
             </div>
         </div>
     </div>
 
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        {#body {
-            font: 16px Arial;  
-        }#}
-
-        .autocomplete {
-            /*the container must be positioned relative:*/
-            position: relative;
-            display: inline-block;
-        }
-
-        input {
-            border: 1px solid transparent;
-            background-color: #f1f1f1;
-            {#            padding: 10px;#}
-            font-size: 16px;
-        }
-
-        input[type=text] {
-            background-color: #f1f1f1;
-            width: 100%;
-        }
-
-        input[type=submit] {
-            background-color: DodgerBlue;
-            color: #fff;
-            cursor: pointer;
-        }
-
-        .autocomplete-items {
-            position: absolute;
-            border: 1px solid #d4d4d4;
-            border-bottom: none;
-            border-top: none;
-            z-index: 99;
-            /*position the autocomplete items to be the same width as the container:*/
-            top: 100%;
-            left: 0;
-            right: 0;
-        }
-
-        .autocomplete-items div {
-            padding: 10px;
-            cursor: pointer;
-            background-color: #fff; 
-            border-bottom: 1px solid #d4d4d4; 
-        }
-
-        .autocomplete-items div:hover {
-            /*when hovering an item:*/
-            background-color: #e9e9e9; 
-        }
-
-        .autocomplete-active {
-            /*when navigating through the items using the arrow keys:*/
-            background-color: DodgerBlue !important; 
-            color: #ffffff; 
-        }
-
-        .mascara {
-            display: none; 
-            position: fixed; 
-            z-index: 1; 
-            padding-top: 100px; 
-            left: 0;
-            top: 0;
-            width: 100%; 
-            height: 100%; 
-            overflow: auto; 
-            background-color: rgb(0,0,0); 
-            background-color: rgba(0,0,0,0.4); 
-            -webkit-transition: opacity 400ms ease-in;
-            -moz-transition: opacity 400ms ease-in;
-            transition: opacity 400ms ease-in;
-            pointer-events: auto;
-        }
-        .mascara > div {
-            width: 550px;
-            height: 500px;
-            top: 0%;
-            position: relative;
-            margin: 0% auto;
-            padding: 5px 20px 13px 20px;
-            border-radius: 10px;
-            background: #FFFFFF;  /* fallback for old browsers */            
-            transition: opacity 400ms ease-in;
-        }
-        .contenido {
-            background-color: #fefefe;
-            margin: auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 50%;  
-            height: auto;
-            overflow-y: auto;
-            -webkit-animation-name: animatetop;
-            -webkit-animation-duration: 0.8s;
-            animation-name: animatetop;
-            animation-duration: 0.8s
-        }
-        /* Add Animation */
-        @-webkit-keyframes animatetop {
-            from {top:-300px; opacity:0} 
-            to {top:0; opacity:1}
-        }
-
-        @keyframes animatetop {
-            from {top:-300px; opacity:0}
-            to {top:0; opacity:1}
-        }       
-
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .mascaraPayments {
-            display: none; 
-            position: fixed; 
-            z-index: 1; 
-            padding-top: 100px; 
-            left: 0;
-            top: 0;
-            width: 100%; 
-            height: 100%; 
-            overflow: auto; 
-            background-color: rgb(0,0,0); 
-            background-color: rgba(0,0,0,0.4); 
-            -webkit-transition: opacity 400ms ease-in;
-            -moz-transition: opacity 400ms ease-in;
-            transition: opacity 400ms ease-in;
-            pointer-events: auto;
-        }
-        .mascaraPayments > div {
-            width: 900px;
-            top: 0%;
-            position: relative;
-            margin: 0% auto;
-            padding: 5px 20px 13px 20px;
-            border-radius: 10px;
-            background: #FFFFFF;  /* fallback for old browsers */            
-            transition: opacity 400ms ease-in;
-        }
-        .contenidoPayments {
-            background-color: #fefefe;
-            margin: auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 50%;  
-            height: auto;
-            overflow-y: auto;
-            -webkit-animation-name: animatetop;
-            -webkit-animation-duration: 0.8s;
-            animation-name: animatetop;
-            animation-duration: 0.8s
-        }
-        /* Add Animation */
-        @-webkit-keyframes animatetop {
-            from {top:-300px; opacity:0} 
-            to {top:0; opacity:1}
-        }
-
-        @keyframes animatetop {
-            from {top:-300px; opacity:0}
-            to {top:0; opacity:1}
-        }  
-
-        .mascaraInfoLicense {
-            display: none; 
-            position: fixed; 
-            z-index: 1; 
-            padding-top: 100px; 
-            left: 0;
-            top: 0;
-            width: 100%; 
-            height: 100%; 
-            overflow: auto; 
-            background-color: rgb(0,0,0); 
-            background-color: rgba(0,0,0,0.4); 
-            -webkit-transition: opacity 400ms ease-in;
-            -moz-transition: opacity 400ms ease-in;
-            transition: opacity 400ms ease-in;
-            pointer-events: auto;
-        }
-        .mascaraInfoLicense > div {
-            width: 500px;
-            height: 300px;
-            top: 0%;
-            position: relative;
-            margin: 0% auto;
-            padding: 5px 20px 13px 20px;
-            border-radius: 10px;
-            background: #FFFFFF;  /* fallback for old browsers */            
-            transition: opacity 400ms ease-in;
-        }
-        .contenidoInfoLicense {
-            background-color: #fefefe;
-            margin: auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 50%;  
-            height: auto;
-            overflow-y: auto;
-            -webkit-animation-name: animatetop;
-            -webkit-animation-duration: 0.8s;
-            animation-name: animatetop;
-            animation-duration: 0.8s
-        }
-        /* Add Animation */
-        @-webkit-keyframes animatetop {
-            from {top:-300px; opacity:0} 
-            to {top:0; opacity:1}
-        }
-
-        @keyframes animatetop {
-            from {top:-300px; opacity:0}
-            to {top:0; opacity:1}
-        }  
-
-        .mascaraDelete {
-            display: none; 
-            position: fixed; 
-            z-index: 1; 
-            padding-top: 100px; 
-            left: 0;
-            top: 0;
-            width: 100%; 
-            height: 100%; 
-            overflow: auto; 
-            background-color: rgb(0,0,0); 
-            background-color: rgba(0,0,0,0.4); 
-            -webkit-transition: opacity 400ms ease-in;
-            -moz-transition: opacity 400ms ease-in;
-            transition: opacity 400ms ease-in;
-            pointer-events: auto;
-        }
-        .mascaraDelete > div {
-            width: 400px;
-            height: 200px;
-            top: 0%;
-            position: relative;
-            margin: 0% auto;
-            padding: 5px 20px 13px 20px;
-            border-radius: 10px;
-            background: #FFFFFF;  /* fallback for old browsers */            
-            transition: opacity 400ms ease-in;
-        }
-        .contenidoDelete {
-            background-color: #fefefe;
-            margin: auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 50%;  
-            height: auto;
-            overflow-y: auto;
-            -webkit-animation-name: animatetop;
-            -webkit-animation-duration: 0.8s;
-            animation-name: animatetop;
-            animation-duration: 0.8s
-        }
-        /* Add Animation */
-        @-webkit-keyframes animatetop {
-            from {top:-300px; opacity:0} 
-            to {top:0; opacity:1}
-        }
-
-        @keyframes animatetop {
-            from {top:-300px; opacity:0}
-            to {top:0; opacity:1}
-        }       
+    <style> 
 
     </style>
 
@@ -568,12 +292,15 @@
                 $("#saveone").click(function () {
                     $(".error").remove();
 
+                    $("#spanCountLic").text("");
+                    $("#span1CountPay").text("");
+
                     if ($("#countLicenses").val() === "0") {
-                        alert("You must enter the license");
+                        $("#tablelicenses").focus().after("<span id='spanCountLic' class='error' style='color:#FF0000;'>You must enter the license</span>");
                         return false;                
 
                     } else if ($("#countPayments").val() === "0") {
-                        alert("You must enter the license payment");
+                        $("#tablePayments").focus().after("<span id='span1CountPay' class='error' style='color:#FF0000;'>You must enter the license payment</span>");
                         return false;                
                     }
 
@@ -609,6 +336,11 @@
 
             function loadPaymentModal()
             {
+                $("#spanPay").text("");
+                if ($("#countLicenses").val() === "0") {
+                    $("#labelValidaPay").focus().after("<span id='spanPay' class='error' style='color:#FF0000;'>You must enter the license</span>");
+                    return false;                
+                }
                 var paymentModal = document.getElementById('paymentModal');
                 paymentModal.style.display = "block";
 
@@ -766,28 +498,27 @@
             {
                 var deleteModal = document.getElementById('deleteModal');
                 deleteModal.style.display = "block";
-                
+
                 var boton = document.getElementById("buttonAccept");
-                boton.onclick = function(e) {
+                boton.onclick = function (e) {
                     $("#" + idTr + posicion).remove();
                     deleteModal.style.display = "none";
-                    if(opcion === 1)
+                    if (opcion === 1)
                     {
                         restaLicenses(amount);
-                    }
-                    else
+                    } else
                     {
                         restaPayments(amount);
                     }
-                    
-                }       
+
+                }
             }
 
             function agregarLicenses()
             {
                 $("#span0").text("");
 
-                
+
                 var license = $("#license").val();
                 var inputLicense = $('#inputLicense').val();
                 var inputUsersQuantity = $('#inputUsersQuantity').val();
@@ -822,6 +553,9 @@
             <td align="center">' + inputLicense + '</td>\n\
             <input type="hidden" id="licenseId_' + counter + '" name="licenseId_' + counter + '"  value="' + document.getElementById("licenseid").value + '" />\n\
             <input type="hidden" id="durationTime_' + counter + '" name="durationTime_' + counter + '"  value="' + document.getElementById("inputDurationTime").value + '" />\n\
+            <input type="hidden" id="register_' + counter + '" name="register_' + counter + '"  value="0" />\n\
+            <input type="hidden" id="dueDate_' + counter + '" name="dueDate_' + counter + '"  value="0" />\n\
+            <input type="hidden" id="amountLic_' + counter + '" name="amountLic_' + counter + '"  value="0" />\n\
             <td align="center">' + inputUsersQuantity + '</td>\n\
             <td align="center">' + inputNumberClients + '</td>\n\
             <td align="center">' + inputNumberExams + '</td>\n\
@@ -863,8 +597,8 @@
                 var valorAmountCelda = amountCelda;
                 var valorAmount = $("#amountTotal").val();
                 var resultadoAmount = valorAmount - valorAmountCelda;
-                var amountFormat = number_format(resultadoAmount, 2);                
-                
+                var amountFormat = number_format(resultadoAmount, 2);
+
                 $("#amountTotal").val(resultadoAmount);
                 $("#amountTotalShow").val(amountFormat);
 
@@ -874,10 +608,10 @@
                 $("#remaining").val(resultRemaining);
                 $("#remainingShow").val(resultRemainingFormat);
 
-        
 
-                        if (resultado === 0)
-                        {
+
+                if (resultado === 0)
+                {
         {#$("#tablelicenses").hide();
         $("#divAmount").hide();
         $('#labelPayments').hide();
@@ -1028,7 +762,7 @@
                 $("#span11").text("");
                 $("#span12").text("");
                 $("#span13").text("");
-                
+
                 var simboloMoneda = $("#simboloMoneda").val();
                 var waytopay = $("#waytopay").val();
                 var waytopay_name = $("#waytopay").children(':selected').text();
@@ -1267,7 +1001,6 @@
 
                 return amount_parts.join('.');
             }
-
 
     </script>  
 
