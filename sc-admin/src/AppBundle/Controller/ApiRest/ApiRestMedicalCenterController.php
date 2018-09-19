@@ -164,13 +164,16 @@ class ApiRestMedicalCenterController extends Controller {
                 if ($user) {
 
                     $medicalCenterId = "";
+                    if ($data_token["profile_is_default"] == "internal") {
+                        foreach ($data_token['profile'] as $valor) {
 
-                    foreach ($data_token['medical_center'] as $valor) {
-                        if ($valor->is_default == "1") {
-                            $medicalCenterId = $valor->_id;
+                            foreach ($valor->medical_center as $valorMedicalCenter) {
+                                if ($valorMedicalCenter->is_default == "1") {
+                                    $medicalCenterId = $valorMedicalCenter->_id;
+                                }
+                            }
                         }
                     }
-
                     $encoders = array(new XmlEncoder(), new JsonEncoder());
                     $normalizers = array(new ObjectNormalizer());
 
@@ -216,10 +219,14 @@ class ApiRestMedicalCenterController extends Controller {
                 if ($user) {
 
                     $medicalCenterId = "";
+                    if ($data_token["profile_is_default"] == "internal") {
+                        foreach ($data_token['profile'] as $valor) {
 
-                    foreach ($data_token['medical_center'] as $valor) {
-                        if ($valor->is_default == "1") {
-                            $medicalCenterId = $valor->_id;
+                            foreach ($valor->medical_center as $valorMedicalCenter) {
+                                if ($valorMedicalCenter->is_default == "1") {
+                                    $medicalCenterId = $valorMedicalCenter->_id;
+                                }
+                            }
                         }
                     }
 
@@ -272,7 +279,7 @@ class ApiRestMedicalCenterController extends Controller {
      * @Route("/api/editBranchOffices")     
      * @Method("POST")
      */
-    public function editeditBranchOfficesAction(Request $request) {
+    public function editBranchOfficesAction(Request $request) {
 
         $fechaNow = new \MongoDate();
 
@@ -296,10 +303,14 @@ class ApiRestMedicalCenterController extends Controller {
                 if ($user) {
 
                     $medicalCenterId = "";
-//                    var_dump($data_token['medical_center']);
-                    foreach ($data_token['medical_center'] as $valor) {
-                        if ($valor->is_default == "1") {
-                            $medicalCenterId = $valor->_id;
+                    if ($data_token["profile_is_default"] == "internal") {
+                        foreach ($data_token['profile'] as $valor) {
+
+                            foreach ($valor->medical_center as $valorMedicalCenter) {
+                                if ($valorMedicalCenter->is_default == "1") {
+                                    $medicalCenterId = $valorMedicalCenter->_id;
+                                }
+                            }
                         }
                     }
 
@@ -322,7 +333,24 @@ class ApiRestMedicalCenterController extends Controller {
                     $instagram = $request->request->get("instagram");
                     $web = $request->request->get("web");
 
-                    if (($sucursal != "") && ($code != "") && ($idCountry != "0") && ($provincesid != "") && ($type != "0") && ($sector != "0") && ($log != "") && ($lat != "") && ($contactos[0] != null)) {
+                    if ($sucursal == "") {
+                        return new Response('Ingrese la sucursal');
+                    } else if ($idCountry == "") {
+                        return new Response('Seleccione el pais');
+                    } else if ($provincesid == "") {
+                        return new Response('Seleccione la provincia');
+                    } else if ($type == "") {
+                        return new Response('Seleccione el tipo');
+                    } else if ($sector == "") {
+                        return new Response('Seleccione el sector');
+                    } else if ($log == "") {
+                        return new Response('Ingrese la longitud');
+                    } else if ($lat == "") {
+                        return new Response('Ingrese la latitud');
+                    } else if ($contactos[0] == null) {
+                        return new Response('Ingrese al menos un contacto');
+                    } else {
+
 
                         $medicalcenter = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->find($medicalCenterId);
                         $arrayBranchoffices = $medicalcenter->getBranchoffices();
@@ -344,9 +372,9 @@ class ApiRestMedicalCenterController extends Controller {
                             "facebook" => $facebook,
                             "twitter" => $twitter,
                             "instagram" => $instagram,
-                            "web" => $web,                            
+                            "web" => $web,
                             "created_at" => $fechaNow,
-                            "created_by" => $user_id);                        
+                            "created_by" => $user_id);
 //                        var_dump($arrayBranchoffices);
                         $medicalcenter->setBranchoffices($arrayBranchoffices);
 //
@@ -358,9 +386,82 @@ class ApiRestMedicalCenterController extends Controller {
                         $dm->flush();
 
                         return new Response('Operacion exitosa');
+                    }
+                } else {
+
+                    $data = array('message' => 'Error al consultar los datos, problemas con el token');
+                    return new JsonResponse($data, 403);
+                }
+            }
+        }
+    }
+
+    /**
+     * @Route("/api/editPerfilMedicalCenter")     
+     * @Method("POST")
+     */
+    public function editPerfilMedicalCenterAction(Request $request) {
+
+        $fechaNow = new \MongoDate();
+
+        $token = $request->headers->get('Authorization');
+        if ($token == "") {
+
+            $data = array('message' => 'Token invalido');
+            return new JsonResponse($data, 403);
+        } else {
+
+            $data_token = $this->get('lexik_jwt_authentication.encoder')->decode($token);
+
+            if ($data_token == false) {
+
+                $data = array('message' => 'Authentication Required');
+                return new JsonResponse($data, 403);
+            } else {
+
+                $user_id = $data_token["id"];
+                $user = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findOneBy(['_id' => $user_id]);
+                if ($user) {
+
+                    $medicalCenterId = "";
+                    if ($data_token["profile_is_default"] == "internal") {
+                        foreach ($data_token['profile'] as $valor) {
+
+                            foreach ($valor->medical_center as $valorMedicalCenter) {
+                                if ($valorMedicalCenter->is_default == "1") {
+                                    $medicalCenterId = $valorMedicalCenter->_id;
+                                }
+                            }
+                        }
+                    }
+
+//                  AQUI EMPIEZA LA LOGICA DEL EDIT  
+                    $name = $request->request->get("name");
+                    $idCountry = $request->request->get("idCountry");
+                    $provinceid = $request->request->get("provinceid");
+
+                    if ($name == "") {
+                        return new Response('Ingrese el nombre del centro medico');
+                    } else if ($idCountry == "") {
+                        return new Response('Seleccione el pais');
+                    } else if ($provinceid == "") {
+                        return new Response('Seleccione la provincia');
                     } else {
 
-                        return new Response('Campos vacios');
+                        $medicalcenter = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->find($medicalCenterId);
+
+                        $medicalcenter->setCountryid($idCountry);
+                        $medicalcenter->setProvinceid($provinceid);
+                        $medicalcenter->setName($name);
+//
+                        $medicalcenter->setUpdatedAt($fechaNow);
+                        $medicalcenter->setUpdatedBy($user_id);
+//                        
+                        $dm = $this->get('doctrine_mongodb')->getManager();
+                        //$dm->persist($medicalcenter);
+                        $dm->flush();
+
+                        return new Response('Operacion exitosa');
                     }
                 } else {
 

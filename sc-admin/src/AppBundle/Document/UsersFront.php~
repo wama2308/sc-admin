@@ -39,9 +39,14 @@ class UsersFront {
     protected $password;
     
     /**
+     * @MongoDB\Field(type="string")
+     */
+    protected $profile_is_default;
+    
+    /**
      * @MongoDB\Field(type="collection")
      */
-    protected $medical_center;
+    protected $profile;
     
     /**
      * @MongoDB\Field(type="collection")
@@ -517,5 +522,29 @@ class UsersFront {
     public function getUnlockUser()
     {
         return $this->unlock_user;
+    }
+
+    
+
+    /**
+     * Set profile
+     *
+     * @param collection $profile
+     * @return $this
+     */
+    public function setProfile($profile)
+    {
+        $this->profile = $profile;
+        return $this;
+    }
+
+    /**
+     * Get profile
+     *
+     * @return collection $profile
+     */
+    public function getProfile()
+    {
+        return $this->profile;
     }
 }

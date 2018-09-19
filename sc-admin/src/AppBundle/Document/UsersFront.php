@@ -39,9 +39,14 @@ class UsersFront {
     protected $password;
     
     /**
+     * @MongoDB\Field(type="string")
+     */
+    protected $profile_is_default;
+    
+    /**
      * @MongoDB\Field(type="collection")
      */
-    protected $medical_center;
+    protected $profile;
     
     /**
      * @MongoDB\Field(type="collection")
@@ -519,25 +524,49 @@ class UsersFront {
         return $this->unlock_user;
     }
 
+    
+
     /**
-     * Set medicalCenter
+     * Set profile
      *
-     * @param collection $medicalCenter
+     * @param collection $profile
      * @return $this
      */
-    public function setMedicalCenter($medicalCenter)
+    public function setProfile($profile)
     {
-        $this->medical_center = $medicalCenter;
+        $this->profile = $profile;
         return $this;
     }
 
     /**
-     * Get medicalCenter
+     * Get profile
      *
-     * @return collection $medicalCenter
+     * @return collection $profile
      */
-    public function getMedicalCenter()
+    public function getProfile()
     {
-        return $this->medical_center;
+        return $this->profile;
+    }
+
+    /**
+     * Set profileIsDefault
+     *
+     * @param string $profileIsDefault
+     * @return $this
+     */
+    public function setProfileIsDefault($profileIsDefault)
+    {
+        $this->profile_is_default = $profileIsDefault;
+        return $this;
+    }
+
+    /**
+     * Get profileIsDefault
+     *
+     * @return string $profileIsDefault
+     */
+    public function getProfileIsDefault()
+    {
+        return $this->profile_is_default;
     }
 }

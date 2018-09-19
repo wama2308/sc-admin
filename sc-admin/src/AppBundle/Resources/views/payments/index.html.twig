@@ -50,7 +50,7 @@
 
                                     <input class="form-control" id="myInput" type="text" name="myInput" placeholder="Search..." on />
                                     <div class="input-group-btn">
-
+                                        &nbsp;&nbsp;&nbsp;
                                         <button title="Search" class="btn btn-primary" type="button" onclick="loadAjax($('#myInput').val(), 'divPaymentsMedicalCenter', 7);
                                                 loadAjax($('#myInput').val(), 'div-licenses', 8);
                                                 loadAjax($('#myInput').val(), 'divWayToPay', 9);
@@ -538,7 +538,7 @@
                     for (i = 0; i <= counter; i++) {
                         if ($("#licenseId_" + i).val() === license) {
         {#                            alert("This license is already in the table");#}
-                            $("#tablelicenses_").focus().after("<span id = 'span0' class='error' style='color:#FF0000; text-align: center;'>This license is already in the table</span>");
+                            $("#divButton").focus().after("<div align='center' id = 'span0' class='error' style='color:#FF0000; text-align: center;'>This license is already in the table</div>");
                             $("#fields").val("");
                             return false;
                         }

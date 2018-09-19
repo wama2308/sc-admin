@@ -112,31 +112,34 @@
             <tr>
                 <td align="center" colspan="2"><b>Este email ya esta en uso, de la siguiente manera:</b></td>                                                                                       
             </tr>            
-            {% for medicalCenter in medicalCenter %}
-                {% if medicalCenter.active == 1 %} 
-                    <tr>
-                        <td align="center" colspan="2"><b>Centro medico</b></td>                                                                                       
-                    </tr>
-                    <tr>
-                        <td align="center" colspan="2">{{ medicalCenter.name }}</td>                                                                                       
-                    </tr>
-                    <tr>
-                        <td align="center"><b>Sucursal</b></td>                                                                                       
-                        <td align="center"><b>Roles</b></td>                                                                                       
-                    </tr>
+            {% for profile in profile %}
 
-                    {% for branchOficces in medicalCenter.branch_office %}
-                        {% set permisos = "" %}  
-                        {% for permission in branchOficces.permission %}
-                            {% set permisos = permisos ~ " " ~ permission._id  %}  
-                        {% endfor %}
-
+                {% for medicalCenter in profile.medical_center %}
+                    {% if medicalCenter.active == 1 %} 
                         <tr>
-                            <td align="center">{{ branchOficces.name }}</td>                                                                                       
-                            <td align="center">{{ permisos }}</td>                                                                                       
+                            <td align="center" colspan="2"><b>Centro medico</b></td>                                                                                       
                         </tr>
-                    {% endfor %}
-                {% endif %}
+                        <tr>
+                            <td align="center" colspan="2">{{ medicalCenter.name }}</td>                                                                                       
+                        </tr>
+                        <tr>
+                            <td align="center"><b>Sucursal</b></td>                                                                                       
+                            <td align="center"><b>Roles</b></td>                                                                                       
+                        </tr>
+
+                        {% for branchOficces in medicalCenter.branch_office %}
+                            {% set permisos = "" %}  
+                            {% for permission in branchOficces.permission %}
+                                {% set permisos = permisos ~ " " ~ permission._id  %}  
+                            {% endfor %}
+
+                            <tr>
+                                <td align="center">{{ branchOficces.name }}</td>                                                                                       
+                                <td align="center">{{ permisos }}</td>                                                                                       
+                            </tr>
+                        {% endfor %}
+                    {% endif %}
+                {% endfor %}            
             {% endfor %}            
         </table>     
 
@@ -146,6 +149,9 @@
             <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="$('#modalUserFront').hide();">Cancel</button>
         </div>    
 
+    {% elseif valorCampo == 2 %}    
+        <input name="validateEmaiText" id="validateEmaiText" type="text" value="2" >      
+        <input name="insertFrontUser" id="insertFrontUser" type="hidden" value="2" >    
     {% else %}    
         <input name="validateEmaiText" id="validateEmaiText" type="text" value="0" >      
         <input name="insertFrontUser" id="insertFrontUser" type="hidden" value="0" >    

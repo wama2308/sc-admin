@@ -185,36 +185,48 @@ class MedicalCenterController extends Controller {
                 $emailUserFront = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findBy(array('email' => $master));
                 $idUserFornt = $emailUserFront[0]->getId();
                 $userFront = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->find($idUserFornt);
-                $arrayMedicalCenterUsersFront = $userFront->getMedicalCenter();
+                $arrayProfile = $userFront->getProfile();
+//                $profile = $userFront->getProfile();
+                foreach ($arrayProfile as $key => $value) {
+                    if ($value["name"] == "internal") {
 
-                //CREACION DE LOS ARRAYS
-                $arrayPermission[] = array(
-                    '_id' => 'MASTER',
-                    'type' => 0
-                );
+                        //CREACION DE LOS ARRAYS
+                        $arrayMedicalCenterUsersFront = $value["medical_center"];
 
-                $arrayBranchOffice[] = array(
-                    '_id' => 0,
-                    'name' => 'Sucursal',
-                    'is_default' => 0,
-                    'permission' => $arrayPermission
-                );
+                        $arrayPermission[] = array(
+                            '_id' => 'MASTER',
+                            'type' => 0
+                        );
 
-                $arrayMedicalCenterUsersFront[] = array(
-                    "_id" => $latestIdMedicalCenter,
-                    "name" => $name,
-                    "is_default" => 0,
-                    "branch_office" => $arrayBranchOffice,
-                    "active" => true,
-                    "created_at" => $fechaNow,
-                    "created_by" => $user,
-                    "updated_at" => $fechaNow,
-                    "updated_by" => $user);
+                        $arrayBranchOffice[] = array(
+                            '_id' => 0,
+                            'name' => 'Sucursal',
+                            'is_default' => 0,
+                            'permission' => $arrayPermission
+                        );
 
-                $userFront->setMedicalCenter($arrayMedicalCenterUsersFront);
+                        $arrayMedicalCenterUsersFront[] = array(
+                            "_id" => $latestIdMedicalCenter,
+                            "name" => $name,
+                            "is_default" => 0,
+                            "branch_office" => $arrayBranchOffice,
+                            "active" => true,
+                            "created_at" => $fechaNow,
+                            "created_by" => $user,
+                            "updated_at" => $fechaNow,
+                            "updated_by" => $user);
 
-                $dm->persist($userFront);
-                $dm->flush();
+                        $arrayProfile[$key] = array(
+                            'name' => 'internal',                            
+                            'medical_center' => $arrayMedicalCenterUsersFront
+                        );
+
+                        $userFront->setProfile($arrayProfile);
+
+//                        $dm->persist($userFront);
+                        $dm->flush();
+                    }
+                }
             }
 
             $this->addFlash('notice', 'Registered Medical Center');
@@ -262,6 +274,156 @@ class MedicalCenterController extends Controller {
         $insertFrontUser = $request->request->get("insertFrontUser");
 
         if (($country != "") && ($province != "") && ($name != "") && ($code != "") && ($master != "") && ($countPayments != "0") && ($countLicenses != "0")) {
+
+            //INICIO VALIDACION PARA AGREGAR LOS DATOS EN LA COLECCION USERSFRONT EN CASO DE QUE EL CORREO SE REPITA Y EL USUARIO ACEPTE
+            if ($insertFrontUser == "2") {
+                $search = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findBy(array('profile.name' => 'internal', 'profile.medical_center._id' => $id, 'profile.medical_center.active' => true, 'profile.medical_center.branch_office.permission._id' => 'MASTER'));
+                $profile = $search[0]->getProfile();
+                $idUserFront = $search[0]->getId();
+                $UsersFront = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->find($idUserFront);
+                $arrayProfile = $UsersFront->getProfile();
+
+                foreach ($arrayProfile as $key => $value) {
+                    if ($value["name"] == "internal") {
+
+                        //CREACION DE LOS ARRAYS
+                        $arrayMedicalCenterUsersFront = $value["medical_center"];
+
+                        $arrayPermission[] = array(
+                            '_id' => 'MASTER',
+                            'type' => 0
+                        );
+
+                        $arrayBranchOffice[] = array(
+                            '_id' => 0,
+                            'name' => 'Sucursal',
+                            'is_default' => 0,
+                            'permission' => $arrayPermission
+                        );
+
+                        foreach ($value["medical_center"] as $keyMedical => $valueMedical) {
+                            if ($valueMedical['_id'] == $id) {
+
+                                $arrayMedicalCenterUsersFront[$keyMedical] = array(
+                                    "_id" => $id,
+                                    "name" => $name,
+                                    "is_default" => 0,
+                                    "branch_office" => $arrayBranchOffice,
+                                    "active" => true,
+                                    "created_at" => $fechaNow,
+                                    "created_by" => $user,
+                                    "updated_at" => $fechaNow,
+                                    "updated_by" => $user);
+
+                                $arrayProfile[$key] = array(
+                                    'name' => 'internal',
+                                    'medical_center' => $arrayMedicalCenterUsersFront
+                                );
+
+                                $UsersFront->setProfile($arrayProfile);
+                            }
+                        }
+                    }
+                }
+            } else if ($insertFrontUser == "1") {
+
+                $search = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findBy(array('profile.name' => 'internal', 'profile.medical_center._id' => $id, 'profile.medical_center.active' => true, 'profile.medical_center.branch_office.permission._id' => 'MASTER'));
+                $profile = $search[0]->getProfile();
+                $idUserFront = $search[0]->getId();
+                $UsersFront = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->find($idUserFront);
+                $arrayProfile = $UsersFront->getProfile();
+
+                foreach ($arrayProfile as $key => $value) {
+                    if ($value["name"] == "internal") {
+
+                        //CREACION DE LOS ARRAYS
+                        $arrayMedicalCenterUsersFront = $value["medical_center"];
+
+                        $arrayPermission[] = array(
+                            '_id' => 'MASTER',
+                            'type' => 0
+                        );
+
+                        $arrayBranchOffice[] = array(
+                            '_id' => 0,
+                            'name' => 'Sucursal',
+                            'is_default' => 0,
+                            'permission' => $arrayPermission
+                        );
+
+                        foreach ($value["medical_center"] as $keyMedical => $valueMedical) {
+                            if ($valueMedical['_id'] == $id) {
+
+                                $arrayMedicalCenterUsersFront[$keyMedical] = array(
+                                    "_id" => $id,
+                                    "name" => $name,
+                                    "is_default" => 0,
+                                    "branch_office" => $arrayBranchOffice,
+                                    "active" => false,
+                                    "created_at" => $fechaNow,
+                                    "created_by" => $user,
+                                    "updated_at" => $fechaNow,
+                                    "updated_by" => $user);
+
+                                $arrayProfile[$key] = array(
+                                    'name' => 'internal',                                    
+                                    'medical_center' => $arrayMedicalCenterUsersFront
+                                );
+
+                                $UsersFront->setProfile($arrayProfile);
+                            }
+                        }
+                    }
+                }
+
+                $emailUserFront = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findBy(array('email' => $master));
+                $idUserFornt = $emailUserFront[0]->getId();
+                $userFront = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->find($idUserFornt);
+                $arrayProfileNew = $userFront->getProfile();
+//                $profile = $userFront->getProfile();
+                foreach ($arrayProfileNew as $key => $value) {
+                    if ($value["name"] == "internal") {
+
+                        //CREACION DE LOS ARRAYS
+                        $arrayMedicalCenterUsersFrontNew = $value["medical_center"];
+
+                        $arrayPermissionNew[] = array(
+                            '_id' => 'MASTER',
+                            'type' => 0
+                        );
+
+                        $arrayBranchOfficeNew[] = array(
+                            '_id' => 0,
+                            'name' => 'Sucursal',
+                            'is_default' => 0,
+                            'permission' => $arrayPermissionNew
+                        );
+
+                        $arrayMedicalCenterUsersFrontNew[] = array(
+                            "_id" => $id,
+                            "name" => $name,
+                            "is_default" => 0,
+                            "branch_office" => $arrayBranchOfficeNew,
+                            "active" => true,
+                            "created_at" => $fechaNow,
+                            "created_by" => $user,
+                            "updated_at" => $fechaNow,
+                            "updated_by" => $user);
+
+                        $arrayProfileNew[$key] = array(
+                            'name' => 'internal',                            
+                            'medical_center' => $arrayMedicalCenterUsersFrontNew
+                        );
+
+                        $userFront->setProfile($arrayProfileNew);
+
+//                        $dm->persist($userFront);
+//                        $dm->flush();
+                    }
+                }
+            }
+
+            //FIN VALIDACION PARA AGREGAR LOS DATOS EN LA COLECCION USERSFRONT EN CASO DE QUE EL CORREO SE REPITA Y EL USUARIO ACEPTE
 
             $medicalcenter = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->find($id);
 
@@ -370,66 +532,6 @@ class MedicalCenterController extends Controller {
             $dm = $this->get('doctrine_mongodb')->getManager();
             //$dm->persist($medicalcenter);
             $dm->flush();
-
-            //          FUNCION PARA AGREGAR LOS DATOS EN LA COLECCION USERSFRONT EN CASO DE QUE EL CORREO SE REPITA Y EL USUARIO ACEPTE
-            if ($insertFrontUser == "1") {
-
-                $exist = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findBy(array('medical_center._id' => $id, 'medical_center.active' => true, 'email' => $master, 'medical_center.branch_office.permission._id' => 'MASTER'));
-                if (!$exist) {
-
-                    $search = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findBy(array('medical_center._id' => $id, 'medical_center.active' => true, 'medical_center.branch_office.permission._id' => 'MASTER'));
-                    $medical = $search[0]->getMedicalCenter();
-                    $idUserFront = $search[0]->getId();
-                    $UsersFront = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->find($idUserFront);
-                    $arrayMedical = $UsersFront->getMedicalCenter();
-
-                    foreach ($medical as $key => $value) {
-                        if ($value['_id'] == $id) {
-                            
-                            $arrayMedical[$key]["active"] = false;
-                            $UsersFront->setMedicalCenter($arrayMedical);
-
-                            $dm = $this->get('doctrine_mongodb')->getManager();
-                            $dm->persist($UsersFront);
-                            $dm->flush();
-                        }
-                    }
-
-                    $emailUserFront = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findBy(array('email' => $master));
-                    $idUserFornt = $emailUserFront[0]->getId();
-                    $userFront = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->find($idUserFornt);
-                    $arrayMedicalCenterUsersFront = $userFront->getMedicalCenter();
-
-                    //CREACION DE LOS ARRAYS
-                    $arrayPermission[] = array(
-                        '_id' => 'MASTER',
-                        'type' => 0
-                    );
-
-                    $arrayBranchOffice[] = array(
-                        '_id' => 0,
-                        'name' => 'Sucursal',
-                        'is_default' => 0,
-                        'permission' => $arrayPermission
-                    );
-
-                    $arrayMedicalCenterUsersFront[] = array(
-                        "_id" => $id,
-                        "name" => $name,
-                        "is_default" => 0,
-                        "branch_office" => $arrayBranchOffice,
-                        "active" => true,
-                        "created_at" => $fechaNow,
-                        "created_by" => $user,
-                        "updated_at" => $fechaNow,
-                        "updated_by" => $user);
-
-                    $userFront->setMedicalCenter($arrayMedicalCenterUsersFront);
-
-                    $dm->persist($userFront);
-                    $dm->flush();
-                }
-            }
 
             $this->addFlash('notice', 'Medical Center Updated');
             return $this->redirectToRoute('medical_center_details', array('id' => $id));
@@ -672,20 +774,35 @@ class MedicalCenterController extends Controller {
 
             $email = $request->request->get("email");
             $opcion = $request->request->get("opcion");
+            $idMedicalCenter = $request->request->get("idMedical");
             $valorCampo;
-            $EmailExist = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findBy(array('email' => $email));
-//            var_dump($EmailExist);
-            if ($EmailExist) {
-                $valorCampo = 1;
-                $medicalCenter = $EmailExist[0]->getMedicalCenter();
-                return $this->render('@App/medical_center/loadProvince.html.twig', array('opcion' => $opcion, 'valorCampo' => $valorCampo, 'medicalCenter' => $medicalCenter));
-            } else {
-                $valorCampo = 0;
-                return $this->render('@App/medical_center/loadProvince.html.twig', array('opcion' => $opcion, 'valorCampo' => $valorCampo));
-            }
+            $exist = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findBy(
+                    array('profile.name' => 'internal',
+                        'profile.medical_center._id' => $idMedicalCenter,
+                        'profile.medical_center.active' => true,
+                        'email' => $email,
+                        'profile.medical_center.branch_office.permission._id' => 'MASTER'
+            ));
+            if ($exist) {
 
-//            return $this->render('@App/medical_center/loadProvince.html.twig', array('opcion' => $opcion));                
-            //$this->addFlash('error', 'Province Removed');
+                $valorCampo = 2;
+                return $this->render('@App/medical_center/loadProvince.html.twig', array('opcion' => $opcion, 'valorCampo' => $valorCampo));
+            } else {
+
+                $EmailExist = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findBy(array('email' => $email));
+
+                if ($EmailExist) {
+
+                    $valorCampo = 1;
+                    $profile = $EmailExist[0]->getProfile();
+
+                    return $this->render('@App/medical_center/loadProvince.html.twig', array('opcion' => $opcion, 'valorCampo' => $valorCampo, 'profile' => $profile));
+                } else {
+
+                    $valorCampo = 0;
+                    return $this->render('@App/medical_center/loadProvince.html.twig', array('opcion' => $opcion, 'valorCampo' => $valorCampo));
+                }
+            }
         }
         return new Response('Unauthorized Request, No es XmlHttpRequest', Response::HTTP_UNAUTHORIZED);
     }

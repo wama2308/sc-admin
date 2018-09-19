@@ -139,11 +139,17 @@ class ApiRestUserController extends Controller {
                 "updated_at" => $fechaNow,
                 "updated_by" => "0");
 
+            $arrayProfile[] = array(
+                'name' => 'internal',
+                'medical_center' => $arrayMedicalCenter
+            );
+
             $userFront = new UsersFront();
             $userFront->setEmail($email);
             $userFront->setEnabled(1);
             $userFront->setPassword($passwordEnc);
-            $userFront->setMedicalCenter($arrayMedicalCenter);
+            $userFront->setProfileIsDefault("internal");
+            $userFront->setProfile($arrayProfile);
             $userFront->setSecretQuestion1($secret_question1);
             $userFront->setSecretQuestion2($secret_question2);
             $userFront->setSecretQuestion3($secret_question3);
@@ -340,7 +346,11 @@ class ApiRestUserController extends Controller {
         }
 //        return new Response('HOLA');
         $token = $this->get('lexik_jwt_authentication.encoder')
-                ->encode(['username' => $user->getEmail(), 'id' => $user->getId(), 'medical_center' => $user->getMedicalCenter()]);
+                ->encode([
+                            'username' => $user->getEmail(), 'id' => $user->getId(), 
+                            'profile_is_default' => $user->getProfileIsDefault(), 
+                            'profile' => $user->getProfile()
+                        ]);
 
         return new JsonResponse(['token' => $token]);
     }
@@ -438,8 +448,6 @@ class ApiRestUserController extends Controller {
                         ->setBody('Su codigo de validacion para restablecer su password en Smart Clinic es: ' . $key . '');
                 $this->get('mailer')->send($message);
             }
-
-
 
             return new Response('Operacion exitosa');
         }
@@ -794,6 +802,6 @@ class ApiRestUserController extends Controller {
 
             return new Response('Operacion exitosa');
         }
-    }    
+    }
 
 }

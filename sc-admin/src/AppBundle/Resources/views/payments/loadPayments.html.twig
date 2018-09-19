@@ -47,10 +47,11 @@
     {#    <span class="close" onclick="$('#licenseModal').hide();">&times;</span>#}
     <table align="center" id="tablelicenses_" class="table table-responsive-sm table-bordered table-hover table-sm" style="width: 100%; border-radius: 40px; font-size: 14px;">
         <tr align="center" style="">
-            <th colspan="2" align="center"><img src="{{ asset('img/sc.png') }}" alt="License" width="280px" height="80px"/></th>                                                            
+            {#            <th colspan="2" align="center"><img src="{{ asset('img/sc.png') }}" alt="License" width="280px" height="80px"/></th>                                                            #}
+            <th colspan="2" align="center" style="background-color: #f0f3f5;"><h3><b>{{ license.license }}</b></h3></th>                                                            
         </tr>
         <tr align="center" style="">
-            <th style="width: 30px" align="center"><b>License</b></th>   
+            {#            <th style="width: 30px" align="center"><b>License</b></th>   #}
         <input name="licenseid" id="licenseid" type="hidden" value="{{ license.id }}" >                    
         <input name="inputLicense" id="inputLicense" type="hidden" value="{{ license.license }}" >                    
         <input name="inputUsersQuantity" id="inputUsersQuantity" type="hidden" value="{{ license.usersquantity }}" >                    
@@ -60,32 +61,32 @@
         <input name="inputAmount" id="inputAmount" type="hidden" value="{{ license.amount }}" >                    
         <input name="inputCurrentSymbol" id="inputCurrentSymbol" type="hidden" value="{{ country.currencySymbol }}" >                    
         <input name="inputNuevaFecha" id="inputNuevaFecha" type="hidden" value="{{ nuevafecha }}" >                    
-        <th style="width: 30px" align="center" id="thLicense">{{ license.license }}</th>                                                            
-    </tr>
-    <tr align="center" style="">
-        <th style="width: 30px" align="center"><b>Users Quantity</b></th>                                                            
-        <th style="width: 30px" align="center">{{ license.usersquantity }}</th>                                                            
-    </tr>
-    <tr align="center" style="">
-        <th style="width: 30px" align="center"><b>Number of Clients</b></th>                                                            
-        <th style="width: 30px" align="center">{{ license.numberclients }}</th>                                                            
-    </tr>
-    <tr align="center" style="">
-        <th style="width: 30px" align="center"><b>Number of Exams</b></th>                                                            
-        <th style="width: 30px" align="center">{{ license.numberexams }}</th>                                                            
-    </tr>
-    <tr align="center" style="">
-        <th style="width: 30px" align="center"><b>Duration Time</b></th>                                                            
-        <th style="width: 30px" align="center">{{ license.durationtime }}</th>                                                            
-    </tr>
-    <tr align="center" style="">
-        <th style="width: 30px" align="center"><b>Amount</b></th>                                                            
-        <th style="width: 30px" align="center">{{ license.amount|number_format(2, '.', ',') }}  {{ country.currencySymbol }}</th>                                                            
-    </tr>    
-</table>   
-<div class="form-group">  
-    <input type="button" value="Add" class="btn btn-primary" id="addButtonLicenses" onclick="agregarLicenses();">&nbsp;&nbsp;&nbsp;                                                        
-</div>   
+        {#        <th style="width: 30px" align="center" id="thLicense">{{ license.license }}</th>                                                            #}
+        </tr>
+        <tr align="center" style="">
+            <th style="width: 30px" align="center"><b>Users Quantity</b></th>                                                            
+            <th style="width: 30px" align="center">{{ license.usersquantity }}</th>                                                            
+        </tr>
+        <tr align="center" style="">
+            <th style="width: 30px" align="center"><b>Number of Clients</b></th>                                                            
+            <th style="width: 30px" align="center">{{ license.numberclients }}</th>                                                            
+        </tr>
+        <tr align="center" style="">
+            <th style="width: 30px" align="center"><b>Number of Exams</b></th>                                                            
+            <th style="width: 30px" align="center">{{ license.numberexams }}</th>                                                            
+        </tr>
+        <tr align="center" style="">
+            <th style="width: 30px" align="center"><b>Duration Time</b></th>                                                            
+            <th style="width: 30px" align="center">{{ license.durationtime }}</th>                                                            
+        </tr>
+        <tr align="center" style="">
+            <th style="width: 30px" align="center"><b>Amount</b></th>                                                            
+            <th style="width: 30px" align="center">{{ license.amount|number_format(2, '.', ',') }}  {{ country.currencySymbol }}</th>                                                            
+        </tr>    
+    </table>   
+    <div class="form-group" id="divButton">  
+        <input type="button" value="Add" class="btn btn-primary" id="addButtonLicenses" onclick="agregarLicenses();">&nbsp;&nbsp;&nbsp;                                                        
+    </div>   
 {% elseif opcion == 6 %}    
     <table id="tablePayments" class="table table-responsive-sm table-striped"> 
         <thead> 
@@ -218,16 +219,14 @@
                 </div>
             </div>
         </div>
-    </div>
-    <br>
-    <br>
+    </div>    
     {#<a class="btn btn-primary btn-sm" href="{{ path('payment_create', { 'id': id }) }}" title="Add Payment" role="button"><i class="fas fa-plus-circle"></i> Add Payment</a>&nbsp;&nbsp;&nbsp;&nbsp;          #}
     <div align="center" id="labelPayments" style="display: block"><h4 style="background-color:  #f0f3f5; align-items: center">Payments</h4></div>    
     {#    <a class="btn btn-primary btn-sm" onclick="loadPaymentModal();" title="Add Payment" role="button"><i class="fas fa-plus-circle"></i> Add Payment</a>&nbsp;&nbsp;&nbsp;&nbsp;          #}
     <button title="Add Payment" type="button" onclick="loadPaymentModal();" class="btn btn-primary btn-sm" style=""><i class="fas fa-plus-circle"></i> Add Payment</button>
     <div align="center" id="labelValidaPay" style="display: block"></div>
     <br>
-    <br>
+
     <input name="countPayments" id="countPayments" type="hidden" value="0">
     <table id="tablePayments" class="table table-responsive-sm table-bordered table-hover table-sm" style="display: table; width: 100%; font-size: 14px;">
         <tr align="center" style="background-color: #f0f3f5;">
