@@ -518,7 +518,6 @@
             {
                 $("#span0").text("");
 
-
                 var license = $("#license").val();
                 var inputLicense = $('#inputLicense').val();
                 var inputUsersQuantity = $('#inputUsersQuantity').val();
@@ -922,13 +921,13 @@
                 </tr>';
 
                 counter++;
-                var a = number_format(sum_amount_total, 2);
-                var b = number_format(remaining, 2);
+                var totalShow = number_format(sum_amount_total, 2);
+                var remainingShow = number_format(remaining, 2);
 
                 $("#total").val(sum_amount_total);
-                $("#totalShow").val(a);
+                $("#totalShow").val(totalShow);
                 $("#remaining").val(remaining);
-                $("#remainingShow").val(b);
+                $("#remainingShow").val(remainingShow);
 
                 $("#countPayments").val(counter);
 

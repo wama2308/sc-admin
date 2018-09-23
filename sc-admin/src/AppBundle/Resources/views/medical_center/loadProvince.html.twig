@@ -1,4 +1,5 @@
 {% set answerG = "" %}         
+{% set globalCurrentSymbol = "" %}         
 {% if opcion == 1 %}    
     <select class="form-control select-province" style="" name="province" id="province">
         <option value="">Select...</option>     
@@ -18,9 +19,9 @@
     </select>
 {% elseif opcion == 4 %}    
     <span class="close" onclick="">&times;</span>
-    <table align="center" id="tablelicenses" class="table table-bordered table-hover" style="width: 100%; border-radius: 40px">
+    <table align="center" id="tablelicenses" class="table table-responsive-sm table-bordered table-hover table-sm" style="width: 100%; border-radius: 40px; font-size: 14px;">
         <tr align="center" style="">
-            <th colspan="2" align="center"><img src="{{ asset('img/sc.png') }}" alt="License" width="280px" height="80px"/></th>                                                            
+            <th colspan="2" align="center" style="background-color: #f0f3f5;"><h3><b>{{ license.license }}</b></h3></th>                                                            
         </tr>
         <tr align="center" style="">
             <th style="width: 30px" align="center"><b>License</b></th>   
@@ -52,15 +53,16 @@
     </tr>
     <tr align="center" style="">
         <th style="width: 30px" align="center"><b>Amount</b></th>                                                            
-        <th style="width: 30px" align="center">{{ license.amount }} {{ country.currencySymbol }}</th>                                                            
+        <th style="width: 30px" align="center">{{ license.amount|number_format(2, '.', ',') }} {{ country.currencySymbol }}</th>                                                            
     </tr>    
-</table>        
+</table>       
+{% set globalCurrentSymbol = country.currencySymbol %}    
 {% elseif opcion == 5 %}  
     <select class="form-control select-waytopay" style="width: 95%" name="waytopay" id="waytopay" onchange="wayToPayOperation();">            
         <option value="">Select...</option> 
         {% for waytopay in waytopay %}
             {% set selected = '' %}
-            <option value="{{loop.index-1}}">{{waytopay}}</option>
+            <option value="{{waytopay}}">{{waytopay}}</option>
         {% endfor %}
     </select>
 {% elseif opcion == 6 %}  
@@ -68,7 +70,7 @@
         <option value="">Select...</option> 
         {% for issuingbank in issuingbank %}
             {% set selected = '' %}
-            <option value="{{loop.index-1}}">{{issuingbank}}</option>
+            <option value="{{issuingbank}}">{{issuingbank}}</option>
         {% endfor %}
     </select>
 {% elseif opcion == 7 %}  
@@ -76,7 +78,7 @@
         <option value="">Select...</option> 
         {% for receivingbank in receivingbank %}
             {% set selected = '' %}
-            <option value="{{loop.index-1}}">{{receivingbank}}</option>
+            <option value="{{receivingbank}}">{{receivingbank}}</option>
         {% endfor %}
     </select>
 {% elseif opcion == 8 %}      
@@ -215,6 +217,13 @@
             placeholder_text_single: "Select the way to pay",
             width: "100%"
         });
+        
+                
+        if ("{{ opcion }}" === "4") {
+            $("#labelCurrent").text("{{globalCurrentSymbol}}");
+            $("#labelCurrenRemaining").text("{{globalCurrentSymbol}}");
+            $("#labelCurrentTotalPay").text("{{globalCurrentSymbol}}");
+        }
 
         if ("{{ opcion }}" === "60") {
 
