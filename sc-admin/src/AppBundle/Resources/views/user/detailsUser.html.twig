@@ -27,7 +27,7 @@
 {% block body %}
     {% set status = "" %}             
     <div class="card">
-        <div class="card-header">
+        <div class="card-header" style="width: 100%; overflow: auto">
             <strong>Datails User</strong>
             <a style="float: right" title="INACTIVE" href="{{ path('delete_user', { 'id': user.id }) }}" class="btn btn-danger" onclick="return confirm('¿Be sure to eliminate the user?');"><i class="fas fa-user-times"></i></a>
             <strong style="float: right">&nbsp;&nbsp;</strong>

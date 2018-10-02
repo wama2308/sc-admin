@@ -276,10 +276,10 @@ class ApiRestMedicalCenterController extends Controller {
     }
 
     /**
-     * @Route("/api/editBranchOffices")     
+     * @Route("/api/saveBranchOffices")     
      * @Method("POST")
      */
-    public function editBranchOfficesAction(Request $request) {
+    public function saveBranchOfficesAction(Request $request) {
 
         $fechaNow = new \MongoDate();
 
@@ -321,9 +321,10 @@ class ApiRestMedicalCenterController extends Controller {
                     $provincesid = $request->request->get("provincesid");
                     $type = $request->request->get("type");
                     $sector = $request->request->get("sector");
+                    $direccion = $request->request->get("direccion");
                     $log = $request->request->get("log");
                     $lat = $request->request->get("lat");
-                    $contactos[] = $request->request->get("contactos");
+                    $contactos = $request->request->get("contactos");
                     $logo = $request->request->get("logo");
                     $foto1 = $request->request->get("foto1");
                     $foto2 = $request->request->get("foto2");
@@ -343,6 +344,8 @@ class ApiRestMedicalCenterController extends Controller {
                         return new Response('Seleccione el tipo');
                     } else if ($sector == "") {
                         return new Response('Seleccione el sector');
+                    } else if ($direccion == "") {
+                        return new Response('Ingrese la direccion');
                     } else if ($log == "") {
                         return new Response('Ingrese la longitud');
                     } else if ($lat == "") {
@@ -362,6 +365,7 @@ class ApiRestMedicalCenterController extends Controller {
                             "provinceId" => $provincesid,
                             "type" => $type,
                             "sector" => $sector,
+                            "direccion" => $direccion,
                             "log" => $log,
                             "lat" => $lat,
                             "contacto" => $contactos,
@@ -373,6 +377,7 @@ class ApiRestMedicalCenterController extends Controller {
                             "twitter" => $twitter,
                             "instagram" => $instagram,
                             "web" => $web,
+                            "status" => true,
                             "created_at" => $fechaNow,
                             "created_by" => $user_id);
 //                        var_dump($arrayBranchoffices);
@@ -387,6 +392,200 @@ class ApiRestMedicalCenterController extends Controller {
 
                         return new Response('Operacion exitosa');
                     }
+                } else {
+
+                    $data = array('message' => 'Error al consultar los datos, problemas con el token');
+                    return new JsonResponse($data, 403);
+                }
+            }
+        }
+    }
+    
+    /**
+     * @Route("/api/editBranchOffices")     
+     * @Method("POST")
+     */
+    public function editBranchOfficesAction(Request $request) {
+
+        $fechaNow = new \MongoDate();
+
+        $token = $request->headers->get('Authorization');
+        if ($token == "") {
+
+            $data = array('message' => 'Token invalido');
+            return new JsonResponse($data, 403);
+        } else {
+
+            $data_token = $this->get('lexik_jwt_authentication.encoder')->decode($token);
+
+            if ($data_token == false) {
+
+                $data = array('message' => 'Authentication Required');
+                return new JsonResponse($data, 403);
+            } else {
+
+                $user_id = $data_token["id"];
+                $user = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findOneBy(['_id' => $user_id]);
+                if ($user) {
+
+                    $medicalCenterId = "";
+                    if ($data_token["profile_is_default"] == "internal") {
+                        foreach ($data_token['profile'] as $valor) {
+
+                            foreach ($valor->medical_center as $valorMedicalCenter) {
+                                if ($valorMedicalCenter->is_default == "1") {
+                                    $medicalCenterId = $valorMedicalCenter->_id;
+                                }
+                            }
+                        }
+                    }
+
+//                  AQUI EMPIEZA LA LOGICA DEL EDIT  
+                    $posicion = $request->request->get("posicion");
+                    $sucursal = $request->request->get("sucursal");
+                    $code = $request->request->get("code");
+                    $idCountry = $request->request->get("idCountry");
+                    $provincesid = $request->request->get("provincesid");
+                    $type = $request->request->get("type");
+                    $sector = $request->request->get("sector");
+                    $direccion = $request->request->get("direccion");
+                    $log = $request->request->get("log");
+                    $lat = $request->request->get("lat");
+                    $contactos = $request->request->get("contactos");
+                    $logo = $request->request->get("logo");
+                    $foto1 = $request->request->get("foto1");
+                    $foto2 = $request->request->get("foto2");
+                    $foto3 = $request->request->get("foto3");
+                    $facebook = $request->request->get("facebook");
+                    $twitter = $request->request->get("twitter");
+                    $instagram = $request->request->get("instagram");
+                    $web = $request->request->get("web");
+
+                    if ($sucursal == "") {
+                        return new Response('Ingrese la sucursal');
+                    } else if ($idCountry == "") {
+                        return new Response('Seleccione el pais');
+                    } else if ($provincesid == "") {
+                        return new Response('Seleccione la provincia');
+                    } else if ($type == "") {
+                        return new Response('Seleccione el tipo');
+                    } else if ($sector == "") {
+                        return new Response('Seleccione el sector');
+                    } else if ($direccion == "") {
+                        return new Response('Ingrese la direccion');
+                    } else if ($log == "") {
+                        return new Response('Ingrese la longitud');
+                    } else if ($lat == "") {
+                        return new Response('Ingrese la latitud');
+                    } else if ($contactos[0] == null) {
+                        return new Response('Ingrese al menos un contacto');
+                    } else {
+
+
+                        $medicalcenter = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->find($medicalCenterId);
+                        $arrayBranchoffices = $medicalcenter->getBranchoffices();
+
+                        $arrayBranchoffices[$posicion]["name"] = $sucursal;
+                        $arrayBranchoffices[$posicion]["code"] = $code;
+                        $arrayBranchoffices[$posicion]["countryId"] = $idCountry;
+                        $arrayBranchoffices[$posicion]["provinceId"] = $provincesid;
+                        $arrayBranchoffices[$posicion]["type"] = $type;
+                        $arrayBranchoffices[$posicion]["sector"] = $sector;
+                        $arrayBranchoffices[$posicion]["direccion"] = $direccion;
+                        $arrayBranchoffices[$posicion]["log"] = $log;
+                        $arrayBranchoffices[$posicion]["lat"] = $lat;
+                        $arrayBranchoffices[$posicion]["contacto"] = $contactos;
+                        $arrayBranchoffices[$posicion]["logo"] = $logo;
+                        $arrayBranchoffices[$posicion]["foto1"] = $foto1;
+                        $arrayBranchoffices[$posicion]["foto2"] = $foto2;
+                        $arrayBranchoffices[$posicion]["foto3"] = $foto3;
+                        $arrayBranchoffices[$posicion]["facebook"] = $facebook;
+                        $arrayBranchoffices[$posicion]["twitter"] = $twitter;
+                        $arrayBranchoffices[$posicion]["instagram"] = $instagram;
+                        $arrayBranchoffices[$posicion]["web"] = $web;                        
+                        $arrayBranchoffices[$posicion]["updated_at"] = $fechaNow;
+                        $arrayBranchoffices[$posicion]["updated_by"] = $user_id;
+                        
+                        $medicalcenter->setBranchoffices($arrayBranchoffices);
+//
+                        $medicalcenter->setUpdatedAt($fechaNow);
+                        $medicalcenter->setUpdatedBy($user_id);
+//                        
+                        $dm = $this->get('doctrine_mongodb')->getManager();
+                        $dm->persist($medicalcenter);
+                        $dm->flush();
+
+                        return new Response('Operacion exitosa');
+                    }
+                } else {
+
+                    $data = array('message' => 'Error al consultar los datos, problemas con el token');
+                    return new JsonResponse($data, 403);
+                }
+            }
+        }
+    }
+    
+    /**
+     * @Route("/api/deleteBranchOffices")     
+     * @Method("POST")
+     */
+    public function deleteBranchOfficesAction(Request $request) {
+
+        $fechaNow = new \MongoDate();
+
+        $token = $request->headers->get('Authorization');
+        if ($token == "") {
+
+            $data = array('message' => 'Token invalido');
+            return new JsonResponse($data, 403);
+        } else {
+
+            $data_token = $this->get('lexik_jwt_authentication.encoder')->decode($token);
+
+            if ($data_token == false) {
+
+                $data = array('message' => 'Authentication Required');
+                return new JsonResponse($data, 403);
+            } else {
+
+                $user_id = $data_token["id"];
+                $user = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findOneBy(['_id' => $user_id]);
+                if ($user) {
+
+                    $medicalCenterId = "";
+                    if ($data_token["profile_is_default"] == "internal") {
+                        foreach ($data_token['profile'] as $valor) {
+
+                            foreach ($valor->medical_center as $valorMedicalCenter) {
+                                if ($valorMedicalCenter->is_default == "1") {
+                                    $medicalCenterId = $valorMedicalCenter->_id;
+                                }
+                            }
+                        }
+                    }
+
+//                  AQUI EMPIEZA LA LOGICA DEL EDIT  
+                    $posicion = $request->request->get("posicion");     
+
+                    $medicalcenter = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->find($medicalCenterId);
+                    $arrayBranchoffices = $medicalcenter->getBranchoffices();
+
+                    $arrayBranchoffices[$posicion]["status"] = false;                        
+                    $arrayBranchoffices[$posicion]["updated_at"] = $fechaNow;
+                    $arrayBranchoffices[$posicion]["updated_by"] = $user_id;
+
+                    $medicalcenter->setBranchoffices($arrayBranchoffices);
+//
+                    $medicalcenter->setUpdatedAt($fechaNow);
+                    $medicalcenter->setUpdatedBy($user_id);
+//                        
+                    $dm = $this->get('doctrine_mongodb')->getManager();
+                    $dm->persist($medicalcenter);
+                    $dm->flush();
+
+                    return new Response('Operacion exitosa');
+                    
                 } else {
 
                     $data = array('message' => 'Error al consultar los datos, problemas con el token');
