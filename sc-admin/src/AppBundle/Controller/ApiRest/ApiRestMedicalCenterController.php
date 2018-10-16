@@ -15,6 +15,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use AppBundle\Document\Country;
 use AppBundle\Document\MedicalCenter;
 use AppBundle\Document\UsersFront;
+use AppBundle\Document\Services;
 use \Datetime;
 use AppBundle\Document\GeneralConfiguration;
 
@@ -30,7 +31,7 @@ class ApiRestMedicalCenterController extends Controller {
      */
     public function loadCountriesAction(Request $request) {
 
-        $token = $request->headers->get('Authorization');
+        $token = $request->headers->get('access-token');
 
         if ($token == "") {
             $data = array('message' => 'Token invalido');
@@ -68,7 +69,7 @@ class ApiRestMedicalCenterController extends Controller {
      */
     public function loadCountriesIdAction(Request $request) {
 
-        $token = $request->headers->get('Authorization');
+        $token = $request->headers->get('access-token');
         $country_id = $request->request->get('idCountry');
 
         if ($token == "") {
@@ -107,7 +108,7 @@ class ApiRestMedicalCenterController extends Controller {
      */
     public function loadGeneralConfigurationAction(Request $request) {
 
-        $token = $request->headers->get('Authorization');
+        $token = $request->headers->get('access-token');
         if ($token == "") {
             $data = array('message' => 'Token invalido');
             return new JsonResponse($data, 403);
@@ -144,9 +145,8 @@ class ApiRestMedicalCenterController extends Controller {
      */
     public function LoadMedicalCenterAction(Request $request) {
 
-        $token = $request->headers->get('Authorization');
+        $token = $request->headers->get('access-token');
         if ($token == "") {
-
             $data = array('message' => 'Token invalido');
             return new JsonResponse($data, 403);
         } else {
@@ -162,14 +162,12 @@ class ApiRestMedicalCenterController extends Controller {
                 $user_id = $data_token["id"];
                 $user = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findOneBy(['_id' => $user_id]);
                 if ($user) {
-
-                    $medicalCenterId = "";
                     if ($data_token["profile_is_default"] == "internal") {
                         foreach ($data_token['profile'] as $valor) {
 
                             foreach ($valor->medical_center as $valorMedicalCenter) {
                                 if ($valorMedicalCenter->is_default == "1") {
-                                    $medicalCenterId = $valorMedicalCenter->_id;
+                                    $medicalcenter = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->find($valorMedicalCenter->_id);
                                 }
                             }
                         }
@@ -177,9 +175,7 @@ class ApiRestMedicalCenterController extends Controller {
                     $encoders = array(new XmlEncoder(), new JsonEncoder());
                     $normalizers = array(new ObjectNormalizer());
 
-                    $serializer = new Serializer($normalizers, $encoders);
-
-                    $medicalcenter = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->find($medicalCenterId);
+                    $serializer = new Serializer($normalizers, $encoders);                    
 
                     $jsonContent = $serializer->serialize($medicalcenter, 'json');
 
@@ -199,7 +195,7 @@ class ApiRestMedicalCenterController extends Controller {
      */
     public function LoadLicenseAction(Request $request) {
 
-        $token = $request->headers->get('Authorization');
+        $token = $request->headers->get('access-token');
         if ($token == "") {
 
             $data = array('message' => 'Token invalido');
@@ -283,7 +279,7 @@ class ApiRestMedicalCenterController extends Controller {
 
         $fechaNow = new \MongoDate();
 
-        $token = $request->headers->get('Authorization');
+        $token = $request->headers->get('access-token');
         if ($token == "") {
 
             $data = array('message' => 'Token invalido');
@@ -400,7 +396,7 @@ class ApiRestMedicalCenterController extends Controller {
             }
         }
     }
-    
+
     /**
      * @Route("/api/editBranchOffices")     
      * @Method("POST")
@@ -409,7 +405,7 @@ class ApiRestMedicalCenterController extends Controller {
 
         $fechaNow = new \MongoDate();
 
-        $token = $request->headers->get('Authorization');
+        $token = $request->headers->get('access-token');
         if ($token == "") {
 
             $data = array('message' => 'Token invalido');
@@ -502,10 +498,10 @@ class ApiRestMedicalCenterController extends Controller {
                         $arrayBranchoffices[$posicion]["facebook"] = $facebook;
                         $arrayBranchoffices[$posicion]["twitter"] = $twitter;
                         $arrayBranchoffices[$posicion]["instagram"] = $instagram;
-                        $arrayBranchoffices[$posicion]["web"] = $web;                        
+                        $arrayBranchoffices[$posicion]["web"] = $web;
                         $arrayBranchoffices[$posicion]["updated_at"] = $fechaNow;
                         $arrayBranchoffices[$posicion]["updated_by"] = $user_id;
-                        
+
                         $medicalcenter->setBranchoffices($arrayBranchoffices);
 //
                         $medicalcenter->setUpdatedAt($fechaNow);
@@ -525,7 +521,7 @@ class ApiRestMedicalCenterController extends Controller {
             }
         }
     }
-    
+
     /**
      * @Route("/api/deleteBranchOffices")     
      * @Method("POST")
@@ -534,7 +530,7 @@ class ApiRestMedicalCenterController extends Controller {
 
         $fechaNow = new \MongoDate();
 
-        $token = $request->headers->get('Authorization');
+        $token = $request->headers->get('access-token');
         if ($token == "") {
 
             $data = array('message' => 'Token invalido');
@@ -566,12 +562,12 @@ class ApiRestMedicalCenterController extends Controller {
                     }
 
 //                  AQUI EMPIEZA LA LOGICA DEL EDIT  
-                    $posicion = $request->request->get("posicion");     
+                    $posicion = $request->request->get("posicion");
 
                     $medicalcenter = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->find($medicalCenterId);
                     $arrayBranchoffices = $medicalcenter->getBranchoffices();
 
-                    $arrayBranchoffices[$posicion]["status"] = false;                        
+                    $arrayBranchoffices[$posicion]["status"] = false;
                     $arrayBranchoffices[$posicion]["updated_at"] = $fechaNow;
                     $arrayBranchoffices[$posicion]["updated_by"] = $user_id;
 
@@ -585,7 +581,6 @@ class ApiRestMedicalCenterController extends Controller {
                     $dm->flush();
 
                     return new Response('Operacion exitosa');
-                    
                 } else {
 
                     $data = array('message' => 'Error al consultar los datos, problemas con el token');
@@ -603,7 +598,7 @@ class ApiRestMedicalCenterController extends Controller {
 
         $fechaNow = new \MongoDate();
 
-        $token = $request->headers->get('Authorization');
+        $token = $request->headers->get('access-token');
         if ($token == "") {
 
             $data = array('message' => 'Token invalido');

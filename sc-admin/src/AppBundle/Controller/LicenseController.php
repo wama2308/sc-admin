@@ -3,7 +3,7 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Document\License;
-use AppBundle\Document\Exams;
+use AppBundle\Document\Services;
 use AppBundle\Document\Country;
 use AppBundle\Document\GeneralConfiguration;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -89,7 +89,7 @@ class LicenseController extends Controller {
             return $this->redirectToRoute('license_list');
         }
 
-        $exams = $this->get('doctrine_mongodb')->getRepository('AppBundle:Exams')->findByActive(true);
+        $exams = $this->get('doctrine_mongodb')->getRepository('AppBundle:Services')->findByActive(true);
 
         $countries = $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->findByActive(true);
 
@@ -164,7 +164,7 @@ class LicenseController extends Controller {
             return $this->redirectToRoute('license_details', array('id' => $id));
         }
 
-        $exams = $this->get('doctrine_mongodb')->getRepository('AppBundle:Exams')->findByActive(true);
+        $exams = $this->get('doctrine_mongodb')->getRepository('AppBundle:Services')->findByActive(true);
         $countries = $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->findByActive(true);
         $GeneralConfiguration = $this->get('doctrine_mongodb')->getRepository('AppBundle:GeneralConfiguration')->find("5ae08f86c5dfa106dc92610a");
         $ArrayModules = $GeneralConfiguration->getModules();
@@ -180,7 +180,7 @@ class LicenseController extends Controller {
      */
     public function detailsAction($id) {
         $license = $this->get('doctrine_mongodb')->getRepository('AppBundle:License')->find($id);
-        $exams = $this->get('doctrine_mongodb')->getRepository('AppBundle:Exams')->findByActive(true);
+        $exams = $this->get('doctrine_mongodb')->getRepository('AppBundle:Services')->findByActive(true);
         $countries = $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->findByActive(true);
         $GeneralConfiguration = $this->get('doctrine_mongodb')->getRepository('AppBundle:GeneralConfiguration')->find("5ae08f86c5dfa106dc92610a");
         $ArrayModules = $GeneralConfiguration->getModules();
