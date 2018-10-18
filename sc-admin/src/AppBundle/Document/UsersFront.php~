@@ -547,4 +547,26 @@ class UsersFront {
     {
         return $this->profile;
     }
+
+    /**
+     * Set profileIsDefault
+     *
+     * @param string $profileIsDefault
+     * @return $this
+     */
+    public function setProfileIsDefault($profileIsDefault)
+    {
+        $this->profile_is_default = $profileIsDefault;
+        return $this;
+    }
+
+    /**
+     * Get profileIsDefault
+     *
+     * @return string $profileIsDefault
+     */
+    public function getProfileIsDefault()
+    {
+        return $this->profile_is_default;
+    }
 }

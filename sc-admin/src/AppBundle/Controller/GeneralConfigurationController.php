@@ -50,6 +50,7 @@ class GeneralConfigurationController extends Controller {
                 $arrayMethod = explode(",", $request->request->get("method_" . $i));
 
                 $arrayPermits[] = array(
+                    "_id" => new \MongoId(),
                     "permit" => $request->request->get("permit_" . $i),
                     "route" => $request->request->get("route_" . $i),
                     "action" => $request->request->get("action_" . $i),
@@ -116,6 +117,7 @@ class GeneralConfigurationController extends Controller {
                     $arrayMethod = explode(",", $request->request->get("method_" . $i));
 
                     $arrayPermits[] = array(
+                        "_id" => new \MongoId(),
                         "permit" => $request->request->get("permit_" . $i),
                         "route" => $request->request->get("route_" . $i),
                         "action" => $request->request->get("action_" . $i),

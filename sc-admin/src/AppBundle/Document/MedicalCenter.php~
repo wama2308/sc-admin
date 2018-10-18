@@ -111,6 +111,11 @@ class MedicalCenter {
     /**
      * @MongoDB\Field(type="collection")
      */
+    protected $roles;
+    
+    /**
+     * @MongoDB\Field(type="collection")
+     */
     protected $payments;
     
     /**

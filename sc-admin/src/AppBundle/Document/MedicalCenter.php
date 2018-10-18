@@ -111,6 +111,11 @@ class MedicalCenter {
     /**
      * @MongoDB\Field(type="collection")
      */
+    protected $roles;
+    
+    /**
+     * @MongoDB\Field(type="collection")
+     */
     protected $payments;
     
     /**
@@ -706,5 +711,27 @@ class MedicalCenter {
     public function getUpdatedBy()
     {
         return $this->updated_by;
+    }
+
+    /**
+     * Set roles
+     *
+     * @param collection $roles
+     * @return $this
+     */
+    public function setRoles($roles)
+    {
+        $this->roles = $roles;
+        return $this;
+    }
+
+    /**
+     * Get roles
+     *
+     * @return collection $roles
+     */
+    public function getRoles()
+    {
+        return $this->roles;
     }
 }
