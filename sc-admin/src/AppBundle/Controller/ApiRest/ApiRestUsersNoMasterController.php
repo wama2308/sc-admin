@@ -225,7 +225,7 @@ class ApiRestUsersNoMasterController extends Controller {
                                 if ($travelOnlyModules == $partesSelected[0]) {
 
                                     $arrayPemits[] = $partesSelected[2];
-                                    
+
                                     $arrayModules[] = array(
                                         "name" => $travelOnlyModules,
                                         "permits" => $arrayPemits
@@ -253,6 +253,99 @@ class ApiRestUsersNoMasterController extends Controller {
                         $medicalcenter->setUpdatedAt($fechaNow);
                         $medicalcenter->setUpdatedBy($user_id);
 //                        
+                        $dm = $this->get('doctrine_mongodb')->getManager();
+                        //$dm->persist($medicalcenter);
+                        $dm->flush();
+
+                        return new Response('Operacion exitosa');
+                    }
+                } else {
+
+                    $data = array('message' => 'Error al consultar los datos, problemas con el token');
+                    return new JsonResponse($data, 403);
+                }
+            }
+        }
+    }
+
+    /**
+     * @Route("/api/editRol")     
+     * @Method("POST")
+     */
+    public function editRolAction(Request $request) {
+
+        $fechaNow = new \MongoDate();
+
+        $token = $request->headers->get('access-token');
+        if ($token == "") {
+
+            $data = array('message' => 'Token invalido');
+            return new JsonResponse($data, 403);
+        } else {
+
+            $data_token = $this->get('lexik_jwt_authentication.encoder')->decode($token);
+
+            if ($data_token == false) {
+
+                $data = array('message' => 'Authentication Required');
+                return new JsonResponse($data, 403);
+            } else {
+
+                $user_id = $data_token["id"];
+                $user = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findOneBy(['_id' => $user_id]);
+                if ($user) {
+
+                    $medicalCenterId = "";
+                    if ($data_token["profile_is_default"] == "internal") {
+                        foreach ($data_token['profile'] as $valor) {
+
+                            foreach ($valor->medical_center as $valorMedicalCenter) {
+                                if ($valorMedicalCenter->is_default == "1") {
+                                    $medicalCenterId = $valorMedicalCenter->_id;
+                                }
+                            }
+                        }
+                    }
+
+//                  AQUI EMPIEZA LA LOGICA DEL EDIT  
+                    $posicion = $request->request->get("posicion");
+                    $rol = $request->request->get("rol");
+                    $selected = $request->request->get("selected");
+                    $onlyModules = $request->request->get("onlyModules");
+
+                    if ($rol == "") {
+                        return new Response('Ingrese el rol');
+                    } else if ($selected == "") {
+                        return new Response('Seleccione los modulos');
+                    } else {
+
+                        foreach ($onlyModules as $travelOnlyModules) {
+
+                            foreach ($selected as $travelSelected) {
+
+                                $partesSelected = explode("-", $travelSelected);
+
+                                if ($travelOnlyModules == $partesSelected[0]) {
+
+                                    $arrayPemits[] = $partesSelected[2];
+
+                                    $arrayModules[] = array(
+                                        "name" => $travelOnlyModules,
+                                        "permits" => $arrayPemits
+                                    );
+                                }
+                            }
+
+                            unset($arrayPemits);
+                        }
+
+                        $medicalcenter = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->find($medicalCenterId);
+                        $arrayRoles = $medicalcenter->getRoles();
+                        
+                        $arrayRoles[$posicion]["rol"] = $rol;
+                        $arrayRoles[$posicion]["modules"] = $arrayModules;
+                        $medicalcenter->setRoles($arrayRoles);
+                        
                         $dm = $this->get('doctrine_mongodb')->getManager();
                         //$dm->persist($medicalcenter);
                         $dm->flush();
@@ -314,6 +407,107 @@ class ApiRestUsersNoMasterController extends Controller {
                     $jsonContent = $serializer->serialize($arrayEnd, 'json');
 
                     return new Response($jsonContent);
+                } else {
+
+                    $data = array('message' => 'Error al consultar los datos, problemas con el token');
+                    return new JsonResponse($data, 403);
+                }
+            }
+        }
+    }
+
+    /**
+     * @Route("/api/LoadRolId")     
+     * @Method("POST")
+     */
+    public function LoadRolIdAction(Request $request) {
+
+        $fechaNow = new \MongoDate();
+
+        $token = $request->headers->get('access-token');
+        if ($token == "") {
+
+            $data = array('message' => 'Token invalido');
+            return new JsonResponse($data, 403);
+        } else {
+
+            $data_token = $this->get('lexik_jwt_authentication.encoder')->decode($token);
+
+            if ($data_token == false) {
+
+                $data = array('message' => 'Authentication Required');
+                return new JsonResponse($data, 403);
+            } else {
+
+                $user_id = $data_token["id"];
+                $user = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findOneBy(['_id' => $user_id]);
+                if ($user) {
+
+                    $medicalCenterId = "";
+                    if ($data_token["profile_is_default"] == "internal") {
+                        foreach ($data_token['profile'] as $valor) {
+
+                            foreach ($valor->medical_center as $valorMedicalCenter) {
+                                if ($valorMedicalCenter->is_default == "1") {
+                                    $medicalCenterId = $valorMedicalCenter->_id;
+                                }
+                            }
+                        }
+                    }
+
+//                  AQUI EMPIEZA LA LOGICA DEL EDIT  
+                    $posicion = $request->request->get("posicion");
+
+                    $medicalcenter = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->find($medicalCenterId);
+                    $arrayRoles = $medicalcenter->getRoles();
+
+                    $GeneralConfiguration = $this->get('doctrine_mongodb')->getRepository('AppBundle:GeneralConfiguration')->find("5ae08f86c5dfa106dc92610a");
+                    $arrayModulesGeneral = $GeneralConfiguration->getModules();
+
+                    foreach ($arrayRoles as $key => $travelArrayRoles) {
+                        if ($key == $posicion) {
+
+                            $nameRol = $travelArrayRoles["rol"];
+
+                            foreach ($travelArrayRoles["modules"] as $travelArrayModules) {
+
+                                $nameModule = $travelArrayModules["name"];
+
+                                foreach ($travelArrayModules["permits"] as $travelArrayPermits) {
+
+                                    foreach ($arrayModulesGeneral as $travelArrayModulesGeneral) {
+
+                                        if ($nameModule == $travelArrayModulesGeneral["name"]) {
+
+                                            foreach ($travelArrayModulesGeneral["permits"] as $travelArrayPermitsGeneral) {
+
+                                                if ($travelArrayPermits == $travelArrayPermitsGeneral["permit"]) {
+
+
+                                                    $permits = $travelArrayPermitsGeneral["_id"] . "-" . $travelArrayPermitsGeneral["permit"];
+                                                }
+                                            }
+                                            $arrayPermits[] = $nameModule . "-" . $permits;
+                                        }
+                                    }
+
+                                    //var_dump($arra);
+                                }
+                            }
+                            $arrayEnd = array(
+                                "rol" => $nameRol,
+                                "modules" => $arrayPermits,
+                            );
+                            $encoders = array(new XmlEncoder(), new JsonEncoder());
+                            $normalizers = array(new ObjectNormalizer());
+
+                            $serializer = new Serializer($normalizers, $encoders);
+
+                            $jsonContent = $serializer->serialize($arrayEnd, 'json');
+
+                            return new Response($jsonContent);
+                        }
+                    }
                 } else {
 
                     $data = array('message' => 'Error al consultar los datos, problemas con el token');
