@@ -353,8 +353,10 @@ class ApiRestMedicalCenterController extends Controller {
 
                         $medicalcenter = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->find($medicalCenterId);
                         $arrayBranchoffices = $medicalcenter->getBranchoffices();
+                        $branchOfficesId = new \MongoId();
 
                         $arrayBranchoffices[] = array(
+                            "_id" => $branchOfficesId,
                             "name" => $sucursal,
                             "code" => $code,
                             "countryId" => $idCountry,
