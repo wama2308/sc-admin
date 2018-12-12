@@ -118,6 +118,7 @@ class ApiRestUserController extends Controller {
             //CREACION DE LOS ARRAYS
             $arrayPermission[] = array(
                 '_id' => 'MASTER',
+                'name' => 'MASTER',
                 'type' => 0
             );
 
@@ -131,7 +132,7 @@ class ApiRestUserController extends Controller {
             $arrayMedicalCenter[] = array(
                 "_id" => $medical_center_id,
                 "name" => $name,
-                "is_default" => 0,
+                "is_default" => 1,
                 "branch_office" => $arrayBranchOffice,
                 "active" => true,
                 "created_at" => $fechaNow,
@@ -177,95 +178,102 @@ class ApiRestUserController extends Controller {
         $date = new \MongoDate();
         $email = $request->request->get("email");
 
-        $check_mail = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->findBy(array('master.email' => $email));
+        $user = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findOneBy(['email' => $email]);
 
-        if (!$check_mail) {
-
-            return new Response('¡Email no encontrado!');
+        if ($user) {
+            return new Response('¡Este email ya esta registrado!');
         } else {
 
-            $id = $check_mail[0]->getId();
+            $check_mail = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->findBy(array('master.email' => $email));
 
-            $medical_center_master = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->find($id);
-            $arrayMaster = $medical_center_master->getMaster();
-            $name_medical_center = $medical_center_master->getName();
-            $arrayEmailMaster = $arrayMaster[0]["email"];
-            $arrayCodeValidationMaster = $arrayMaster[0]["validation_code"];
-            $arrayStatusMaster = $arrayMaster[0]["status"];
+            if (!$check_mail) {
 
-            if (($arrayCodeValidationMaster != "") && ($arrayStatusMaster == "1")) {
+                return new Response('¡Email no encontrado!');
+            } else {
 
-                return new Response('¡Ya le fue enviado un codigo de validacion, por favor revise su correo!');
-            } else if (($arrayCodeValidationMaster != "") && ($arrayStatusMaster == "2")) {
+                $id = $check_mail[0]->getId();
 
-                $key = '';
-                $pattern = '1234567890abcdefghijklmnopqrstuvwxyz';
-                $max = strlen($pattern) - 1;
-                for ($i = 0; $i < 6; $i++)
-                    $key .= $pattern{mt_rand(0, $max)};
+                $medical_center_master = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->find($id);
+                $arrayMaster = $medical_center_master->getMaster();
+                $name_medical_center = $medical_center_master->getName();
+                $arrayEmailMaster = $arrayMaster[0]["email"];
+                $arrayCodeValidationMaster = $arrayMaster[0]["validation_code"];
+                $arrayStatusMaster = $arrayMaster[0]["status"];
 
-                $cod_enc = sha1($key);
+                if (($arrayCodeValidationMaster != "") && ($arrayStatusMaster == "1")) {
 
-                $arrayMaster[0]["validation_code"] = $cod_enc;
-                $arrayMaster[0]["status"] = "1";
-                $arrayMaster[0]["created_at"] = $date;
+                    return new Response('¡Ya le fue enviado un codigo de validacion, por favor revise su correo e ingrese el codigo!');
+                } else if (($arrayCodeValidationMaster != "") && ($arrayStatusMaster == "2")) {
 
-                $medical_center_master->setMaster($arrayMaster);
-                $dm = $this->get('doctrine_mongodb')->getManager();
-                $dm->persist($medical_center_master);
-                $dm->flush();
+                    $key = '';
+                    $pattern = '1234567890abcdefghijklmnopqrstuvwxyz';
+                    $max = strlen($pattern) - 1;
+                    for ($i = 0; $i < 6; $i++)
+                        $key .= $pattern{mt_rand(0, $max)};
 
+                    $cod_enc = sha1($key);
 
-                $mailer = $this->container->get('mailer');
+                    $arrayMaster[0]["validation_code"] = $cod_enc;
+                    $arrayMaster[0]["status"] = "1";
+                    $arrayMaster[0]["created_at"] = $date;
 
-                $transport = \Swift_SmtpTransport::newInstance('smtp.gmail.com', 587)
-                        ->setUsername('smartclinicsoft@gmail.com')
-                        ->setPassword('smartclinic1');
-
-                $mailer = \Swift_Mailer::newInstance($transport);
-                $message = \Swift_Message::newInstance('Test')
-                        ->setSubject('Codigo de Validacion')
-                        ->setFrom('smartclinicsoft@gmail.com')
-                        ->setTo($email)
-                        ->setBody('Estimado(a) cliente: ' . $name_medical_center . ', su codigo de validacion para el regsitro en Smart Clinic es: ' . $key . '');
-                $this->get('mailer')->send($message);
-
-                return new Response('Operacion exitosa');
-            } else if (($arrayCodeValidationMaster == "") && ($arrayStatusMaster == "0")) {
-
-                $key = '';
-                $pattern = '1234567890abcdefghijklmnopqrstuvwxyz';
-                $max = strlen($pattern) - 1;
-                for ($i = 0; $i < 6; $i++)
-                    $key .= $pattern{mt_rand(0, $max)};
-
-                $cod_enc = sha1($key);
-
-                $arrayMaster[0]["validation_code"] = $cod_enc;
-                $arrayMaster[0]["status"] = "1";
-                $arrayMaster[0]["created_at"] = $date;
-
-                $medical_center_master->setMaster($arrayMaster);
-                $dm = $this->get('doctrine_mongodb')->getManager();
-                $dm->persist($medical_center_master);
-                $dm->flush();
+                    $medical_center_master->setMaster($arrayMaster);
+                    $dm = $this->get('doctrine_mongodb')->getManager();
+                    $dm->persist($medical_center_master);
+                    $dm->flush();
 
 
-                $mailer = $this->container->get('mailer');
+                    $mailer = $this->container->get('mailer');
 
-                $transport = \Swift_SmtpTransport::newInstance('smtp.gmail.com', 587)
-                        ->setUsername('smartclinicsoft@gmail.com')
-                        ->setPassword('smartclinic1');
+                    $transport = \Swift_SmtpTransport::newInstance('smtp.gmail.com', 587)
+                            ->setUsername('smartclinicsoft@gmail.com')
+                            ->setPassword('smartclinic1');
 
-                $mailer = \Swift_Mailer::newInstance($transport);
-                $message = \Swift_Message::newInstance('Test')
-                        ->setSubject('Codigo de Validacion')
-                        ->setFrom('smartclinicsoft@gmail.com')
-                        ->setTo($email)
-                        ->setBody('Estimado(a) cliente: ' . $name_medical_center . ', su codigo de validacion para el registro en Smart Clinic es: ' . $key . '');
-                $this->get('mailer')->send($message);
+                    $mailer = \Swift_Mailer::newInstance($transport);
+                    $message = \Swift_Message::newInstance('Test')
+                            ->setSubject('Codigo de Validacion')
+                            ->setFrom('smartclinicsoft@gmail.com')
+                            ->setTo($email)
+                            ->setBody('Estimado(a) cliente: ' . $name_medical_center . ', su codigo de validacion para el registro en Smart Clinic es: ' . $key . '');
+                    $this->get('mailer')->send($message);
 
-                return new Response('Operacion exitosa');
+                    return new Response('Operacion exitosa');
+                } else if (($arrayCodeValidationMaster == "") && ($arrayStatusMaster == "0")) {
+
+                    $key = '';
+                    $pattern = '1234567890abcdefghijklmnopqrstuvwxyz';
+                    $max = strlen($pattern) - 1;
+                    for ($i = 0; $i < 6; $i++)
+                        $key .= $pattern{mt_rand(0, $max)};
+
+                    $cod_enc = sha1($key);
+
+                    $arrayMaster[0]["validation_code"] = $cod_enc;
+                    $arrayMaster[0]["status"] = "1";
+                    $arrayMaster[0]["created_at"] = $date;
+
+                    $medical_center_master->setMaster($arrayMaster);
+                    $dm = $this->get('doctrine_mongodb')->getManager();
+                    $dm->persist($medical_center_master);
+                    $dm->flush();
+
+
+                    $mailer = $this->container->get('mailer');
+
+                    $transport = \Swift_SmtpTransport::newInstance('smtp.gmail.com', 587)
+                            ->setUsername('smartclinicsoft@gmail.com')
+                            ->setPassword('smartclinic1');
+
+                    $mailer = \Swift_Mailer::newInstance($transport);
+                    $message = \Swift_Message::newInstance('Test')
+                            ->setSubject('Codigo de Validacion')
+                            ->setFrom('smartclinicsoft@gmail.com')
+                            ->setTo($email)
+                            ->setBody('Estimado(a) cliente: ' . $name_medical_center . ', su codigo de validacion para el registro en Smart Clinic es: ' . $key . '');
+                    $this->get('mailer')->send($message);
+
+                    return new Response('Operacion exitosa');
+                }
             }
         }
     }
@@ -347,10 +355,10 @@ class ApiRestUserController extends Controller {
 //        return new Response('HOLA');
         $token = $this->get('lexik_jwt_authentication.encoder')
                 ->encode([
-                            'username' => $user->getEmail(), 'id' => $user->getId(), 
-                            'profile_is_default' => $user->getProfileIsDefault(), 
-                            'profile' => $user->getProfile()
-                        ]);
+            'username' => $user->getEmail(), 'id' => $user->getId(),
+            'profile_is_default' => $user->getProfileIsDefault(),
+            'profile' => $user->getProfile()
+        ]);
 
         return new JsonResponse(['token' => $token]);
     }
@@ -502,7 +510,7 @@ class ApiRestUserController extends Controller {
 
     /**
      * @Route("/api/ResetPassword")     
-     * @Method("PUT")
+     * @Method("POST")
      */
     public function ResetPasswordAction(Request $request) {
 
@@ -515,9 +523,12 @@ class ApiRestUserController extends Controller {
 
         $check_user_front = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findBy(array('email' => $email));
 
-        if (($email == "") || ($password == "")) {
+        if ($email == "") {
 
-            return new Response('Campos vacios');
+            return new Response('Ingrese el email');
+        } else if ($password == "") {
+
+            return new Response('Ingrese la contraseña');
         } else if (!$check_user_front) {
 
             return new Response('¡Email no encontrado!');
@@ -553,9 +564,17 @@ class ApiRestUserController extends Controller {
 //        if ($option == "questions") {
 
         $GeneralConfiguration = $this->get('doctrine_mongodb')->getRepository('AppBundle:GeneralConfiguration')->find("5ae08f86c5dfa106dc92610a");
-        $ArrayLanguajes = $GeneralConfiguration->getSecretQuestions();
+        $ArraySecretQuestions = $GeneralConfiguration->getSecretQuestions();
 
-        $jsonContent = $serializer->serialize($ArrayLanguajes, 'json');
+        foreach ($ArraySecretQuestions as $travelArraySecretQuestions) {
+            $arrayQuestions[] = array(
+                "value" => $travelArraySecretQuestions,
+                "label" => $travelArraySecretQuestions,
+            );
+        }
+
+
+        $jsonContent = $serializer->serialize($arrayQuestions, 'json');
 
         return new Response($jsonContent);
 //        }

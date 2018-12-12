@@ -523,6 +523,107 @@ class ApiRestUsersNoMasterController extends Controller {
     }
 
     /**
+     * @Route("/api/ViewRolId")     
+     * @Method("POST")
+     */
+    public function ViewRolIdAction(Request $request) {
+
+        $fechaNow = new \MongoDate();
+
+        $token = $request->headers->get('access-token');
+        if ($token == "") {
+
+            $data = array('message' => 'Token invalido');
+            return new JsonResponse($data, 403);
+        } else {
+
+            $data_token = $this->get('lexik_jwt_authentication.encoder')->decode($token);
+
+            if ($data_token == false) {
+
+                $data = array('message' => 'Authentication Required');
+                return new JsonResponse($data, 403);
+            } else {
+
+                $user_id = $data_token["id"];
+                $user = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findOneBy(['_id' => $user_id]);
+                if ($user) {
+
+                    $medicalCenterId = "";
+                    if ($data_token["profile_is_default"] == "internal") {
+                        foreach ($data_token['profile'] as $valor) {
+
+                            foreach ($valor->medical_center as $valorMedicalCenter) {
+                                if ($valorMedicalCenter->is_default == "1") {
+                                    $medicalCenterId = $valorMedicalCenter->_id;
+                                }
+                            }
+                        }
+                    }
+
+//                  AQUI EMPIEZA LA LOGICA DEL EDIT  
+                    $rolId = $request->request->get("rolId");
+
+                    $medicalcenter = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->find($medicalCenterId);
+                    $arrayRoles = $medicalcenter->getRoles();
+
+                    $GeneralConfiguration = $this->get('doctrine_mongodb')->getRepository('AppBundle:GeneralConfiguration')->find("5ae08f86c5dfa106dc92610a");
+                    $arrayModulesGeneral = $GeneralConfiguration->getModules();
+
+                    foreach ($arrayRoles as $key => $travelArrayRoles) {
+                        if ($rolId == $travelArrayRoles["_id"]) {
+
+                            $nameRol = $travelArrayRoles["rol"];
+
+                            foreach ($travelArrayRoles["modules"] as $travelArrayModules) {
+
+                                $nameModule = $travelArrayModules["name"];
+
+                                foreach ($travelArrayModules["permits"] as $travelArrayPermits) {
+
+                                    foreach ($arrayModulesGeneral as $travelArrayModulesGeneral) {
+
+                                        if ($nameModule == $travelArrayModulesGeneral["name"]) {
+
+                                            foreach ($travelArrayModulesGeneral["permits"] as $travelArrayPermitsGeneral) {
+
+                                                if ($travelArrayPermits == $travelArrayPermitsGeneral["permit"]) {
+
+
+                                                    $permits = $travelArrayPermitsGeneral["_id"] . "-" . $travelArrayPermitsGeneral["permit"];
+                                                }
+                                            }
+                                            $arrayPermits[] = $nameModule . "-" . $permits;
+                                        }
+                                    }
+
+                                    //var_dump($arra);
+                                }
+                            }
+                            $arrayEnd = array(
+                                "rol" => $nameRol,
+                                "modules" => $arrayPermits,
+                            );
+                            $encoders = array(new XmlEncoder(), new JsonEncoder());
+                            $normalizers = array(new ObjectNormalizer());
+
+                            $serializer = new Serializer($normalizers, $encoders);
+
+                            $jsonContent = $serializer->serialize($arrayEnd, 'json');
+
+                            return new Response($jsonContent);
+                        }
+                    }
+                } else {
+
+                    $data = array('message' => 'Error al consultar los datos, problemas con el token');
+                    return new JsonResponse($data, 403);
+                }
+            }
+        }
+    }
+
+    /**
      * @Route("/api/LoadSelectBranchOffices")     
      * @Method("GET")
      */
@@ -785,8 +886,6 @@ class ApiRestUsersNoMasterController extends Controller {
 
                         $email = $request->request->get("email");
                         $sucursal = $request->request->get("sucursal");
-                        $rol = $request->request->get("rol");
-                        $modules = $request->request->get("modules");
                         $onlyModules = $request->request->get("onlyModules");
 
                         if ($email == "") {
@@ -795,50 +894,66 @@ class ApiRestUsersNoMasterController extends Controller {
                         } else if (($sucursal == "") || ($sucursal == null)) {
 
                             return new Response('Seleccione la sucursal');
-                        } else if ((($rol == "") || ($rol == null)) && (($modules == "") || ($modules == null))) {
-
-                            return new Response('Seleccione el rol o los modulos');
                         } else {
 
-                            /////////////////////////////////ROLES Y MODULOS
-                            if (!empty($modules)) {
+                            foreach ($sucursal as $key => $travelSucursal) {
 
-                                foreach ($onlyModules as $travelOnlyModules) {
+                                if ($key == 0) {
+                                    $is_default = 1;
+                                } else {
+                                    $is_default = 0;
+                                }
 
-                                    foreach ($modules as $travelSelected) {
+                                if (!empty($travelSucursal["modulos"])) {
 
-                                        $partesSelected = explode("-", $travelSelected);
+                                    foreach ($onlyModules as $travelOnlyModules) {
 
-                                        if ($travelOnlyModules == $partesSelected[0]) {
+                                        foreach ($travelSucursal["modulos"] as $travelSelected) {
 
-                                            $arrayPemits[] = $partesSelected[2];
+                                            $partesSelected = explode("-", $travelSelected);
+
+                                            if ($travelOnlyModules == $partesSelected[0]) {
+
+                                                $arrayPemits[] = $partesSelected[2];
+                                            }
+                                        }
+                                        if (!empty($arrayPemits)) {
+
+                                            $arrayModules[] = array(
+                                                "name" => $travelOnlyModules,
+                                                "type" => 1,
+                                                "permits" => $arrayPemits
+                                            );
+
+                                            unset($arrayPemits);
                                         }
                                     }
-                                    if (!empty($arrayPemits)) {
+                                    $arrayPermission = $arrayModules;
+                                    unset($arrayModules);
+                                    //var_dump($arrayPermission);
+                                }
 
-                                        $arrayModules[] = array(
-                                            "name" => $travelOnlyModules,
-                                            "type" => 1,
-                                            "permits" => $arrayPemits
+                                if (!empty($travelSucursal["rol"])) {
+                                    if ($travelSucursal["rol"]["value"] != "0") {
+                                        $arrayRol = array(
+                                            "_id" => $travelSucursal["rol"]["value"],
+                                            "name" => $travelSucursal["rol"]["label"],
+                                            "type" => 0
                                         );
 
-                                        unset($arrayPemits);
+                                        $arrayPermission[] = $arrayRol;
+                                        unset($arrayRol);
                                     }
                                 }
-                                $arrayPermission = $arrayModules;
-                            }
 
-                            if (!empty($rol)) {
-
-                                $arrayRol = array(
-                                    "_id" => $rol["value"],
-                                    "name" => $rol["label"],
-                                    "type" => 0
+                                $arrayBranchOffices[] = array(
+                                    "_id" => $travelSucursal["value"],
+                                    "name" => $travelSucursal["label"],
+                                    "is_default" => $is_default,
+                                    "permission" => $arrayPermission
                                 );
-
-                                $arrayPermission[] = $arrayRol;
+                                unset($arrayPermission);
                             }
-                            /////////////////////////////////ROLES Y MODULOS
 
                             $userExist = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findOneBy(array('email' => $email));
                             if ($userExist) {
@@ -851,57 +966,26 @@ class ApiRestUsersNoMasterController extends Controller {
                                 $acumSucursalesDesIgual = 0;
                                 $acumIsDefaultMedicalCenter = 0;
                                 $acumIsDefaultSucursal = 0;
+
                                 foreach ($userExist->getProfile() as $key => $travelUserExistProfile) {
+
                                     if ($travelUserExistProfile["name"] == "internal") {
+
                                         $pos = $key;
 
                                         $arrayMedicalCenter = $travelUserExistProfile["medical_center"];
 
                                         foreach ($travelUserExistProfile["medical_center"] as $keyMedical => $travelMedicalCenter) {
+
                                             if ($travelMedicalCenter["is_default"] == "1") {
                                                 $acumIsDefaultMedicalCenter++;
                                             }
 
-
                                             if ($travelMedicalCenter["_id"] == $medicalCenterId) {
+
                                                 $aisDefaultMedicalCenterSucursal = $travelMedicalCenter["is_default"];
                                                 $posMedical = $keyMedical;
                                                 $acum++;
-                                                $arrayBranchOffices = $travelMedicalCenter["branch_office"];
-                                                foreach ($sucursal as $key => $travelSucursal) {
-
-                                                    foreach ($travelMedicalCenter["branch_office"] as $travelBranchOffice) {
-                                                        if ($travelBranchOffice["is_default"] == "1") {
-                                                            $acumIsDefaultSucursal++;
-                                                        }
-
-                                                        if ($travelBranchOffice["_id"] == $travelSucursal["value"]) {
-
-                                                            $acumSucursalesIgual++;
-                                                        } else {
-
-                                                            $acumSucursalesDesIgual = $acumSucursalesIgual;
-                                                        }
-                                                    }
-
-                                                    if (($acumSucursalesIgual == 0) && ($acumSucursalesDesIgual == 0)) {
-
-                                                        if ($acumIsDefaultSucursal == 1) {
-                                                            $isDefaultSucursal = 0;
-                                                        } else {
-                                                            $isDefaultSucursal = 1;
-                                                        }
-
-                                                        $arrayBranchOffices[] = array(
-                                                            "_id" => $travelSucursal["value"],
-                                                            "name" => $travelSucursal["label"],
-                                                            "is_default" => $isDefaultSucursal,
-                                                            "permission" => $arrayPermission
-                                                        );
-                                                    }
-                                                    $acumSucursalesIgual = 0;
-                                                    $acumSucursalesDesIgual = 0;
-                                                }
                                             }
                                         }
                                     }
@@ -913,22 +997,6 @@ class ApiRestUsersNoMasterController extends Controller {
                                         $isDefaultMedicalCenter = 0;
                                     } else {
                                         $isDefaultMedicalCenter = 1;
-                                    }
-
-                                    foreach ($sucursal as $key => $travelSucursal) {
-
-                                        if ($key == 0) {
-                                            $is_default = 1;
-                                        } else {
-                                            $is_default = 0;
-                                        }
-
-                                        $arrayBranchOffices[] = array(
-                                            "_id" => $travelSucursal["value"],
-                                            "name" => $travelSucursal["label"],
-                                            "is_default" => $is_default,
-                                            "permission" => $arrayPermission
-                                        );
                                     }
 
                                     $arrayMedicalCenter[] = array(
@@ -949,45 +1017,58 @@ class ApiRestUsersNoMasterController extends Controller {
                                     //$dm->persist($user_front);
                                     $dm->flush();
 
+                                    $html = "<h3>Se realizaron modificaciones en su usuario en Smart Clinic:</h3>";
+                                    $html .= "<table style='width: 50%; text-align: left;'>";
+                                    foreach ($arrayProfile as $key => $travelProfile) {
+                                        foreach ($travelProfile["medical_center"] as $travelMedicalCenter) {
+                                            $html .= "<tr>";
+                                            $html .= "<td bgcolor='#E3E3E4'><strong>Centro Medico: </strong></td>";
+                                            $html .= "<td bgcolor='#E3E3E4'>" . $travelMedicalCenter["name"] . "</td>";
+                                            $html .= "</tr>";
+                                            foreach ($travelMedicalCenter["branch_office"] as $travelBranchOffice) {
+                                                $html .= "<tr>";
+                                                $html .= "<td bgcolor='#E3E3E4'><strong>Sucursal: </strong></td>";
+                                                $html .= "<td bgcolor='#E3E3E4'>" . $travelBranchOffice["name"] . "</td>";
+                                                $html .= "</tr>";
+
+                                                foreach ($travelBranchOffice["permission"] as $travelPermission) {
+                                                    if ($travelPermission["type"] == 1) {
+                                                        $permiso = "Modulo: ";
+                                                    } else {
+                                                        $permiso = "Rol: ";
+                                                    }
+                                                    $html .= "<tr>";
+                                                    $html .= "<td bgcolor='#E3E3E4'><strong>" . $permiso . " </strong></td>";
+                                                    $html .= "<td bgcolor='#E3E3E4'>" . $travelPermission["name"] . "</td>";
+                                                    $html .= "</tr>";
+                                                }
+                                            }
+                                        }
+                                    }
+                                    $html .= "</table>";
+                                    //$html .= "<h3>Para continuar con el registro acceda al siguiente link:</h3>";
+                                    //$html .= "<a href='http://smartclinics.online/sc-front/#/register-email'>http://smartclinics.online/sc-front/#/register-email</a>";
+
+                                    $mailer = $this->container->get('mailer');
+                                    //$transport = \Swift_SmtpTransport::newInstance('smtp.gmail.com', 465, 'ssl')
+                                    $transport = \Swift_SmtpTransport::newInstance('smtp.gmail.com', 587)
+                                            ->setUsername('smartclinicsoft@gmail.com')
+                                            ->setPassword('smartclinic1');
+
+                                    $mailer = \Swift_Mailer::newInstance($transport);
+                                    $message = \Swift_Message::newInstance('Test')
+                                            ->setSubject('Registro de Usuario')
+                                            ->setFrom('smartclinicsoft@gmail.com')
+                                            ->setTo($email)
+                                            ->setBody($html, 'text/html');
+                                    $this->get('mailer')->send($message);
+
                                     return new Response('Operacion exitosa');
-                                } else if ($acum == 1) {
+                                } else {
 
-                                    $arrayMedicalCenter[$posMedical] = array(
-                                        "_id" => $medicalCenterId,
-                                        "name" => $nameMedicalCenter,
-                                        "is_default" => $aisDefaultMedicalCenterSucursal,
-                                        "branch_office" => $arrayBranchOffices
-                                    );
-
-                                    $arrayProfile[$pos] = array(
-                                        "name" => "internal",
-                                        "medical_center" => $arrayMedicalCenter
-                                    );
-
-                                    $user_front->setProfile($arrayProfile);
-//                        
-                                    $dm = $this->get('doctrine_mongodb')->getManager();
-                                    //$dm->persist($user_front);
-                                    $dm->flush();
-
-                                    return new Response('Operacion exitosa');
+                                    return new Response(1);
                                 }
                             } else {
-                                foreach ($sucursal as $key => $travelSucursal) {
-
-                                    if ($key == 0) {
-                                        $is_default = 1;
-                                    } else {
-                                        $is_default = 0;
-                                    }
-
-                                    $arrayBranchOffices[] = array(
-                                        "_id" => $travelSucursal["value"],
-                                        "name" => $travelSucursal["label"],
-                                        "is_default" => $is_default,
-                                        "permission" => $arrayPermission
-                                    );
-                                }
 
                                 $arrayMedicalCenter[] = array(
                                     "_id" => $medicalCenterId,
@@ -1021,12 +1102,805 @@ class ApiRestUsersNoMasterController extends Controller {
                                 $dm->persist($userFront);
                                 $dm->flush();
 
+
+                                $html = "<h3>Usted ha sido registrado en Smart Clinic:</h3>";
+                                $html .= "<table style='width: 50%; text-align: left;'>";
+                                foreach ($arrayProfile as $key => $travelProfile) {
+                                    foreach ($travelProfile["medical_center"] as $travelMedicalCenter) {
+                                        $html .= "<tr>";
+                                        $html .= "<td bgcolor='#E3E3E4'><strong>Centro Medico: </strong></td>";
+                                        $html .= "<td bgcolor='#E3E3E4'>" . $travelMedicalCenter["name"] . "</td>";
+                                        $html .= "</tr>";
+                                        foreach ($travelMedicalCenter["branch_office"] as $travelBranchOffice) {
+                                            $html .= "<tr>";
+                                            $html .= "<td bgcolor='#E3E3E4'><strong>Sucursal: </strong></td>";
+                                            $html .= "<td bgcolor='#E3E3E4'>" . $travelBranchOffice["name"] . "</td>";
+                                            $html .= "</tr>";
+
+                                            foreach ($travelBranchOffice["permission"] as $travelPermission) {
+                                                if ($travelPermission["type"] == 1) {
+                                                    $permiso = "Modulo: ";
+                                                } else {
+                                                    $permiso = "Rol: ";
+                                                }
+                                                $html .= "<tr>";
+                                                $html .= "<td bgcolor='#E3E3E4'><strong>" . $permiso . " </strong></td>";
+                                                $html .= "<td bgcolor='#E3E3E4'>" . $travelPermission["name"] . "</td>";
+                                                $html .= "</tr>";
+                                            }
+                                        }
+                                    }
+                                }
+                                $html .= "</table>";
+                                $html .= "<h3>Para continuar con el registro acceda al siguiente link:</h3>";
+                                $html .= "<a href='http://smartclinics.online/sc-front/#/register-email'>http://smartclinics.online/sc-front/#/register-email</a>";
+
+                                $mailer = $this->container->get('mailer');
+                                //$transport = \Swift_SmtpTransport::newInstance('smtp.gmail.com', 465, 'ssl')
+                                $transport = \Swift_SmtpTransport::newInstance('smtp.gmail.com', 587)
+                                        ->setUsername('smartclinicsoft@gmail.com')
+                                        ->setPassword('smartclinic1');
+
+                                $mailer = \Swift_Mailer::newInstance($transport);
+                                $message = \Swift_Message::newInstance('Test')
+                                        ->setSubject('Registro de Usuario')
+                                        ->setFrom('smartclinicsoft@gmail.com')
+                                        ->setTo($email)
+                                        ->setBody($html, 'text/html');
+                                $this->get('mailer')->send($message);
+
                                 return new Response('Operacion exitosa');
                             }
                         }
-
-                        return new Response("11111");
                     }
+                } else {
+
+                    $data = array('message' => 'Error al consultar los datos, problemas con el token');
+                    return new JsonResponse($data, 403);
+                }
+            }
+        }
+    }
+
+    /**
+     * @Route("/api/editUserNoMaster")     
+     * @Method("POST")
+     */
+    public function editUserNoMasterAction(Request $request) {
+
+        $fechaNow = new \MongoDate();
+
+        $token = $request->headers->get('access-token');
+        if ($token == "") {
+
+            $data = array('message' => 'Token invalido');
+            return new JsonResponse($data, 403);
+        } else {
+
+            $data_token = $this->get('lexik_jwt_authentication.encoder')->decode($token);
+
+            if ($data_token == false) {
+
+                $data = array('message' => 'Authentication Required');
+                return new JsonResponse($data, 403);
+            } else {
+
+                $user_id = $data_token["id"];
+                $user = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findOneBy(['_id' => $user_id]);
+                if ($user) {
+
+                    $medicalCenterId = "";
+                    if ($data_token["profile_is_default"] == "internal") {
+                        foreach ($data_token['profile'] as $valor) {
+
+                            foreach ($valor->medical_center as $valorMedicalCenter) {
+                                if ($valorMedicalCenter->is_default == "1") {
+                                    $medicalCenterId = $valorMedicalCenter->_id;
+                                    $medicalcenter = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->find($medicalCenterId);
+                                    $nameMedicalCenter = $medicalcenter->getName();
+                                }
+                            }
+                        }
+
+                        $id = $request->request->get("id");
+                        $email = $request->request->get("email");
+                        $sucursal = $request->request->get("sucursal");
+                        $onlyModules = $request->request->get("onlyModules");
+
+                        if ($email == "") {
+
+                            return new Response('Ingrese el email');
+                        } else if (($sucursal == "") || ($sucursal == null)) {
+
+                            return new Response('Seleccione la sucursal');
+                        } else {
+
+                            foreach ($sucursal as $key => $travelSucursal) {
+
+                                if ($key == 0) {
+                                    $is_default = 1;
+                                } else {
+                                    $is_default = 0;
+                                }
+
+                                if (!empty($travelSucursal["modulos"])) {
+
+                                    foreach ($onlyModules as $travelOnlyModules) {
+
+                                        foreach ($travelSucursal["modulos"] as $travelSelected) {
+                                            if ($travelSelected != "") {
+
+                                                $partesSelected = explode("-", $travelSelected);
+
+                                                if ($travelOnlyModules == $partesSelected[0]) {
+
+                                                    $arrayPemits[] = $partesSelected[2];
+                                                }
+                                            }
+                                        }
+                                        if (!empty($arrayPemits)) {
+
+                                            $arrayModules[] = array(
+                                                "name" => $travelOnlyModules,
+                                                "type" => 1,
+                                                "permits" => $arrayPemits
+                                            );
+
+                                            unset($arrayPemits);
+                                        }
+                                    }
+                                    $arrayPermission = $arrayModules;
+                                    unset($arrayModules);
+                                    //var_dump($arrayPermission);
+                                }
+
+                                if (!empty($travelSucursal["rol"])) {
+                                    if ($travelSucursal["rol"]["value"] != "0") {
+                                        $arrayRol = array(
+                                            "_id" => $travelSucursal["rol"]["value"],
+                                            "name" => $travelSucursal["rol"]["label"],
+                                            "type" => 0
+                                        );
+
+                                        $arrayPermission[] = $arrayRol;
+                                        unset($arrayRol);
+                                    }
+                                }
+
+                                $arrayBranchOffices[] = array(
+                                    "_id" => $travelSucursal["value"],
+                                    "name" => $travelSucursal["label"],
+                                    "is_default" => $is_default,
+                                    "permission" => $arrayPermission
+                                );
+                                unset($arrayPermission);
+                            }
+
+                            $userExist = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->find($id);
+                            if ($userExist) {
+
+                                $acum = 0;
+                                $acumIsDefaultMedicalCenter = 0;
+
+                                $arrayProfile = $userExist->getProfile();
+                                foreach ($arrayProfile as $key => $travelUserExistProfile) {
+
+                                    if ($travelUserExistProfile["name"] == "internal") {
+
+                                        $pos = $key;
+
+                                        foreach ($travelUserExistProfile["medical_center"] as $keyMedical => $travelMedicalCenter) {
+
+                                            if ($travelMedicalCenter["is_default"] == "1") {
+                                                $acumIsDefaultMedicalCenter++;
+                                            }
+
+                                            if ($travelMedicalCenter["_id"] == $medicalCenterId) {
+
+                                                $acum++;
+                                            }
+                                        }
+                                    }
+                                }
+                                if ($acumIsDefaultMedicalCenter == 1) {
+                                    $isDefaultMedicalCenter = 0;
+                                } else {
+                                    $isDefaultMedicalCenter = 1;
+                                }
+
+                                $arrayMedicalCenter[] = array(
+                                    "_id" => $medicalCenterId,
+                                    "name" => $nameMedicalCenter,
+                                    "is_default" => $isDefaultMedicalCenter,
+                                    "branch_office" => $arrayBranchOffices
+                                );
+
+                                $arrayProfile[$pos] = array(
+                                    "name" => "internal",
+                                    "medical_center" => $arrayMedicalCenter
+                                );
+
+                                $userExist->setEmail($email);
+                                $userExist->setProfile($arrayProfile);
+//                        
+                                $dm = $this->get('doctrine_mongodb')->getManager();
+                                //$dm->persist($user_front);
+                                $dm->flush();
+
+                                $html = "<h3>Se realizaron modificaciones en su usuario en Smart Clinic:</h3>";
+                                $html .= "<table style='width: 50%; text-align: left;'>";
+                                foreach ($arrayProfile as $key => $travelProfile) {
+                                    foreach ($travelProfile["medical_center"] as $travelMedicalCenter) {
+                                        $html .= "<tr>";
+                                        $html .= "<td bgcolor='#E3E3E4'><strong>Centro Medico: </strong></td>";
+                                        $html .= "<td bgcolor='#E3E3E4'>" . $travelMedicalCenter["name"] . "</td>";
+                                        $html .= "</tr>";
+                                        foreach ($travelMedicalCenter["branch_office"] as $travelBranchOffice) {
+                                            $html .= "<tr>";
+                                            $html .= "<td bgcolor='#E3E3E4'><strong>Sucursal: </strong></td>";
+                                            $html .= "<td bgcolor='#E3E3E4'>" . $travelBranchOffice["name"] . "</td>";
+                                            $html .= "</tr>";
+
+                                            foreach ($travelBranchOffice["permission"] as $travelPermission) {
+                                                if ($travelPermission["type"] == 1) {
+                                                    $permiso = "Modulo: ";
+                                                } else {
+                                                    $permiso = "Rol: ";
+                                                }
+                                                $html .= "<tr>";
+                                                $html .= "<td bgcolor='#E3E3E4'><strong>" . $permiso . " </strong></td>";
+                                                $html .= "<td bgcolor='#E3E3E4'>" . $travelPermission["name"] . "</td>";
+                                                $html .= "</tr>";
+                                            }
+                                        }
+                                    }
+                                }
+                                $html .= "</table>";
+                                //$html .= "<h3>Para continuar con el registro acceda al siguiente link:</h3>";
+                                //$html .= "<a href='http://smartclinics.online/sc-front/#/register-email'>http://smartclinics.online/sc-front/#/register-email</a>";
+
+                                $mailer = $this->container->get('mailer');
+                                //$transport = \Swift_SmtpTransport::newInstance('smtp.gmail.com', 465, 'ssl')
+                                $transport = \Swift_SmtpTransport::newInstance('smtp.gmail.com', 587)
+                                        ->setUsername('smartclinicsoft@gmail.com')
+                                        ->setPassword('smartclinic1');
+
+                                $mailer = \Swift_Mailer::newInstance($transport);
+                                $message = \Swift_Message::newInstance('Test')
+                                        ->setSubject('Registro de Usuario')
+                                        ->setFrom('smartclinicsoft@gmail.com')
+                                        ->setTo($email)
+                                        ->setBody($html, 'text/html');
+                                $this->get('mailer')->send($message);
+
+                                return new Response('Operacion exitosa');
+                            }
+                        }
+                    }
+                } else {
+
+                    $data = array('message' => 'Error al consultar los datos, problemas con el token');
+                    return new JsonResponse($data, 403);
+                }
+            }
+        }
+    }
+
+    /**
+     * @Route("/api/LoadAllUsersNoMaster")     
+     * @Method("GET")
+     */
+    public function LoadAllUsersNoMasterAction(Request $request) {
+
+        $token = $request->headers->get('access-token');
+        if ($token == "") {
+            $data = array('message' => 'Token invalido');
+            return new JsonResponse($data, 403);
+        } else {
+
+            $data_token = $this->get('lexik_jwt_authentication.encoder')->decode($token);
+
+            if ($data_token == false) {
+
+                $data = array('message' => 'Authentication Required');
+                return new JsonResponse($data, 403);
+            } else {
+
+                $user_id = $data_token["id"];
+                $user = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findOneBy(['_id' => $user_id]);
+                if ($user) {
+                    if ($data_token["profile_is_default"] == "internal") {
+                        foreach ($data_token['profile'] as $valor) {
+
+                            foreach ($valor->medical_center as $valorMedicalCenter) {
+                                if ($valorMedicalCenter->is_default == "1") {
+                                    $medicalcenter = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->find($valorMedicalCenter->_id);
+                                    $medicalCenterId = $medicalcenter->getId();
+                                }
+                            }
+                        }
+                    }
+
+                    $allUsersNoMaster = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findBy(array('profile.medical_center._id' => $medicalCenterId, 'enabled' => 1));
+
+                    foreach ($allUsersNoMaster as $travelAllUsersNoMaster) {
+                        $email = $travelAllUsersNoMaster->getEmail();
+                        $id = $travelAllUsersNoMaster->getId();
+                        $estado = $travelAllUsersNoMaster->getEnabled();
+
+                        foreach ($travelAllUsersNoMaster->getProfile() as $travelProfile) {
+
+                            if ($travelProfile["name"] == "internal") {
+
+                                foreach ($travelProfile["medical_center"] as $travelMedicalCenter) {
+
+                                    if ($travelMedicalCenter["_id"] == $medicalCenterId) {
+                                        $acumMAster = 0;
+                                        foreach ($travelMedicalCenter["branch_office"] as $travelBranchOffice) {
+
+                                            foreach ($travelBranchOffice["permission"] as $travelPermission) {
+
+                                                if ($travelPermission["name"] == "MASTER") {
+                                                    $acumMAster++;
+                                                }
+                                            }
+                                        }
+                                        if ($acumMAster == 0) {
+                                            $arrayUsersNoMaster[] = array(
+                                                "id" => $id,
+                                                "email" => $email,
+                                                "estado" => $estado
+                                            );
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    $arrayEnd = array(
+                        "users" => $arrayUsersNoMaster
+                    );
+                    $encoders = array(new XmlEncoder(), new JsonEncoder());
+                    $normalizers = array(new ObjectNormalizer());
+
+                    $serializer = new Serializer($normalizers, $encoders);
+
+                    $jsonContent = $serializer->serialize($arrayEnd, 'json');
+
+                    return new Response($jsonContent);
+                } else {
+
+                    $data = array('message' => 'Error al consultar los datos, problemas con el token');
+                    return new JsonResponse($data, 403);
+                }
+            }
+        }
+    }
+
+    /**
+     * @Route("/api/ValidateEmailUserNoMaster")     
+     * @Method("POST")
+     */
+    public function ValidateEmailUserNoMasterAction(Request $request) {
+
+        $fechaNow = new \MongoDate();
+
+        $token = $request->headers->get('access-token');
+        if ($token == "") {
+
+            $data = array('message' => 'Token invalido');
+            return new JsonResponse($data, 403);
+        } else {
+
+            $data_token = $this->get('lexik_jwt_authentication.encoder')->decode($token);
+
+            if ($data_token == false) {
+
+                $data = array('message' => 'Authentication Required');
+                return new JsonResponse($data, 403);
+            } else {
+
+                $user_id = $data_token["id"];
+                $user = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findOneBy(['_id' => $user_id]);
+                if ($user) {
+
+                    $medicalCenterId = "";
+                    if ($data_token["profile_is_default"] == "internal") {
+                        foreach ($data_token['profile'] as $valor) {
+
+                            foreach ($valor->medical_center as $valorMedicalCenter) {
+                                if ($valorMedicalCenter->is_default == "1") {
+                                    $medicalCenterId = $valorMedicalCenter->_id;
+                                }
+                            }
+                        }
+                    }
+
+//                  AQUI EMPIEZA LA LOGICA DEL EDIT  
+                    $email = $request->request->get("email");
+
+                    $emailUserNoMaster = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findOneBy(array('email' => $email));
+                    if ($emailUserNoMaster) {
+                        $estadoUser = $emailUserNoMaster->getEnabled();
+
+                        foreach ($emailUserNoMaster->getProfile() as $travelProfile) {
+
+                            if ($travelProfile["name"] == "internal") {
+                                $profile = "Personal Interno";
+                            } else if ($travelProfile["name"] == "external") {
+                                $profile = "Personal Externo";
+                            } else if ($travelProfile["name"] == "client") {
+                                $profile = "Cliente";
+                            }
+                            $acumMedicalCenter = 0;
+                            foreach ($travelProfile["medical_center"] as $travelMedicalCenter) {
+                                $medicalCenter = $travelMedicalCenter["name"];
+                                $medicalCenterId = $travelMedicalCenter["_id"];
+                                if ($travelMedicalCenter["_id"] == $medicalCenterId) {
+                                    $acumMedicalCenter++;
+                                }
+
+                                foreach ($travelMedicalCenter["branch_office"] as $travelBranchOffice) {
+
+                                    $branchOffice = $travelBranchOffice["name"];
+                                    $branchOfficeId = $travelBranchOffice["_id"];
+
+                                    foreach ($travelBranchOffice["permission"] as $travelPermission) {
+
+                                        if ($travelPermission["type"] == 1) {
+                                            $permiso = "Modulo: " . $travelPermission["name"];
+                                        } else {
+                                            $permiso = "Rol: " . $travelPermission["name"];
+                                        }
+                                        $arrayPermission[] = array(
+                                            "name" => $permiso
+                                        );
+                                    }
+                                    $arrayBranchOffices[] = array(
+                                        "branchOfficeId" => $branchOfficeId,
+                                        "name" => $branchOffice,
+                                        "permission" => $arrayPermission
+                                    );
+                                    unset($arrayPermission);
+                                }
+                                $arrayMedicalCenter[] = array(
+                                    "medicalCenterId" => $medicalCenterId,
+                                    "name" => $medicalCenter,
+                                    "branchOffice" => $arrayBranchOffices
+                                );
+                                unset($arrayBranchOffices);
+                            }
+                        }
+                        $arrayEnd = array(
+                            "exist" => $acumMedicalCenter,
+                            "estado" => $estadoUser,
+                            "infoEmail" => $arrayMedicalCenter
+                        );
+                    } else {
+                        $arrayEnd = null;
+                    }
+
+                    $encoders = array(new XmlEncoder(), new JsonEncoder());
+                    $normalizers = array(new ObjectNormalizer());
+
+                    $serializer = new Serializer($normalizers, $encoders);
+
+                    $jsonContent = $serializer->serialize($arrayEnd, 'json');
+
+                    return new Response($jsonContent);
+                } else {
+
+                    $data = array('message' => 'Error al consultar los datos, problemas con el token');
+                    return new JsonResponse($data, 403);
+                }
+            }
+        }
+    }
+
+    /**
+     * @Route("/api/LoadIdUsersNoMaster")     
+     * @Method("POST")
+     */
+    public function LoadIdUsersNoMasterAction(Request $request) {
+
+        $token = $request->headers->get('access-token');
+        if ($token == "") {
+            $data = array('message' => 'Token invalido');
+            return new JsonResponse($data, 403);
+        } else {
+
+            $data_token = $this->get('lexik_jwt_authentication.encoder')->decode($token);
+
+            if ($data_token == false) {
+
+                $data = array('message' => 'Authentication Required');
+                return new JsonResponse($data, 403);
+            } else {
+
+                $user_id = $data_token["id"];
+                $user = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findOneBy(['_id' => $user_id]);
+                if ($user) {
+                    if ($data_token["profile_is_default"] == "internal") {
+                        foreach ($data_token['profile'] as $valor) {
+
+                            foreach ($valor->medical_center as $valorMedicalCenter) {
+                                if ($valorMedicalCenter->is_default == "1") {
+                                    $medicalcenter = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->find($valorMedicalCenter->_id);
+                                    $medicalCenterId = $medicalcenter->getId();
+                                }
+                            }
+                        }
+                    }
+                    $id = $request->request->get("id");
+                    $userId = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->find($id);
+                    $email = $userId->getEmail();
+
+                    $GeneralConfiguration = $this->get('doctrine_mongodb')->getRepository('AppBundle:GeneralConfiguration')->find("5ae08f86c5dfa106dc92610a");
+                    $arrayModulesGeneral = $GeneralConfiguration->getModules();
+
+                    foreach ($userId->getProfile() as $travelUserId) {
+                        if ($travelUserId["name"] == "internal") {
+
+                            foreach ($travelUserId["medical_center"] as $travelMedicalCenter) {
+
+                                if ($travelMedicalCenter["_id"] == $medicalCenterId) {
+
+                                    foreach ($travelMedicalCenter["branch_office"] as $travelBranchOffice) {
+
+                                        foreach ($travelBranchOffice["permission"] as $travelPermission) {
+
+                                            if ($travelPermission["type"] == 0) {
+
+                                                $arrayRol = array(
+                                                    "label" => $travelPermission["name"],
+                                                    "value" => $travelPermission["_id"]
+                                                );
+                                                $arrayPermits[] = "";
+                                            } else {
+                                                $arrayRol = array(
+                                                    "label" => "Sin Rol seleccionado",
+                                                    "value" => "0"
+                                                );
+                                                $nameModule = $travelPermission["name"];
+                                                foreach ($travelPermission["permits"] as $travelArrayPermits) {
+
+                                                    foreach ($arrayModulesGeneral as $travelArrayModulesGeneral) {
+
+                                                        if ($nameModule == $travelArrayModulesGeneral["name"]) {
+
+                                                            foreach ($travelArrayModulesGeneral["permits"] as $travelArrayPermitsGeneral) {
+
+                                                                if ($travelArrayPermits == $travelArrayPermitsGeneral["permit"]) {
+                                                                    $permits = $travelArrayPermitsGeneral["_id"] . "-" . $travelArrayPermitsGeneral["permit"];
+                                                                    $arrayPermits[] = $nameModule . "-" . $permits;
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        $arrayBranhOffice[] = array(
+                                            "label" => $travelBranchOffice["name"],
+                                            "value" => $travelBranchOffice["_id"],
+                                            "rol" => $arrayRol,
+                                            "modulos" => $arrayPermits
+                                        );
+                                        unset($arrayPermits);
+                                        unset($arrayRol);
+                                    }
+
+                                    $arrayEnd = array(
+                                        "email" => $email,
+                                        "sucursal" => $arrayBranhOffice
+                                    );
+                                }
+                            }
+                            $encoders = array(new XmlEncoder(), new JsonEncoder());
+                            $normalizers = array(new ObjectNormalizer());
+                            $serializer = new Serializer($normalizers, $encoders);
+                            $jsonContent = $serializer->serialize($arrayEnd, 'json');
+                            return new Response($jsonContent);
+                        }
+                    }
+                } else {
+
+                    $data = array('message' => 'Error al consultar los datos, problemas con el token');
+                    return new JsonResponse($data, 403);
+                }
+            }
+        }
+    }
+
+    /**
+     * @Route("/api/DeleteUserNoMaster")     
+     * @Method("POST")
+     */
+    public function DeleteUserNoMasterAction(Request $request) {
+
+        $token = $request->headers->get('access-token');
+        if ($token == "") {
+            $data = array('message' => 'Token invalido');
+            return new JsonResponse($data, 403);
+        } else {
+
+            $data_token = $this->get('lexik_jwt_authentication.encoder')->decode($token);
+
+            if ($data_token == false) {
+
+                $data = array('message' => 'Authentication Required');
+                return new JsonResponse($data, 403);
+            } else {
+
+                $user_id = $data_token["id"];
+                $user = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findOneBy(['_id' => $user_id]);
+                if ($user) {
+                    if ($data_token["profile_is_default"] == "internal") {
+                        foreach ($data_token['profile'] as $valor) {
+
+                            foreach ($valor->medical_center as $valorMedicalCenter) {
+                                if ($valorMedicalCenter->is_default == "1") {
+                                    $medicalcenter = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->find($valorMedicalCenter->_id);
+                                }
+                            }
+                        }
+                    }
+
+                    $userId = $request->request->get("userId");
+                    $userFront = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->find($userId);
+                    $userFront->setEnabled(0);
+                    $dm = $this->get('doctrine_mongodb')->getManager();
+                    $dm->flush();
+                    return new Response('Operacion exitosa');
+                } else {
+
+                    $data = array('message' => 'Error al consultar los datos, problemas con el token');
+                    return new JsonResponse($data, 403);
+                }
+            }
+        }
+    }
+
+    /**
+     * @Route("/api/enviarEmail")     
+     * @Method("PUT")
+     */
+    public function enviarEmailAction(Request $request) {
+
+        $date = new \MongoDate();
+        $email = $request->request->get("email");
+
+        $check_mail = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->findBy(array('master.email' => $email));
+
+        if (!$check_mail) {
+
+            return new Response('¡Email no encontrado!');
+        } else {
+
+            $mailer = $this->container->get('mailer');
+
+            //$transport = \Swift_SmtpTransport::newInstance('smtp.gmail.com', 465, 'ssl')
+            $transport = \Swift_SmtpTransport::newInstance('smtp.gmail.com', 587)
+                    ->setUsername('smartclinicsoft@gmail.com')
+                    ->setPassword('smartclinic1');
+
+            $mailer = \Swift_Mailer::newInstance($transport);
+            $message = \Swift_Message::newInstance('Test')
+                    ->setSubject('Codigo de Validacion')
+                    ->setFrom('smartclinicsoft@gmail.com')
+                    ->setTo($email)
+                    ->setBody('
+                        <h3>Usted ha sido registrado en Smart Clinic:</h3> 
+                        <table style="width: 30%; text-align: left;">
+                            <tr>
+                              <td bgcolor="#E3E3E4"><strong>Centro Medico: </strong></td>
+                              <td bgcolor="#E3E3E4">Policlinica</td>  
+                            </tr>
+                            <tr>
+                              <td bgcolor="#E3E3E4"><strong>Sucursal: </strong></td>
+                              <td bgcolor="#E3E3E4">Madre Teresa</td>                          
+                            </tr>
+                            <tr>
+                              <td bgcolor="#E3E3E4"><strong>Rol: </strong></td>
+                              <td bgcolor="#E3E3E4">Interno</td>                          
+                            </tr>                        
+                        </table>
+                        <h3>Para continuar con el registro acceda al siguiente link:</h3>
+                        http://smartclinics.online/sc-front/#/register-email', 'text/html');
+            $this->get('mailer')->send($message);
+
+            return new Response('Operacion exitosa');
+        }
+    }
+
+    /**
+     * @Route("/api/RolesPermisosValidateEmailUserNoMaster")     
+     * @Method("POST")
+     */
+    public function RolesPermisosValidateEmailUserNoMasterAction(Request $request) {
+
+        $fechaNow = new \MongoDate();
+
+        $token = $request->headers->get('access-token');
+        if ($token == "") {
+
+            $data = array('message' => 'Token invalido');
+            return new JsonResponse($data, 403);
+        } else {
+
+            $data_token = $this->get('lexik_jwt_authentication.encoder')->decode($token);
+
+            if ($data_token == false) {
+
+                $data = array('message' => 'Authentication Required');
+                return new JsonResponse($data, 403);
+            } else {
+
+                $user_id = $data_token["id"];
+                $user = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findOneBy(['_id' => $user_id]);
+                if ($user) {
+
+                    $medicalCenterId = "";
+                    if ($data_token["profile_is_default"] == "internal") {
+                        foreach ($data_token['profile'] as $valor) {
+
+                            foreach ($valor->medical_center as $valorMedicalCenter) {
+                                if ($valorMedicalCenter->is_default == "1") {
+                                    $medicalCenterId = $valorMedicalCenter->_id;
+                                }
+                            }
+                        }
+                    }
+
+//                  AQUI EMPIEZA LA LOGICA DEL EDIT  
+                    $email = $request->request->get("email");
+                    $medicalCenterIdPost = $request->request->get("medicalCenterId");
+                    $branchOfficeIdPost = $request->request->get("branchOfficeId");
+
+                    $emailUserNoMaster = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findOneBy(array('email' => $email));
+                    if ($emailUserNoMaster) {
+                        $estadoUser = $emailUserNoMaster->getEnabled();
+
+                        foreach ($emailUserNoMaster->getProfile() as $travelProfile) {
+
+                            foreach ($travelProfile["medical_center"] as $travelMedicalCenter) {
+                                if ($travelMedicalCenter["_id"] == $medicalCenterIdPost) {
+
+                                    foreach ($travelMedicalCenter["branch_office"] as $travelBranchOffice) {
+
+                                        if ($travelBranchOffice["_id"] == $branchOfficeIdPost) {
+
+                                            foreach ($travelBranchOffice["permission"] as $travelPermission) {
+
+                                                if ($travelPermission["type"] == 1) {
+                                                    $permiso = "Modulo: " . $travelPermission["name"];
+                                                } else {
+                                                    $permiso = "Rol: " . $travelPermission["name"];
+                                                }
+                                                $arrayPermission[] = array(
+                                                    "name" => $permiso
+                                                );
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        $arrayEnd = array(
+                            "estado" => $estadoUser                            
+                        );
+                    } else {
+                        $arrayEnd = null;
+                    }
+
+                    $encoders = array(new XmlEncoder(), new JsonEncoder());
+                    $normalizers = array(new ObjectNormalizer());
+
+                    $serializer = new Serializer($normalizers, $encoders);
+
+                    $jsonContent = $serializer->serialize($arrayPermission, 'json');
+
+                    return new Response($jsonContent);
                 } else {
 
                     $data = array('message' => 'Error al consultar los datos, problemas con el token');

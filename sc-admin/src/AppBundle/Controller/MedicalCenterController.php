@@ -130,6 +130,9 @@ class MedicalCenterController extends Controller {
             }
 
             $medicalcenter->setLicenses($arrayLicenses);
+            
+            $arrayBranchOffices  = array();            
+            $medicalcenter->setBranchoffices($arrayBranchOffices);
 
             for ($i = 0; $i < $countPayments; $i++) {
 
@@ -195,6 +198,7 @@ class MedicalCenterController extends Controller {
 
                         $arrayPermission[] = array(
                             '_id' => 'MASTER',
+                            'name' => 'MASTER',
                             'type' => 0
                         );
 
@@ -217,7 +221,7 @@ class MedicalCenterController extends Controller {
                             "updated_by" => $user);
 
                         $arrayProfile[$key] = array(
-                            'name' => 'internal',                            
+                            'name' => 'internal',
                             'medical_center' => $arrayMedicalCenterUsersFront
                         );
 
@@ -291,6 +295,7 @@ class MedicalCenterController extends Controller {
 
                         $arrayPermission[] = array(
                             '_id' => 'MASTER',
+                            'name' => 'MASTER',
                             'type' => 0
                         );
 
@@ -341,6 +346,7 @@ class MedicalCenterController extends Controller {
 
                         $arrayPermission[] = array(
                             '_id' => 'MASTER',
+                            'name' => 'MASTER',
                             'type' => 0
                         );
 
@@ -366,7 +372,7 @@ class MedicalCenterController extends Controller {
                                     "updated_by" => $user);
 
                                 $arrayProfile[$key] = array(
-                                    'name' => 'internal',                                    
+                                    'name' => 'internal',
                                     'medical_center' => $arrayMedicalCenterUsersFront
                                 );
 
@@ -389,6 +395,7 @@ class MedicalCenterController extends Controller {
 
                         $arrayPermissionNew[] = array(
                             '_id' => 'MASTER',
+                            'name' => 'MASTER',
                             'type' => 0
                         );
 
@@ -411,7 +418,7 @@ class MedicalCenterController extends Controller {
                             "updated_by" => $user);
 
                         $arrayProfileNew[$key] = array(
-                            'name' => 'internal',                            
+                            'name' => 'internal',
                             'medical_center' => $arrayMedicalCenterUsersFrontNew
                         );
 
@@ -492,6 +499,9 @@ class MedicalCenterController extends Controller {
                 unset($arrayModulesInsert);
             }
             $medicalcenter->setLicenses($arrayLicenses);
+            
+            $arrayBranchOffices  = array();            
+            $medicalcenter->setBranchoffices($arrayBranchOffices);
 
             for ($i = 0; $i < $countPayments; $i++) {
 
