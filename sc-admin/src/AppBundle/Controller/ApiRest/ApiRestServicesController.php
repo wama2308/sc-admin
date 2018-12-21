@@ -58,6 +58,8 @@ class ApiRestServicesController extends Controller {
 
                                         if ($arrayDate >= $fechaActual) {
 
+
+
                                             $license = $this->get('doctrine_mongodb')->getRepository('AppBundle:License')->find($TravelArrayLicenses["license_id"]);
                                             $servicesLicense = $license->getExams();
                                             $licenseId = $license->getId();
@@ -72,20 +74,57 @@ class ApiRestServicesController extends Controller {
                                                 foreach ($ArrayCategoryExams as $key => $TravelArrayCategoryExams) {
 
                                                     if ($key == $services->getCategory()) {
-                                                        $category = $TravelArrayCategoryExams;
+                                                        $categoryValue = $TravelArrayCategoryExams;
                                                     }
                                                 }
 
                                                 if ($services->getActive() == 1) {
 
-                                                    $arrayServices[] = array(
-                                                        "licenseId" => $licenseId,
-                                                        "serviceId" => $services->getId(),
-                                                        "serviceName" => $services->getName(),
-                                                        "category" => $category,
-                                                        "fields" => $services->getFields(),
-                                                        "format" => $services->getFormat()
-                                                    );
+                                                    $serviceId = "";
+                                                    $serviceName = "";
+                                                    $category = "";
+                                                    $fields = "";
+                                                    $format = "";
+                                                    $acumServices = 0;
+
+                                                    if (!empty($TravelArrayLicenses["services"])) {
+
+                                                        foreach ($TravelArrayLicenses["services"] as $key => $TravelServicesLicenses) {
+
+                                                            if ($services->getId() == $TravelServicesLicenses["_id"]) {
+
+                                                                $acumServices++;
+                                                                $serviceId = $TravelServicesLicenses["_id"];
+                                                                $serviceName = $TravelServicesLicenses["name"];
+                                                                $category = $TravelServicesLicenses["category"];
+                                                                $fields = $TravelServicesLicenses["fields"];
+                                                                $format = $TravelServicesLicenses["format"];
+                                                            }
+                                                        }
+                                                    }
+                                                    if ($acumServices == 1) {
+
+                                                        $arrayServices[] = array(
+                                                            "licenseId" => $licenseId,
+                                                            "serviceId" => $serviceId,
+                                                            "serviceName" => $serviceName,
+                                                            "category" => $category,
+                                                            "fields" => $fields,
+                                                            "format" => $format,
+                                                            "status" => 1
+                                                        );
+                                                    } else {
+
+                                                        $arrayServices[] = array(
+                                                            "licenseId" => $licenseId,
+                                                            "serviceId" => $services->getId(),
+                                                            "serviceName" => $services->getName(),
+                                                            "category" => $categoryValue,
+                                                            "fields" => $services->getFields(),
+                                                            "format" => $services->getFormat(),
+                                                            "status" => 0
+                                                        );
+                                                    }
                                                 }
                                             }
                                         }
@@ -151,82 +190,109 @@ class ApiRestServicesController extends Controller {
                                     foreach ($ArrayLicenses as $TravelArrayLicenses) {
 
                                         if ($TravelArrayLicenses["license_id"] == $licenseIdPost) {
-
                                             $arrayDate = date('Y-m-d H:i:s', $TravelArrayLicenses["expiration_date"]->sec);
                                             $fechaActual = date('Y-m-d h:i:s');
 
                                             if ($arrayDate >= $fechaActual) {
 
                                                 if (!empty($TravelArrayLicenses["services"])) {
-
                                                     $servicesArray = $TravelArrayLicenses["services"];
+
+                                                    $acumServices = 0;
+                                                    $licenseId = "";
+                                                    $serviceId = "";
+                                                    $serviceName = "";
+                                                    $category = "";
+                                                    $fields = "";
+                                                    $format = "";
+                                                    $amount = "";
+                                                    $status = "";
 
                                                     foreach ($servicesArray as $keyServices => $travelServicesArray) {
 
-                                                        $category = array(
+                                                        $category1 = array(
                                                             "label" => $travelServicesArray["category"],
                                                             "value" => $travelServicesArray["category"]
-                                                        );
-
+                                                        );                                                        
+                                                        
                                                         if ($travelServicesArray["_id"] == $serviceIdPost) {
 
                                                             if ($travelServicesArray["active"] == 1) {
 
-                                                                $arrayServices = array(
-                                                                    "licenseId" => $licenseIdPost,
-                                                                    "serviceId" => $serviceIdPost,
-                                                                    "serviceName" => $travelServicesArray["name"],
-                                                                    "category" => $category,
-                                                                    "fields" => $travelServicesArray["fields"],
-                                                                    "format" => $travelServicesArray["format"],
-                                                                    "amount" => $travelServicesArray["amount"],
-                                                                    "currencySymbol" => $currencySymbol,
-                                                                    "status" => 1
-                                                                );
+                                                                $acumServices++;
+                                                                $serviceName = $travelServicesArray["name"];
+                                                                $category = $category1;
+                                                                $fields = $travelServicesArray["fields"];
+                                                                $format = $travelServicesArray["format"];
+                                                                $amount = $travelServicesArray["amount"];
+                                                                $currencySymbol = $currencySymbol;
+                                                                $status = 1;
                                                             }
-                                                        } else {
+                                                            
+                                                        }
+                                                    }
+                                                    
+                                                    if ($acumServices == 1) {
+                                                        
+                                                        $arrayServices = array(
+                                                            "licenseId" => $licenseIdPost,
+                                                            "serviceId" => $serviceIdPost,
+                                                            "serviceName" => $serviceName,
+                                                            "category" => $category,
+                                                            "fields" => $fields,
+                                                            "format" => $format,
+                                                            "amount" => $amount,
+                                                            "currencySymbol" => $currencySymbol,
+                                                            "status" => 1
+                                                        );
+                                                    } else {
+                                                        
+                                                        $license = $this->get('doctrine_mongodb')->getRepository('AppBundle:License')->find($licenseIdPost);
+                                                        $servicesLicense = $license->getExams();
+                                                        $licenseId = $license->getId();
 
-                                                            $license = $this->get('doctrine_mongodb')->getRepository('AppBundle:License')->find($TravelArrayLicenses["license_id"]);
-                                                            $servicesLicense = $license->getExams();
-                                                            $licenseId = $license->getId();
+                                                        foreach ($servicesLicense as $travelServicesLicense) {
 
-                                                            foreach ($servicesLicense as $travelServicesLicense) {
+                                                            if ($travelServicesLicense == $serviceIdPost) {
 
-                                                                if ($travelServicesLicense == $serviceIdPost) {
+                                                                $services = $this->get('doctrine_mongodb')->getRepository('AppBundle:Services')->find($travelServicesLicense);
 
-                                                                    $services = $this->get('doctrine_mongodb')->getRepository('AppBundle:Services')->find($travelServicesLicense);
+                                                                $GeneralConfiguration = $this->get('doctrine_mongodb')->getRepository('AppBundle:GeneralConfiguration')->find("5ae08f86c5dfa106dc92610a");
+                                                                $ArrayCategoryExams = $GeneralConfiguration->getCategoryexams();
 
-                                                                    $GeneralConfiguration = $this->get('doctrine_mongodb')->getRepository('AppBundle:GeneralConfiguration')->find("5ae08f86c5dfa106dc92610a");
-                                                                    $ArrayCategoryExams = $GeneralConfiguration->getCategoryexams();
+                                                                foreach ($ArrayCategoryExams as $key => $TravelArrayCategoryExams) {
 
-                                                                    foreach ($ArrayCategoryExams as $key => $TravelArrayCategoryExams) {
-
-                                                                        if ($key == $services->getCategory()) {
-                                                                            $category = array(
-                                                                                "label" => $TravelArrayCategoryExams,
-                                                                                "value" => $TravelArrayCategoryExams
-                                                                            );
-                                                                        }
-                                                                    }
-
-                                                                    if ($services->getActive() == 1) {
-
-                                                                        $arrayServices = array(
-                                                                            "licenseId" => $licenseId,
-                                                                            "serviceId" => $services->getId(),
-                                                                            "serviceName" => $services->getName(),
-                                                                            "category" => $category,
-                                                                            "fields" => $services->getFields(),
-                                                                            "format" => $services->getFormat(),
-                                                                            "amount" => "0.00",
-                                                                            "currencySymbol" => $currencySymbol,
-                                                                            "status" => 0
+                                                                    if ($key == $services->getCategory()) {
+                                                                        $category = array(
+                                                                            "label" => $TravelArrayCategoryExams,
+                                                                            "value" => $TravelArrayCategoryExams
                                                                         );
                                                                     }
+                                                                }
+
+                                                                if ($services->getActive() == 1) {
+
+                                                                    $arrayServices = array(
+                                                                        "licenseId" => $licenseId,
+                                                                        "serviceId" => $services->getId(),
+                                                                        "serviceName" => $services->getName(),
+                                                                        "category" => $category,
+                                                                        "fields" => $services->getFields(),
+                                                                        "format" => $services->getFormat(),
+                                                                        "amount" => "0.00",
+                                                                        "currencySymbol" => $currencySymbol,
+                                                                        "status" => 2
+                                                                    );
                                                                 }
                                                             }
                                                         }
                                                     }
+
+                                                    $encoders = array(new XmlEncoder(), new JsonEncoder());
+                                                    $normalizers = array(new ObjectNormalizer());
+                                                    $serializer = new Serializer($normalizers, $encoders);
+                                                    $jsonContent = $serializer->serialize($arrayServices, 'json');
+                                                    return new Response($jsonContent);
                                                 } else {
 
                                                     $license = $this->get('doctrine_mongodb')->getRepository('AppBundle:License')->find($TravelArrayLicenses["license_id"]);
@@ -268,6 +334,12 @@ class ApiRestServicesController extends Controller {
                                                             }
                                                         }
                                                     }
+
+                                                    $encoders = array(new XmlEncoder(), new JsonEncoder());
+                                                    $normalizers = array(new ObjectNormalizer());
+                                                    $serializer = new Serializer($normalizers, $encoders);
+                                                    $jsonContent = $serializer->serialize($arrayServices, 'json');
+                                                    return new Response($jsonContent);
                                                 }
                                             }
                                         }
@@ -276,14 +348,112 @@ class ApiRestServicesController extends Controller {
                             }
                         }
                     }
-                    $encoders = array(new XmlEncoder(), new JsonEncoder());
-                    $normalizers = array(new ObjectNormalizer());
+                } else {
 
-                    $serializer = new Serializer($normalizers, $encoders);
+                    $data = array('message' => 'Error al consultar los datos, problemas con el token');
+                    return new JsonResponse($data, 403);
+                }
+            }
+        }
+    }
 
-                    $jsonContent = $serializer->serialize($arrayServices, 'json');
+    /**
+     * @Route("/api/LoadServicesPreloadedOriginalId")     
+     * @Method("POST")
+     */
+    public function LoadServicesPreloadedOriginalAction(Request $request) {
 
-                    return new Response($jsonContent);
+        $token = $request->headers->get('access-token');
+        $licenseIdPost = $request->request->get("licenseId");
+        $serviceIdPost = $request->request->get("serviceId");
+
+        if ($token == "") {
+            $data = array('message' => 'Token invalido');
+            return new JsonResponse($data, 403);
+        } else {
+
+            $data_token = $this->get('lexik_jwt_authentication.encoder')->decode($token);
+
+            if ($data_token == false) {
+
+                $data = array('message' => 'Authentication Required');
+                return new JsonResponse($data, 403);
+            } else {
+
+                $user_id = $data_token["id"];
+                $user = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findOneBy(['_id' => $user_id]);
+                if ($user) {
+                    if ($data_token["profile_is_default"] == "internal") {
+                        foreach ($data_token['profile'] as $valor) {
+
+                            foreach ($valor->medical_center as $valorMedicalCenter) {
+                                if ($valorMedicalCenter->is_default == "1") {
+                                    $medicalcenter = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->find($valorMedicalCenter->_id);
+                                    $countryId = $medicalcenter->getCountryid();
+                                    $country = $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->find($countryId);
+                                    $currencySymbol = $country->getCurrencySymbol();
+
+                                    $ArrayLicenses = $medicalcenter->getLicenses();
+                                    foreach ($ArrayLicenses as $TravelArrayLicenses) {
+
+                                        if ($TravelArrayLicenses["license_id"] == $licenseIdPost) {
+                                            $arrayDate = date('Y-m-d H:i:s', $TravelArrayLicenses["expiration_date"]->sec);
+                                            $fechaActual = date('Y-m-d h:i:s');
+
+                                            if ($arrayDate >= $fechaActual) {
+
+                                                $license = $this->get('doctrine_mongodb')->getRepository('AppBundle:License')->find($TravelArrayLicenses["license_id"]);
+                                                $servicesLicense = $license->getExams();
+                                                $licenseId = $license->getId();
+
+                                                foreach ($servicesLicense as $travelServicesLicense) {
+
+                                                    if ($travelServicesLicense == $serviceIdPost) {
+
+                                                        $services = $this->get('doctrine_mongodb')->getRepository('AppBundle:Services')->find($travelServicesLicense);
+
+                                                        $GeneralConfiguration = $this->get('doctrine_mongodb')->getRepository('AppBundle:GeneralConfiguration')->find("5ae08f86c5dfa106dc92610a");
+                                                        $ArrayCategoryExams = $GeneralConfiguration->getCategoryexams();
+
+                                                        foreach ($ArrayCategoryExams as $key => $TravelArrayCategoryExams) {
+
+                                                            if ($key == $services->getCategory()) {
+                                                                $category = array(
+                                                                    "label" => $TravelArrayCategoryExams,
+                                                                    "value" => $TravelArrayCategoryExams
+                                                                );
+                                                            }
+                                                        }
+
+                                                        if ($services->getActive() == 1) {
+
+                                                            $arrayServices = array(
+                                                                "licenseId" => $licenseId,
+                                                                "serviceId" => $services->getId(),
+                                                                "serviceName" => $services->getName(),
+                                                                "category" => $category,
+                                                                "fields" => $services->getFields(),
+                                                                "format" => $services->getFormat(),
+                                                                "amount" => "0.00",
+                                                                "currencySymbol" => $currencySymbol,
+                                                                "status" => 0
+                                                            );
+                                                        }
+                                                    }
+                                                }
+
+                                                $encoders = array(new XmlEncoder(), new JsonEncoder());
+                                                $normalizers = array(new ObjectNormalizer());
+                                                $serializer = new Serializer($normalizers, $encoders);
+                                                $jsonContent = $serializer->serialize($arrayServices, 'json');
+                                                return new Response($jsonContent);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 } else {
 
                     $data = array('message' => 'Error al consultar los datos, problemas con el token');
@@ -381,15 +551,24 @@ class ApiRestServicesController extends Controller {
                                         foreach ($ArrayLicenses as $key => $TravelArrayLicenses) {
 
                                             if ($TravelArrayLicenses["license_id"] == $licenseIdPost) {
-
                                                 $arrayDate = date('Y-m-d H:i:s', $TravelArrayLicenses["expiration_date"]->sec);
                                                 $fechaActual = date('Y-m-d h:i:s');
 
                                                 if ($arrayDate >= $fechaActual) {
 
                                                     if (!empty($TravelArrayLicenses["services"])) {
-
                                                         $servicesArray = $TravelArrayLicenses["services"];
+
+                                                        $acumServices = 0;
+                                                        $licenseId = "";
+                                                        $serviceId = "";
+                                                        $serviceName = "";
+                                                        $category = "";
+                                                        $fields = "";
+                                                        $format = "";
+                                                        $amount = "";
+                                                        $status = "";
+                                                        $postServices = "";
 
                                                         foreach ($servicesArray as $keyServices => $travelServicesArray) {
 
@@ -402,72 +581,88 @@ class ApiRestServicesController extends Controller {
 
                                                                 if ($travelServicesArray["active"] == 1) {
 
-                                                                    $arrayServices[$keyServices] = array(
-                                                                        "_id" => $serviceIdPost,
-                                                                        "name" => $servicePost,
-                                                                        "category" => $categoryPost,
-                                                                        "format" => $formatPost,
-                                                                        "fields" => $fieldsPost,
-                                                                        "amount" => $amountPost,
-                                                                        "active" => true,
-                                                                        "created_at" => $fechaNow,
-                                                                        "created_by" => $user_id,
-                                                                        "updated_at" => $fechaNow,
-                                                                        "updated_by" => $user_id,
-                                                                    );
-
-                                                                    $arrayLicenses[$key] = array(
-                                                                        "license_id" => $TravelArrayLicenses["license_id"],
-                                                                        "expiration_date" => $TravelArrayLicenses["expiration_date"],
-                                                                        "status" => $TravelArrayLicenses["status"],
-                                                                        "modules" => $TravelArrayLicenses["modules"],
-                                                                        "services" => $arrayServices,
-                                                                        "created_at" => $TravelArrayLicenses["created_at"],
-                                                                        "created_by" => $TravelArrayLicenses["created_by"],
-                                                                        "updated_at" => $TravelArrayLicenses["updated_at"],
-                                                                        "updated_by" => $TravelArrayLicenses["updated_by"]
-                                                                    );
-                                                                    $medicalcenter->setLicenses($arrayLicenses);
-                                                                    $dm = $this->get('doctrine_mongodb')->getManager();
-                                                                    //$dm->persist($GeneralConfiguration);
-                                                                    $dm->flush();
-                                                                    return new Response('Operacion exitosa');
+                                                                    $acumServices++;
+                                                                    $serviceName = $travelServicesArray["name"];
+                                                                    $category = $category;
+                                                                    $fields = $travelServicesArray["fields"];
+                                                                    $format = $travelServicesArray["format"];
+                                                                    $amount = $travelServicesArray["amount"];
+                                                                    $postServices = $keyServices;
+                                                                    $status = 1;
                                                                 }
-                                                            } else {
-                                                                $arrayServices = $TravelArrayLicenses["services"];
-                                                                $arrayServices[] = array(
-                                                                    "_id" => $serviceIdPost,
-                                                                    "name" => $servicePost,
-                                                                    "category" => $categoryPost,
-                                                                    "format" => $formatPost,
-                                                                    "fields" => $fieldsPost,
-                                                                    "amount" => $amountPost,
-                                                                    "active" => true,
-                                                                    "created_at" => $fechaNow,
-                                                                    "created_by" => $user_id,
-                                                                    "updated_at" => $fechaNow,
-                                                                    "updated_by" => $user_id,
-                                                                );
-
-                                                                $arrayLicenses[$key] = array(
-                                                                    "license_id" => $TravelArrayLicenses["license_id"],
-                                                                    "expiration_date" => $TravelArrayLicenses["expiration_date"],
-                                                                    "status" => $TravelArrayLicenses["status"],
-                                                                    "modules" => $TravelArrayLicenses["modules"],
-                                                                    "services" => $arrayServices,
-                                                                    "created_at" => $TravelArrayLicenses["created_at"],
-                                                                    "created_by" => $TravelArrayLicenses["created_by"],
-                                                                    "updated_at" => $TravelArrayLicenses["updated_at"],
-                                                                    "updated_by" => $TravelArrayLicenses["updated_by"]
-                                                                );
-
-                                                                $medicalcenter->setLicenses($arrayLicenses);
-                                                                $dm = $this->get('doctrine_mongodb')->getManager();
-                                                                //$dm->persist($GeneralConfiguration);
-                                                                $dm->flush();
-                                                                return new Response('Operacion exitosa');
                                                             }
                                                         }
+
+                                                        if ($acumServices == 1) {
+                                                            $arrayServices = $servicesArray;
+                                                            $arrayServices[$postServices] = array(
+                                                                "_id" => $serviceIdPost,
+                                                                "name" => $servicePost,
+                                                                "category" => $categoryPost,
+                                                                "format" => $formatPost,
+                                                                "fields" => $fieldsPost,
+                                                                "amount" => $amountPost,
+                                                                "active" => true,
+                                                                "created_at" => $fechaNow,
+                                                                "created_by" => $user_id,
+                                                                "updated_at" => $fechaNow,
+                                                                "updated_by" => $user_id,
+                                                            );
+
+                                                            $arrayLicenses[$key] = array(
+                                                                "license_id" => $TravelArrayLicenses["license_id"],
+                                                                "expiration_date" => $TravelArrayLicenses["expiration_date"],
+                                                                "status" => $TravelArrayLicenses["status"],
+                                                                "modules" => $TravelArrayLicenses["modules"],
+                                                                "services" => $arrayServices,
+                                                                "created_at" => $TravelArrayLicenses["created_at"],
+                                                                "created_by" => $TravelArrayLicenses["created_by"],
+                                                                "updated_at" => $TravelArrayLicenses["updated_at"],
+                                                                "updated_by" => $TravelArrayLicenses["updated_by"]
+                                                            );
+
+                                                            $medicalcenter->setLicenses($arrayLicenses);
+                                                            $dm = $this->get('doctrine_mongodb')->getManager();
+                                                            //$dm->persist($GeneralConfiguration);
+                                                            $dm->flush();
+                                                            return new Response('Operacion exitosa');
+                                                        } else {
+
+                                                            $arrayServices = $servicesArray;
+                                                            $arrayServices[] = array(
+                                                                "_id" => $serviceIdPost,
+                                                                "name" => $servicePost,
+                                                                "category" => $categoryPost,
+                                                                "format" => $formatPost,
+                                                                "fields" => $fieldsPost,
+                                                                "amount" => $amountPost,
+                                                                "active" => true,
+                                                                "created_at" => $fechaNow,
+                                                                "created_by" => $user_id,
+                                                                "updated_at" => $fechaNow,
+                                                                "updated_by" => $user_id,
+                                                            );
+
+                                                            $arrayLicenses[$key] = array(
+                                                                "license_id" => $TravelArrayLicenses["license_id"],
+                                                                "expiration_date" => $TravelArrayLicenses["expiration_date"],
+                                                                "status" => $TravelArrayLicenses["status"],
+                                                                "modules" => $TravelArrayLicenses["modules"],
+                                                                "services" => $arrayServices,
+                                                                "created_at" => $TravelArrayLicenses["created_at"],
+                                                                "created_by" => $TravelArrayLicenses["created_by"],
+                                                                "updated_at" => $TravelArrayLicenses["updated_at"],
+                                                                "updated_by" => $TravelArrayLicenses["updated_by"]
+                                                            );
+
+                                                            $medicalcenter->setLicenses($arrayLicenses);
+                                                            $dm = $this->get('doctrine_mongodb')->getManager();
+                                                            //$dm->persist($GeneralConfiguration);
+                                                            $dm->flush();
+                                                            return new Response('Operacion exitosa');
+                                                        }
+
+                                                        return new Response($a);
                                                     } else {
 
                                                         $arrayServices[] = array(
