@@ -116,6 +116,11 @@ class MedicalCenter {
     /**
      * @MongoDB\Field(type="collection")
      */
+    protected $templates;
+    
+    /**
+     * @MongoDB\Field(type="collection")
+     */
     protected $payments;
     
     /**
@@ -733,5 +738,27 @@ class MedicalCenter {
     public function getRoles()
     {
         return $this->roles;
+    }
+
+    /**
+     * Set templates
+     *
+     * @param collection $templates
+     * @return $this
+     */
+    public function setTemplates($templates)
+    {
+        $this->templates = $templates;
+        return $this;
+    }
+
+    /**
+     * Get templates
+     *
+     * @return collection $templates
+     */
+    public function getTemplates()
+    {
+        return $this->templates;
     }
 }

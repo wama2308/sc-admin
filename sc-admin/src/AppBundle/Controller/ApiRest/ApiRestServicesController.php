@@ -213,8 +213,8 @@ class ApiRestServicesController extends Controller {
                                                         $category1 = array(
                                                             "label" => $travelServicesArray["category"],
                                                             "value" => $travelServicesArray["category"]
-                                                        );                                                        
-                                                        
+                                                        );
+
                                                         if ($travelServicesArray["_id"] == $serviceIdPost) {
 
                                                             if ($travelServicesArray["active"] == 1) {
@@ -228,12 +228,11 @@ class ApiRestServicesController extends Controller {
                                                                 $currencySymbol = $currencySymbol;
                                                                 $status = 1;
                                                             }
-                                                            
                                                         }
                                                     }
-                                                    
+
                                                     if ($acumServices == 1) {
-                                                        
+
                                                         $arrayServices = array(
                                                             "licenseId" => $licenseIdPost,
                                                             "serviceId" => $serviceIdPost,
@@ -246,7 +245,7 @@ class ApiRestServicesController extends Controller {
                                                             "status" => 1
                                                         );
                                                     } else {
-                                                        
+
                                                         $license = $this->get('doctrine_mongodb')->getRepository('AppBundle:License')->find($licenseIdPost);
                                                         $servicesLicense = $license->getExams();
                                                         $licenseId = $license->getId();
@@ -705,6 +704,356 @@ class ApiRestServicesController extends Controller {
                             }
                         }
                     }
+                } else {
+
+                    $data = array('message' => 'Error al consultar los datos, problemas con el token');
+                    return new JsonResponse($data, 403);
+                }
+            }
+        }
+    }
+
+    /**
+     * @Route("/api/saveTemplate")     
+     * @Method("POST")
+     */
+    public function saveTemplateAction(Request $request) {
+
+        $fechaNow = new \MongoDate();
+
+        $token = $request->headers->get('access-token');
+        if ($token == "") {
+
+            $data = array('message' => 'Token invalido');
+            return new JsonResponse($data, 403);
+        } else {
+
+            $data_token = $this->get('lexik_jwt_authentication.encoder')->decode($token);
+
+            if ($data_token == false) {
+
+                $data = array('message' => 'Authentication Required');
+                return new JsonResponse($data, 403);
+            } else {
+
+                $user_id = $data_token["id"];
+                $user = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findOneBy(['_id' => $user_id]);
+                if ($user) {
+
+                    $medicalCenterId = "";
+                    if ($data_token["profile_is_default"] == "internal") {
+                        foreach ($data_token['profile'] as $valor) {
+
+                            foreach ($valor->medical_center as $valorMedicalCenter) {
+                                if ($valorMedicalCenter->is_default == "1") {
+                                    $medicalCenterId = $valorMedicalCenter->_id;
+                                }
+                            }
+                        }
+                    }
+
+//                  AQUI EMPIEZA LA LOGICA DEL EDIT  
+                    $plantillaPost = $request->request->get("plantilla");
+                    $formatoPlantillaPost = $request->request->get("formato");
+
+                    if ($plantillaPost == "") {
+                        return new Response('Ingrese la plantilla');
+                    } else if ($formatoPlantillaPost == "") {
+                        return new Response('Ingrese el contenido de la plantilla');
+                    } else {
+
+                        $medicalcenter = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->find($medicalCenterId);
+                        $arrayTemplates = $medicalcenter->getTemplates();
+                        $rolId = new \MongoId();
+
+                        $arrayTemplates[] = array(
+                            "_id" => $rolId,
+                            "template" => $plantillaPost,
+                            "content" => $formatoPlantillaPost,
+                            "status" => true,
+                            "created_at" => $fechaNow,
+                            "created_by" => $user_id,
+                            "updated_at" => $fechaNow,
+                            "updated_by" => $user_id);
+
+                        $medicalcenter->setTemplates($arrayTemplates);
+//
+                        $medicalcenter->setUpdatedAt($fechaNow);
+                        $medicalcenter->setUpdatedBy($user_id);
+//                        
+                        $dm = $this->get('doctrine_mongodb')->getManager();
+                        //$dm->persist($medicalcenter);
+                        $dm->flush();
+
+                        return new Response(1);
+                    }
+                } else {
+
+                    $data = array('message' => 'Error al consultar los datos, problemas con el token');
+                    return new JsonResponse($data, 403);
+                }
+            }
+        }
+    }
+
+    /**
+     * @Route("/api/editTemplate")     
+     * @Method("POST")
+     */
+    public function editTemplateAction(Request $request) {
+
+        $fechaNow = new \MongoDate();
+
+        $token = $request->headers->get('access-token');
+        if ($token == "") {
+
+            $data = array('message' => 'Token invalido');
+            return new JsonResponse($data, 403);
+        } else {
+
+            $data_token = $this->get('lexik_jwt_authentication.encoder')->decode($token);
+
+            if ($data_token == false) {
+
+                $data = array('message' => 'Authentication Required');
+                return new JsonResponse($data, 403);
+            } else {
+
+                $user_id = $data_token["id"];
+                $user = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findOneBy(['_id' => $user_id]);
+                if ($user) {
+
+                    $medicalCenterId = "";
+                    if ($data_token["profile_is_default"] == "internal") {
+                        foreach ($data_token['profile'] as $valor) {
+
+                            foreach ($valor->medical_center as $valorMedicalCenter) {
+                                if ($valorMedicalCenter->is_default == "1") {
+                                    $medicalCenterId = $valorMedicalCenter->_id;
+                                }
+                            }
+                        }
+                    }
+
+//                    AQUI EMPIEZA LA LOGICA DEL EDIT
+                    $plantillaPost = $request->request->get("plantilla");
+                    $formatoPlantillaPost = $request->request->get("formato");
+                    $posicion = $request->request->get("posicion");
+
+                    if ($plantillaPost == "") {
+                        return new Response('Ingrese la plantilla');
+                    } else if ($formatoPlantillaPost == "") {
+                        return new Response('Ingrese el contenido de la plantilla');
+                    } else {
+
+                        $medicalcenter = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->find($medicalCenterId);
+                        $arrayTemplates = $medicalcenter->getTemplates();
+
+                        $arrayTemplates[$posicion]["template"] = $plantillaPost;
+                        $arrayTemplates[$posicion]["content"] = $formatoPlantillaPost;
+                        $arrayTemplates[$posicion]["updated_at"] = $fechaNow;
+                        $arrayTemplates[$posicion]["updated_by"] = $user_id;
+
+                        $medicalcenter->setTemplates($arrayTemplates);
+
+                        $dm = $this->get('doctrine_mongodb')->getManager();
+                        //$dm->persist($medicalcenter);
+                        $dm->flush();
+
+                        return new Response(1);
+                    }
+                } else {
+
+                    $data = array('message' => 'Error al consultar los datos, problemas con el token');
+                    return new JsonResponse($data, 403);
+                }
+            }
+        }
+    }
+
+    /**
+     * @Route("/api/LoadTemplates")     
+     * @Method("GET")
+     */
+    public function LoadTemplatesAction(Request $request) {
+
+        $token = $request->headers->get('access-token');
+        if ($token == "") {
+            $data = array('message' => 'Token invalido');
+            return new JsonResponse($data, 403);
+        } else {
+
+            $data_token = $this->get('lexik_jwt_authentication.encoder')->decode($token);
+
+            if ($data_token == false) {
+
+                $data = array('message' => 'Authentication Required');
+                return new JsonResponse($data, 403);
+            } else {
+
+                $user_id = $data_token["id"];
+                $user = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findOneBy(['_id' => $user_id]);
+                if ($user) {
+                    if ($data_token["profile_is_default"] == "internal") {
+                        foreach ($data_token['profile'] as $valor) {
+
+                            foreach ($valor->medical_center as $valorMedicalCenter) {
+                                if ($valorMedicalCenter->is_default == "1") {
+                                    $medicalcenter = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->find($valorMedicalCenter->_id);
+                                    $arrayTemplates = $medicalcenter->getTemplates();
+                                    $arrayEnd = array(
+                                        "templates" => $arrayTemplates
+                                    );
+                                }
+                            }
+                        }
+                    }
+
+                    $encoders = array(new XmlEncoder(), new JsonEncoder());
+                    $normalizers = array(new ObjectNormalizer());
+
+                    $serializer = new Serializer($normalizers, $encoders);
+
+                    $jsonContent = $serializer->serialize($arrayEnd, 'json');
+
+                    return new Response($jsonContent);
+                } else {
+
+                    $data = array('message' => 'Error al consultar los datos, problemas con el token');
+                    return new JsonResponse($data, 403);
+                }
+            }
+        }
+    }
+
+    /**
+     * @Route("/api/LoadTemplateslId")     
+     * @Method("POST")
+     */
+    public function LoadTemplatesIdAction(Request $request) {
+
+        $fechaNow = new \MongoDate();
+
+        $token = $request->headers->get('access-token');
+        if ($token == "") {
+
+            $data = array('message' => 'Token invalido');
+            return new JsonResponse($data, 403);
+        } else {
+
+            $data_token = $this->get('lexik_jwt_authentication.encoder')->decode($token);
+
+            if ($data_token == false) {
+
+                $data = array('message' => 'Authentication Required');
+                return new JsonResponse($data, 403);
+            } else {
+
+                $user_id = $data_token["id"];
+                $user = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findOneBy(['_id' => $user_id]);
+                if ($user) {
+
+                    $medicalCenterId = "";
+                    if ($data_token["profile_is_default"] == "internal") {
+                        foreach ($data_token['profile'] as $valor) {
+
+                            foreach ($valor->medical_center as $valorMedicalCenter) {
+                                if ($valorMedicalCenter->is_default == "1") {
+                                    $medicalCenterId = $valorMedicalCenter->_id;
+                                }
+                            }
+                        }
+                    }
+
+//                  AQUI EMPIEZA LA LOGICA DEL EDIT  
+
+                    $posicionPost = $request->request->get("posicion");
+
+                    $medicalcenter = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->find($medicalCenterId);
+                    $arrayTemplates = $medicalcenter->getTemplates();
+                    
+                    foreach ($arrayTemplates as $key => $templatesArrayTemplates) {
+                        if ($key == $posicionPost) {                           
+
+                            $arrayEnd = array(
+                                "template" => $templatesArrayTemplates["template"],
+                                "content" => $templatesArrayTemplates["content"]
+                            );
+                            $encoders = array(new XmlEncoder(), new JsonEncoder());
+                            $normalizers = array(new ObjectNormalizer());
+
+                            $serializer = new Serializer($normalizers, $encoders);
+
+                            $jsonContent = $serializer->serialize($arrayEnd, 'json');
+
+                            return new Response($jsonContent);
+                         
+                        }
+                    }
+                    return new Response(0);
+                } else {
+
+                    $data = array('message' => 'Error al consultar los datos, problemas con el token');
+                    return new JsonResponse($data, 403);
+                }
+            }
+        }
+    }
+
+    /**
+     * @Route("/api/deleteTemplateId")     
+     * @Method("POST")
+     */
+    public function deleteTemplateIdAction(Request $request) {
+
+        $fechaNow = new \MongoDate();
+
+        $token = $request->headers->get('access-token');
+        if ($token == "") {
+
+            $data = array('message' => 'Token invalido');
+            return new JsonResponse($data, 403);
+        } else {
+
+            $data_token = $this->get('lexik_jwt_authentication.encoder')->decode($token);
+
+            if ($data_token == false) {
+
+                $data = array('message' => 'Authentication Required');
+                return new JsonResponse($data, 403);
+            } else {
+
+                $user_id = $data_token["id"];
+                $user = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findOneBy(['_id' => $user_id]);
+                if ($user) {
+
+                    $medicalCenterId = "";
+                    if ($data_token["profile_is_default"] == "internal") {
+                        foreach ($data_token['profile'] as $valor) {
+
+                            foreach ($valor->medical_center as $valorMedicalCenter) {
+                                if ($valorMedicalCenter->is_default == "1") {
+                                    $medicalCenterId = $valorMedicalCenter->_id;
+                                }
+                            }
+                        }
+                    }
+
+//                    AQUI EMPIEZA LA LOGICA DEL EDIT                    
+                    $posicion = $request->request->get("posicion");
+
+                    $medicalcenter = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->find($medicalCenterId);
+                    $arrayTemplates = $medicalcenter->getTemplates();
+
+                    $arrayTemplates[$posicion]["status"] = false;
+
+                    $medicalcenter->setTemplates($arrayTemplates);
+
+                    $dm = $this->get('doctrine_mongodb')->getManager();
+                    //$dm->persist($medicalcenter);
+                    $dm->flush();
+
+                    return new Response(1);
                 } else {
 
                     $data = array('message' => 'Error al consultar los datos, problemas con el token');

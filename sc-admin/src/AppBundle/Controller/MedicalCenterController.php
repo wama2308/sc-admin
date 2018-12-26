@@ -133,6 +133,9 @@ class MedicalCenterController extends Controller {
             
             $arrayBranchOffices  = array();            
             $medicalcenter->setBranchoffices($arrayBranchOffices);
+            
+            $arrayTemplates  = array();            
+            $medicalcenter->setTemplates($arrayTemplates);
 
             for ($i = 0; $i < $countPayments; $i++) {
 
@@ -502,6 +505,9 @@ class MedicalCenterController extends Controller {
             
             $arrayBranchOffices  = array();            
             $medicalcenter->setBranchoffices($arrayBranchOffices);
+            
+            $arrayTemplates  = array();            
+            $medicalcenter->setTemplates($arrayTemplates);
 
             for ($i = 0; $i < $countPayments; $i++) {
 
