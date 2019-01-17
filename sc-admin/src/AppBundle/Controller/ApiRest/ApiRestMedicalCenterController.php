@@ -667,5 +667,79 @@ class ApiRestMedicalCenterController extends Controller {
             }
         }
     }
+    
+    /**
+     * @Route("/api/LoadCountBranchOffices")     
+     * @Method("GET")
+     */
+    public function LoadCountBranchOfficesAction(Request $request) {
+
+        $token = $request->headers->get('access-token');
+        if ($token == "") {
+
+            $data = array('message' => 'Token invalido');
+            return new JsonResponse($data, 403);
+        } else {
+
+            $data_token = $this->get('lexik_jwt_authentication.encoder')->decode($token);
+
+            if ($data_token == false) {
+
+                $data = array('message' => 'Authentication Required');
+                return new JsonResponse($data, 403);
+            } else {
+
+                $user_id = $data_token["id"];
+                $user = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findOneBy(['_id' => $user_id]);
+                if ($user) {
+
+                    $medicalCenterId = "";
+                    if ($data_token["profile_is_default"] == "internal") {
+                        foreach ($data_token['profile'] as $valor) {
+
+                            foreach ($valor->medical_center as $valorMedicalCenter) {
+                                if ($valorMedicalCenter->is_default == "1") {
+                                    $medicalCenterId = $valorMedicalCenter->_id;
+                                }
+                            }
+                        }
+                    }
+
+                    $encoders = array(new XmlEncoder(), new JsonEncoder());
+                    $normalizers = array(new ObjectNormalizer());
+
+                    $serializer = new Serializer($normalizers, $encoders);
+
+                    $medicalcenter = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->find($medicalCenterId);
+                    $arrayLicenses = $medicalcenter->getLicenses();
+
+                    foreach ($arrayLicenses as $arrayLicenses) {
+
+                        $renovation = "";
+                        if (isset($arrayLicenses['renovation'])) {
+                            $renovation = $arrayLicenses['renovation'];
+                        } else {
+                            $renovation = "";
+                        }
+
+                        $licensesData = $this->get('doctrine_mongodb')->getRepository('AppBundle:License')->find($arrayLicenses['license_id']);
+                        
+                        $acum = 0;
+                        $numBranchOffices = $licensesData->getNumberbranchOffices();
+                        $acum = $acum + $numBranchOffices;
+                        
+                    }
+
+                    $jsonContent = $serializer->serialize($acum, 'json');
+
+                    return new Response($jsonContent);
+                } else {
+
+                    $data = array('message' => 'Error al consultar los datos, problemas con el token');
+                    return new JsonResponse($data, 403);
+                }
+            }
+        }
+    }
 
 }

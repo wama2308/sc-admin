@@ -22,7 +22,8 @@
 
         <link rel="shortcut icon" href="{{ asset('img/favicon.ico') }}">
     </head>
-    <body>
+    <body style="background-image: url({{ asset('img/brand/backscs.jpg')}});  background-repeat: no-repeat;  background-size: 1440px 840px; ">
+    
         <div>
             {#{% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}
                 {{ 'layout.logged_in_as'|trans({'%username%': app.user.username}, 'FOSUserBundle') }} |

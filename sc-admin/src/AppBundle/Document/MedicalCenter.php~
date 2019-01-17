@@ -739,4 +739,26 @@ class MedicalCenter {
     {
         return $this->roles;
     }
+
+    /**
+     * Set templates
+     *
+     * @param collection $templates
+     * @return $this
+     */
+    public function setTemplates($templates)
+    {
+        $this->templates = $templates;
+        return $this;
+    }
+
+    /**
+     * Get templates
+     *
+     * @return collection $templates
+     */
+    public function getTemplates()
+    {
+        return $this->templates;
+    }
 }

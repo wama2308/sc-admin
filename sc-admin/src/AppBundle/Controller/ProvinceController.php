@@ -28,6 +28,10 @@ class ProvinceController extends Controller {
      */
     public function listAction(Request $request) {
 
+//        date_default_timezone_set("America/Caracas");
+//        print "<p>Ejemplo 1: " . date("d/m/y H:i:s") . "</p>\n";
+        $phpNombre = "wamita";
+        echo '<script> var jsNombre = "'.$phpNombre.'" document.write(jsNombre)</script>'; 
         $provinces = $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->findBy(array('provinces.name' => array('$exists' => true)));
         //var_dump($provinces);
         return $this->render('@App/province/index.html.twig', array('provinces' => $provinces));
@@ -90,17 +94,17 @@ class ProvinceController extends Controller {
      * @Method({"GET", "POST"})
      */
     public function editAction($id, $posicionProvince, Request $request) {
-        
+
         $country = $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->find($id);
         $form = $this->createFormBuilder()->getForm();
-        
+
         $date = new \MongoDate();
         $form->handleRequest($request);
         $country_id = $request->request->get("country_id");
         $province_name = $request->request->get("province");
 
         if (($country_id != "") && ($province_name != "")) {
-            
+
             $provincia = $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->find($country_id);
             //$provincia = $this->get('doctrine_mongodb')->getRepository('AppBundle:Pais')->findBy(array('id' => $pais_id, 'provincia.name' => $nombreProvincia));
             $arrayProvince = $provincia->getProvinces();
@@ -128,8 +132,8 @@ class ProvinceController extends Controller {
         $CountryProvince = $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->find($id);
         $nameCountry = $CountryProvince->getName();
         $arrayProvince = $CountryProvince->getProvinces();
-        $nameProvince = $arrayProvince[$posicionProvince]["name"];        
-        $activeProvince = $arrayProvince[$posicionProvince]["active"];        
+        $nameProvince = $arrayProvince[$posicionProvince]["name"];
+        $activeProvince = $arrayProvince[$posicionProvince]["active"];
 
         return $this->render('@App/province/details.html.twig', array('country' => $nameCountry, 'province' => $nameProvince, 'id' => $id, 'posicionProvince' => $posicionProvince, 'activeProvince' => $activeProvince));
     }

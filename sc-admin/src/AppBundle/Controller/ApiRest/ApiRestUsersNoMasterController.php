@@ -624,6 +624,83 @@ class ApiRestUsersNoMasterController extends Controller {
     }
 
     /**
+     * @Route("/api/ViewRolName")     
+     * @Method("POST")
+     */
+    public function ViewRolNameAction(Request $request) {
+
+        $fechaNow = new \MongoDate();
+
+        $token = $request->headers->get('access-token');
+        if ($token == "") {
+
+            $data = array('message' => 'Token invalido');
+            return new JsonResponse($data, 403);
+        } else {
+
+            $data_token = $this->get('lexik_jwt_authentication.encoder')->decode($token);
+
+            if ($data_token == false) {
+
+                $data = array('message' => 'Authentication Required');
+                return new JsonResponse($data, 403);
+            } else {
+
+                $user_id = $data_token["id"];
+                $user = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findOneBy(['_id' => $user_id]);
+                if ($user) {
+
+                    $medicalCenterId = "";
+                    if ($data_token["profile_is_default"] == "internal") {
+                        foreach ($data_token['profile'] as $valor) {
+
+                            foreach ($valor->medical_center as $valorMedicalCenter) {
+                                if ($valorMedicalCenter->is_default == "1") {
+                                    $medicalCenterId = $valorMedicalCenter->_id;
+                                }
+                            }
+                        }
+                    }
+
+//                  AQUI EMPIEZA LA LOGICA DEL EDIT  
+                    $rolName = $request->request->get("rolName");
+
+                    $medicalcenter = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->find($medicalCenterId);
+                    $arrayRoles = $medicalcenter->getRoles();
+
+                    $GeneralConfiguration = $this->get('doctrine_mongodb')->getRepository('AppBundle:GeneralConfiguration')->find("5ae08f86c5dfa106dc92610a");
+                    $arrayModulesGeneral = $GeneralConfiguration->getModules();
+
+                    foreach ($arrayRoles as $key => $travelArrayRoles) {
+                        if ($rolName == $travelArrayRoles["rol"]) {
+
+
+
+
+                            $arrayEnd = array(
+                                "label" => $travelArrayRoles["rol"],
+                                "value" => (string) $travelArrayRoles["_id"],
+                            );
+                            $encoders = array(new XmlEncoder(), new JsonEncoder());
+                            $normalizers = array(new ObjectNormalizer());
+
+                            $serializer = new Serializer($normalizers, $encoders);
+
+                            $jsonContent = $serializer->serialize($arrayEnd, 'json');
+
+                            return new Response($jsonContent);
+                        }
+                    }
+                } else {
+
+                    $data = array('message' => 'Error al consultar los datos, problemas con el token');
+                    return new JsonResponse($data, 403);
+                }
+            }
+        }
+    }
+
+    /**
      * @Route("/api/LoadSelectBranchOffices")     
      * @Method("GET")
      */
@@ -817,10 +894,17 @@ class ApiRestUsersNoMasterController extends Controller {
                                     $medicalcenter = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->find($valorMedicalCenter->_id);
                                     $arrayRoles = $medicalcenter->getRoles();
 
-                                    foreach ($arrayRoles as $travelArrayRoles) {
+                                    if (!empty($arrayRoles)) {
+                                        foreach ($arrayRoles as $travelArrayRoles) {
+                                            $arrayEnd[] = array(
+                                                "value" => (string) $travelArrayRoles["_id"],
+                                                "label" => $travelArrayRoles["rol"]
+                                            );
+                                        }
+                                    } else {
                                         $arrayEnd[] = array(
-                                            "value" => (string) $travelArrayRoles["_id"],
-                                            "label" => $travelArrayRoles["rol"]
+                                            "value" => "0",
+                                            "label" => "No hay roles registrados"
                                         );
                                     }
                                 }
@@ -885,8 +969,9 @@ class ApiRestUsersNoMasterController extends Controller {
                         }
 
                         $email = $request->request->get("email");
-                        $sucursal = $request->request->get("sucursal");
+                        $sucursal = $request->request->get("listSuc");
                         $onlyModules = $request->request->get("onlyModules");
+                        $groupSucursales = $request->request->get("groupSucursales");
 
                         if ($email == "") {
 
@@ -896,65 +981,76 @@ class ApiRestUsersNoMasterController extends Controller {
                             return new Response('Seleccione la sucursal');
                         } else {
 
-                            foreach ($sucursal as $key => $travelSucursal) {
+                            foreach ($groupSucursales as $key => $travelGroupSucursales) {
 
                                 if ($key == 0) {
                                     $is_default = 1;
                                 } else {
                                     $is_default = 0;
                                 }
+                                foreach ($sucursal as $keyList => $travelSucursal) {
+                                    if ($travelGroupSucursales["label"] == $travelSucursal["label"]) {
+                                        if ($travelSucursal["rol"] != "") {
 
-                                if (!empty($travelSucursal["modulos"])) {
-
-                                    foreach ($onlyModules as $travelOnlyModules) {
-
-                                        foreach ($travelSucursal["modulos"] as $travelSelected) {
-
-                                            $partesSelected = explode("-", $travelSelected);
-
-                                            if ($travelOnlyModules == $partesSelected[0]) {
-
-                                                $arrayPemits[] = $partesSelected[2];
-                                            }
-                                        }
-                                        if (!empty($arrayPemits)) {
-
-                                            $arrayModules[] = array(
-                                                "name" => $travelOnlyModules,
-                                                "type" => 1,
-                                                "permits" => $arrayPemits
+                                            $arrayRol = array(
+                                                "_id" => $travelSucursal["rol"]["value"],
+                                                "name" => $travelSucursal["rol"]["label"],
+                                                "type" => 0
                                             );
 
-                                            unset($arrayPemits);
+                                            $arrayRoles[] = $arrayRol;
+                                            unset($arrayRol);
                                         }
                                     }
-                                    $arrayPermission = $arrayModules;
-                                    unset($arrayModules);
-                                    //var_dump($arrayPermission);
                                 }
+                                foreach ($onlyModules as $travelOnlyModules) {
 
-                                if (!empty($travelSucursal["rol"])) {
-                                    if ($travelSucursal["rol"]["value"] != "0") {
-                                        $arrayRol = array(
-                                            "_id" => $travelSucursal["rol"]["value"],
-                                            "name" => $travelSucursal["rol"]["label"],
-                                            "type" => 0
+                                    foreach ($sucursal as $keyList => $travelSucursal) {
+
+                                        if ($travelGroupSucursales["label"] == $travelSucursal["label"]) {
+
+                                            if ($travelSucursal["modulos"] != "") {
+
+                                                $partesSelected = explode("-", $travelSucursal["modulos"]);
+
+                                                if ($travelOnlyModules == $partesSelected[0]) {
+
+                                                    $arrayPemits[] = $partesSelected[2];
+                                                }
+                                            }
+                                        }
+                                    }
+                                    if (!empty($arrayPemits)) {
+
+                                        $arrayModules[] = array(
+                                            "name" => $travelOnlyModules,
+                                            "type" => 1,
+                                            "permits" => $arrayPemits
                                         );
 
-                                        $arrayPermission[] = $arrayRol;
-                                        unset($arrayRol);
+                                        unset($arrayPemits);
+                                    } else {
+                                        $arrayModules = [];
                                     }
+                                    $arrayPermission = $arrayModules;
+                                }
+                                unset($arrayModules);
+
+                                if (empty($arrayRoles)) {
+                                    $arrayRoles = [];
                                 }
 
-                                $arrayBranchOffices[] = array(
-                                    "_id" => $travelSucursal["value"],
-                                    "name" => $travelSucursal["label"],
-                                    "is_default" => $is_default,
-                                    "permission" => $arrayPermission
-                                );
-                                unset($arrayPermission);
-                            }
+                                $resultado = array_merge($arrayRoles, $arrayPermission);
 
+                                $arrayBranchOffices[] = array(
+                                    "_id" => $travelGroupSucursales["value"],
+                                    "name" => $travelGroupSucursales["label"],
+                                    "is_default" => $is_default,
+                                    "permission" => $resultado
+                                );
+                                unset($arrayRoles);
+                            }
+                            
                             $userExist = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findOneBy(array('email' => $email));
                             if ($userExist) {
 
@@ -1204,8 +1300,9 @@ class ApiRestUsersNoMasterController extends Controller {
 
                         $id = $request->request->get("id");
                         $email = $request->request->get("email");
-                        $sucursal = $request->request->get("sucursal");
+                        $sucursal = $request->request->get("listSuc");
                         $onlyModules = $request->request->get("onlyModules");
+                        $groupSucursales = $request->request->get("groupSucursales");
 
                         if ($email == "") {
 
@@ -1215,22 +1312,37 @@ class ApiRestUsersNoMasterController extends Controller {
                             return new Response('Seleccione la sucursal');
                         } else {
 
-                            foreach ($sucursal as $key => $travelSucursal) {
+                            foreach ($groupSucursales as $key => $travelGroupSucursales) {
 
                                 if ($key == 0) {
                                     $is_default = 1;
                                 } else {
                                     $is_default = 0;
                                 }
+                                foreach ($sucursal as $keyList => $travelSucursal) {
+                                    if ($travelGroupSucursales["label"] == $travelSucursal["label"]) {
+                                        if ($travelSucursal["rol"] != "") {
 
-                                if (!empty($travelSucursal["modulos"])) {
+                                            $arrayRol = array(
+                                                "_id" => $travelSucursal["rol"]["value"],
+                                                "name" => $travelSucursal["rol"]["label"],
+                                                "type" => 0
+                                            );
 
-                                    foreach ($onlyModules as $travelOnlyModules) {
+                                            $arrayRoles[] = $arrayRol;
+                                            unset($arrayRol);
+                                        }
+                                    }
+                                }
+                                foreach ($onlyModules as $travelOnlyModules) {
 
-                                        foreach ($travelSucursal["modulos"] as $travelSelected) {
-                                            if ($travelSelected != "") {
+                                    foreach ($sucursal as $keyList => $travelSucursal) {
 
-                                                $partesSelected = explode("-", $travelSelected);
+                                        if ($travelGroupSucursales["label"] == $travelSucursal["label"]) {
+
+                                            if ($travelSucursal["modulos"] != "") {
+
+                                                $partesSelected = explode("-", $travelSucursal["modulos"]);
 
                                                 if ($travelOnlyModules == $partesSelected[0]) {
 
@@ -1238,43 +1350,42 @@ class ApiRestUsersNoMasterController extends Controller {
                                                 }
                                             }
                                         }
-                                        if (!empty($arrayPemits)) {
-
-                                            $arrayModules[] = array(
-                                                "name" => $travelOnlyModules,
-                                                "type" => 1,
-                                                "permits" => $arrayPemits
-                                            );
-
-                                            unset($arrayPemits);
-                                        }
                                     }
-                                    $arrayPermission = $arrayModules;
-                                    unset($arrayModules);
-                                    //var_dump($arrayPermission);
-                                }
+                                    if (!empty($arrayPemits)) {
 
-                                if (!empty($travelSucursal["rol"])) {
-                                    if ($travelSucursal["rol"]["value"] != "0") {
-                                        $arrayRol = array(
-                                            "_id" => $travelSucursal["rol"]["value"],
-                                            "name" => $travelSucursal["rol"]["label"],
-                                            "type" => 0
+                                        $arrayModules[] = array(
+                                            "name" => $travelOnlyModules,
+                                            "type" => 1,
+                                            "permits" => $arrayPemits
                                         );
 
-                                        $arrayPermission[] = $arrayRol;
-                                        unset($arrayRol);
+                                        unset($arrayPemits);
+                                    } else {
+                                        $arrayModules = [];
                                     }
+                                    $arrayPermission = $arrayModules;
+                                }
+                                unset($arrayModules);
+
+                                if (empty($arrayRoles)) {
+                                    $arrayRoles = [];
                                 }
 
+                                $resultado = array_merge($arrayRoles, $arrayPermission);
+//
                                 $arrayBranchOffices[] = array(
-                                    "_id" => $travelSucursal["value"],
-                                    "name" => $travelSucursal["label"],
+                                    "_id" => $travelGroupSucursales["value"],
+                                    "name" => $travelGroupSucursales["label"],
                                     "is_default" => $is_default,
-                                    "permission" => $arrayPermission
+                                    "permission" => $resultado
                                 );
-                                unset($arrayPermission);
+                                unset($arrayRoles);
                             }
+//                            $encoders = array(new XmlEncoder(), new JsonEncoder());
+//                            $normalizers = array(new ObjectNormalizer());
+//                            $serializer = new Serializer($normalizers, $encoders);
+//                            $jsonContent = $serializer->serialize($arrayBranchOffices, 'json');
+//                            return new Response($jsonContent);
 
                             $userExist = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->find($id);
                             if ($userExist) {
@@ -1451,6 +1562,8 @@ class ApiRestUsersNoMasterController extends Controller {
                                                 "email" => $email,
                                                 "estado" => $estado
                                             );
+                                        } else {
+                                            $arrayUsersNoMaster = [];
                                         }
                                     }
                                 }
@@ -1655,39 +1768,50 @@ class ApiRestUsersNoMasterController extends Controller {
                                                     "label" => $travelPermission["name"],
                                                     "value" => $travelPermission["_id"]
                                                 );
-                                                $arrayPermits[] = "";
-                                            } else {
-                                                $arrayRol = array(
-                                                    "label" => "Sin Rol seleccionado",
-                                                    "value" => "0"
+                                                $arrayPermits = "";
+                                                $modulosMostrar = "";
+
+                                                $arrayBranhOffice[] = array(
+                                                    "label" => $travelBranchOffice["name"],
+                                                    "value" => $travelBranchOffice["_id"],
+                                                    "rol" => $arrayRol,
+                                                    "modulos" => $arrayPermits,
+                                                    "moduloMostrar" => $modulosMostrar
                                                 );
+                                            } else {
+                                                $arrayRol = "";
                                                 $nameModule = $travelPermission["name"];
                                                 foreach ($travelPermission["permits"] as $travelArrayPermits) {
-
+                                                    //var_dump($travelArrayPermits);
                                                     foreach ($arrayModulesGeneral as $travelArrayModulesGeneral) {
-
+                                                        //var_dump($travelArrayModulesGeneral["name"]);
                                                         if ($nameModule == $travelArrayModulesGeneral["name"]) {
-
+                                                            //var_dump($nameModule);
                                                             foreach ($travelArrayModulesGeneral["permits"] as $travelArrayPermitsGeneral) {
 
                                                                 if ($travelArrayPermits == $travelArrayPermitsGeneral["permit"]) {
+                                                                    //var_dump($travelArrayPermitsGeneral["permit"]);
                                                                     $permits = $travelArrayPermitsGeneral["_id"] . "-" . $travelArrayPermitsGeneral["permit"];
-                                                                    $arrayPermits[] = $nameModule . "-" . $permits;
+                                                                    $arrayPermits = $nameModule . "-" . $permits;
+                                                                    $modulosMostrar = $nameModule . "-" . $travelArrayPermitsGeneral["permit"];
+                                                                    //var_dump($nameModule);
+                                                                    $arrayBranhOffice[] = array(
+                                                                        "label" => $travelBranchOffice["name"],
+                                                                        "value" => $travelBranchOffice["_id"],
+                                                                        "rol" => $arrayRol,
+                                                                        "modulos" => $arrayPermits,
+                                                                        "moduloMostrar" => $modulosMostrar
+                                                                    );
                                                                 }
                                                             }
                                                         }
                                                     }
                                                 }
                                             }
+
+//                                            unset($arrayPermits);
+//                                            unset($arrayRol);
                                         }
-                                        $arrayBranhOffice[] = array(
-                                            "label" => $travelBranchOffice["name"],
-                                            "value" => $travelBranchOffice["_id"],
-                                            "rol" => $arrayRol,
-                                            "modulos" => $arrayPermits
-                                        );
-                                        unset($arrayPermits);
-                                        unset($arrayRol);
                                     }
 
                                     $arrayEnd = array(
@@ -1887,7 +2011,7 @@ class ApiRestUsersNoMasterController extends Controller {
                             }
                         }
                         $arrayEnd = array(
-                            "estado" => $estadoUser                            
+                            "estado" => $estadoUser
                         );
                     } else {
                         $arrayEnd = null;

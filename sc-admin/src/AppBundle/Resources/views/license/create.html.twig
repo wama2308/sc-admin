@@ -55,18 +55,24 @@
                     <div class="row">
                         <div class="form-group col-sm-6">   
                             <label>Users Quantity</label>
-                            <input name="UsersQuantity" id="UsersQuantity" type="text" value="" placeholder="Users quantity" class="form-control">                
+                            <input name="UsersQuantity" id="UsersQuantity" type="number" value="" placeholder="Users quantity" class="form-control">                
                         </div>
                         <div class="form-group col-sm-6">      
                             <label>Number of Clients</label>
-                            <input name="numberClients" id="numberClients" type="text" value="" placeholder="Number Clients" class="form-control">                
+                            <input name="numberClients" id="numberClients" type="number" value="" placeholder="Number Clients" class="form-control">                
                         </div>
                     </div>
                     <div class="row">
                         <div class="form-group col-sm-6">   
                             <label>Number of Exams</label>
-                            <input name="numberExams" id="numberExams" type="text" value="" placeholder="Number Exams" class="form-control">                
+                            <input name="numberExams" id="numberExams" type="number" value="" placeholder="Number Exams" class="form-control">                
                         </div>
+                        <div class="form-group col-sm-6">   
+                            <label>Number Branch Offices</label>
+                            <input name="numberBranchOffices" id="numberBranchOffices" type="number" min="0" max="1000" value="" placeholder="Number Branch Offices" class="form-control">                
+                        </div>                        
+                    </div> 
+                    <div class="row">
                         <div class="form-group col-sm-6">  
                             <label>Exams</label>
                             <div class="selector-country">
@@ -79,8 +85,6 @@
                                 </select>
                             </div>
                         </div>
-                    </div> 
-                    <div class="row">
                         <div class="form-group col-sm-6">   
                             <label>Modules</label>
                             <div class="selector-country">
@@ -92,7 +96,9 @@
 
                                 </select>
                             </div>
-                        </div>
+                        </div>                        
+                    </div>
+                    <div class="row">
                         <div class="form-group col-sm-6">   
                             <label>Countries</label>
                             <div class="selector-country">
@@ -105,26 +111,26 @@
                                 </select>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
                         <div class="form-group col-sm-6">   
                             <label>Duration Time</label>
                             <input name="durationTime" id="durationTime" type="text" placeholder="Duration Time" class="form-control">
-                        </div>
+                        </div>                        
+                    </div>
+                    <div class="row">
                         <div class="form-group col-sm-6">   
                             <label>Notice of Payment</label>                
                             <input name="noticePayment" id="noticePayment" type="text" placeholder="Notice of Payment" class="form-control">                
                         </div>
+                        <div class="form-group col-sm-6">   
+                            <label>Amount</label>                
+                            <input name="amount" id="amount" type="text" placeholder="Amount" class="form-control">                
+                        </div>            
                     </div>
-                    <div class="row">
+                    <div class="row">   
                         <div class="form-group col-sm-6">   
                             <label>Description</label>
                             <textarea name="description" id="description" type="text" placeholder="Description" class="form-control"></textarea>
-                        </div>
-                       <div class="form-group col-sm-6">   
-                            <label>Amount</label>                
-                            <input name="amount" id="amount" type="text" placeholder="Amount" class="form-control">                
-                        </div>
+                        </div>                           
                     </div>
                     <div class="form-group">       
                         <input type="submit" value="Save" class="btn btn-primary" id="button">&nbsp;&nbsp;&nbsp;
@@ -209,14 +215,17 @@
                         if ($("#license").val() == "") {
                                 $("#license").focus().after("<span class='error' style='color:#FF0000;'>Enter the license</span>");
                                 return false;
-                        } else if ($("#UsersQuantity").val() == "") {
+                        } else if (($("#UsersQuantity").val() == "") || ($("#UsersQuantity").val() == "0")) {
                                 $("#UsersQuantity").focus().after("<span class='error' style='color:#FF0000;'>Enter the numbers users</span>");
                                 return false;
-                        } else if ($("#numberClients").val() == "") {
+                        } else if (($("#numberClients").val() == "") || ($("#numberClients").val() == "0")){
                                 $("#numberClients").focus().after("<span class='error' style='color:#FF0000;'>Enter numbers clients</span>");
                                 return false;
-                        } else if ($("#numberExams").val() == "") {
+                        } else if (($("#numberExams").val() == "") || ($("#numberExams").val() == "0")) {
                                 $("#numberExams").focus().after("<span class='error' style='color:#FF0000;'>Enter numbers exams</span>");
+                                return false;
+                        } else if (($("#numberBranchOffices").val() == "") || ($("#numberBranchOffices").val() == "0")) {
+                                $("#numberBranchOffices").focus().after("<span class='error' style='color:#FF0000;'>Enter numbers branch offices</span>");
                                 return false;
                         } else if ($("#exams").val() == "") {
                                 $("#exams").focus().after("<span class='error' style='color:#FF0000;'>select exams</span>");

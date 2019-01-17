@@ -45,7 +45,7 @@
     </select>
 {% elseif opcion == 5 %}    
     {#    <span class="close" onclick="$('#licenseModal').hide();">&times;</span>#}
-    <table align="center" id="tablelicenses_" class="table table-responsive-sm table-bordered table-hover table-sm" style="width: 100%; border-radius: 40px; font-size: 14px;">
+    <table align="center" id="tablelicenses_" class="table table-responsive-sm table-bordered table-hover table-sm" style="width: 100%; max-width: 1000px; border-radius: 40px; font-size: 14px;">
         <tr align="center" style="">
             {#            <th colspan="2" align="center"><img src="{{ asset('img/sc.png') }}" alt="License" width="280px" height="80px"/></th>                                                            #}
             <th colspan="2" align="center" style="background-color: #f0f3f5;"><h3><b>{{ license.license }}</b></h3></th>                                                            
@@ -149,9 +149,10 @@
     <br>    
     <input name="countLicenses" id="countLicenses" type="hidden" value="{{arrayLicenseData|length}}">
     <input name="medicalCenterId" id="medicalCenterId" type="hidden" value="{{id}}">
-    <table id="tablelicenses" class="table table-responsive-sm table-bordered table-hover table-sm" style="display: table; width: 100%; font-size: 14px;">
+    <div style="max-width: 1500px; width: 100%; overflow: auto">
+    <table id="tablelicenses" class="table-responsive-sm table-bordered table-hover table-sm" style="display: table; width: 100%; font-size: 14px;">
         <tr align="center" style="background-color: #f0f3f5;">
-            <th align="center">License</th>                            
+            <th align="center">Licenseeeee</th>                            
             <th align="center">Users Quantity</th>                            
             <th align="center">Number of Clients</th>                            
             <th align="center">Number of Exams</th>                            
@@ -204,6 +205,7 @@
 
         {% endfor %}
     </table>
+    </div>
     {#    <div id="divAmount" align="right" style="display: block; background: white; width: 100%"><b>Total to pay:</b>&nbsp;&nbsp;<input readonly="" name="amountTotal" id="amountTotal" type="hidden" value="{{ acumAmountLicense  }}" ><input readonly="" name="amountTotalShow" id="amountTotalShow" type="text" value="{{ acumAmountLicense|number_format(2, '.', ',')  }}" placeholder="" class="" style=" width: 25%; max-width: 50%; box-sizing: border-box;border: none;border-bottom: 2px solid black; text-align: center"><label id="labelAmountCurrentSymbol"><b>{{ currentSymbol }}</b></label></div>                        #}
     <div class="row">
         <div class="form-group col-sm-6"></div>
@@ -228,6 +230,7 @@
     <br>
 
     <input name="countPayments" id="countPayments" type="hidden" value="0">
+    <div style="max-width: 1500px; width: 100%; overflow: auto">
     <table id="tablePayments" class="table table-responsive-sm table-bordered table-hover table-sm" style="display: table; width: 100%; font-size: 14px;">
         <tr align="center" style="background-color: #f0f3f5;">
             <th align="center">Way to pay</th>                            
@@ -255,6 +258,7 @@
             {% endif %}    
         {% endfor %}#}
     </table>
+    </div>
     {% set acumRemaining = acumAmountLicense - acumAmountPayments %} 
     <br>
     <br>

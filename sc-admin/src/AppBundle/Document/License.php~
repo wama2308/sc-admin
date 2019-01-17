@@ -44,6 +44,11 @@ class License {
     protected $numberexams;
     
     /**
+     * @MongoDB\Field(type="int")
+     */
+    protected $numberbranchOffices;
+    
+    /**
      * @MongoDB\Field(type="collection")
      */
     protected $exams;

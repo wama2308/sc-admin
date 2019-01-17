@@ -45,6 +45,7 @@ class LicenseController extends Controller {
         $UsersQuantity = $request->request->get("UsersQuantity");
         $numberClients = $request->request->get("numberClients");
         $numberExams = $request->request->get("numberExams");
+        $numberbranchOffices = $request->request->get("numberBranchOffices");
         $exam = $request->request->get("exams");
         //$arrayExams = explode(",", $exam);
         $modules = $request->request->get("modules");
@@ -57,7 +58,7 @@ class LicenseController extends Controller {
         $amount = $request->request->get("amount");
 
 
-        if (($license != "") && ($typelicense != "") && ($UsersQuantity != "") && ($numberClients != "") && ($numberExams != "") && ($exam != "") && ($modules != "") && ($country != "") && ($durationTime != "") && ($noticePayment != "") && ($description != "") && ($amount != "")) {
+        if (($license != "") && ($typelicense != "") && ($UsersQuantity != "") && ($numberClients != "") && ($numberExams != "") && ($exam != "") && ($numberbranchOffices != "") && ($modules != "") && ($country != "") && ($durationTime != "") && ($noticePayment != "") && ($description != "") && ($amount != "")) {
 
             $fechaNow = new \MongoDate();
 
@@ -68,6 +69,7 @@ class LicenseController extends Controller {
             $licence->setNumberClients($numberClients);
             $licence->setNumberExams($numberExams);
             $licence->setExams($exam);
+            $licence->setNumberbranchOffices($numberbranchOffices);
             $licence->setModules($modules);
             $licence->setCountries($country);
             $licence->setDurationTime($durationTime);
@@ -115,6 +117,7 @@ class LicenseController extends Controller {
         $license->setUsersquantity($license->getUsersquantity());
         $license->setNumberClients($license->getNumberclients());
         $license->setNumberExams($license->getNumberexams());
+        $license->setNumberbranchOffices($license->getNumberbranchOffices());
         $license->setExams($license->getExams());
         $license->setModules($license->getModules());
         $license->setCountries($license->getCountries());
@@ -128,6 +131,7 @@ class LicenseController extends Controller {
         $UsersQuantity = $request->request->get("UsersQuantity");
         $numberClients = $request->request->get("numberClients");
         $numberExams = $request->request->get("numberExams");
+        $numberBranchOffices = $request->request->get("numberBranchOffices");
         $exam = $request->request->get("exams");
         //$arrayExams = explode(",", $exam);
         $modules = $request->request->get("modules");
@@ -139,7 +143,7 @@ class LicenseController extends Controller {
         $description = $request->request->get("description");
         $amount = $request->request->get("amount");
 
-        if (($licenceName != "") && ($typelicense != "") && ($UsersQuantity != "") && ($numberClients != "") && ($numberExams != "") && ($exam != "") && ($modules != "") && ($country != "") && ($durationTime != "") && ($noticePayment != "") && ($description != "") && ($amount != "")) {
+        if (($licenceName != "") && ($typelicense != "") && ($UsersQuantity != "") && ($numberClients != "") && ($numberExams != "") && ($numberBranchOffices != "") && ($exam != "") && ($modules != "") && ($country != "") && ($durationTime != "") && ($noticePayment != "") && ($description != "") && ($amount != "")) {
 
             $dm = $this->get('doctrine_mongodb')->getManager();
             $license = $dm->getRepository('AppBundle:License')->find($id);
@@ -149,6 +153,7 @@ class LicenseController extends Controller {
             $license->setUsersquantity($UsersQuantity);
             $license->setNumberClients($numberClients);
             $license->setNumberExams($numberExams);
+            $license->setNumberbranchOffices($numberBranchOffices);
             $license->setExams($exam);
             $license->setModules($modules);
             $license->setCountries($country);

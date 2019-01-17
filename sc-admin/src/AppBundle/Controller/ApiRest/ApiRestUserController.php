@@ -355,7 +355,8 @@ class ApiRestUserController extends Controller {
 //        return new Response('HOLA');
         $token = $this->get('lexik_jwt_authentication.encoder')
                 ->encode([
-            'username' => $user->getEmail(), 'id' => $user->getId(),
+            'username' => $user->getEmail(),
+            'id' => $user->getId(),
             'profile_is_default' => $user->getProfileIsDefault(),
             'profile' => $user->getProfile()
         ]);

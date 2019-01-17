@@ -71,6 +71,12 @@
                             <label>Number of Exams</label>
                             <input name="numberExams" id="numberExams" type="text" value="{{ license.numberexams }}" placeholder="Number Exams" class="form-control">                
                         </div>
+                        <div class="form-group col-sm-6">   
+                            <label>Number Branch Offices</label>
+                            <input name="numberBranchOffices" id="numberBranchOffices" type="number" min="0" max="1000" value="{{license.numberbranchOffices}}" placeholder="Number Branch Offices" class="form-control">                
+                        </div>                        
+                    </div>
+                    <div class="row">
                         <div class="form-group col-sm-6">       
                             <label>Exams</label>
                             <div class="selector-country">
@@ -87,8 +93,6 @@
                                 </select>                    
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
                         <div class="form-group col-sm-6">       
                             <label>Modules</label>                
                             <div class="selector-country">
@@ -105,7 +109,9 @@
 
                                 </select>
                             </div>
-                        </div>
+                        </div>                        
+                    </div>         
+                    <div class="row">
                         <div class="form-group col-sm-6">       
                             <label>Countries</label>
                             <div class="selector-country">
@@ -123,25 +129,25 @@
                                 </select>
                             </div>
                         </div>         
-                    </div>         
-                    <div class="row">
                         <div class="form-group col-sm-6">       
                             <label>Duration Time</label>
                             <input name="durationTime" id="durationTime" type="text" value="{{ license.durationtime }}" placeholder="Duration Time" class="form-control">
-                        </div>
+                        </div>                        
+                    </div>
+                    <div class="row">
                         <div class="form-group col-sm-6">       
                             <label>Notice of Payment</label>                
                             <input name="noticePayment" id="noticePayment" type="text" value="{{ license.noticepayment }}" placeholder="Notice of Payment" class="form-control">                
+                        </div>                        
+                        <div class="form-group col-sm-6">       
+                            <label>Amount</label>                
+                            <input name="amount" id="amount" type="text" value="{{ license.amount }}" placeholder="Amount" class="form-control">                
                         </div>
                     </div>
                     <div class="row">
                         <div class="form-group col-sm-6">       
                             <label>Description</label>
                             <textarea name="description" id="description" type="text" placeholder="Description" class="form-control">{{ license.description }}</textarea>
-                        </div>
-                        <div class="form-group col-sm-6">       
-                            <label>Amount</label>                
-                            <input name="amount" id="amount" type="text" value="{{ license.amount }}" placeholder="Amount" class="form-control">                
                         </div>
                     </div>
                     <div class="form-group">       

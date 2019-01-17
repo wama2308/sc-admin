@@ -44,6 +44,11 @@ class License {
     protected $numberexams;
     
     /**
+     * @MongoDB\Field(type="int")
+     */
+    protected $numberbranchOffices;
+    
+    /**
      * @MongoDB\Field(type="collection")
      */
     protected $exams;
@@ -493,5 +498,27 @@ class License {
     public function getTypelicense()
     {
         return $this->typelicense;
+    }
+
+    /**
+     * Set numberbranchOffices
+     *
+     * @param int $numberbranchOffices
+     * @return $this
+     */
+    public function setNumberbranchOffices($numberbranchOffices)
+    {
+        $this->numberbranchOffices = $numberbranchOffices;
+        return $this;
+    }
+
+    /**
+     * Get numberbranchOffices
+     *
+     * @return int $numberbranchOffices
+     */
+    public function getNumberbranchOffices()
+    {
+        return $this->numberbranchOffices;
     }
 }
