@@ -58,8 +58,6 @@ class ApiRestServicesController extends Controller {
 
                                         if ($arrayDate >= $fechaActual) {
 
-
-
                                             $license = $this->get('doctrine_mongodb')->getRepository('AppBundle:License')->find($TravelArrayLicenses["license_id"]);
                                             $servicesLicense = $license->getExams();
                                             $licenseId = $license->getId();
@@ -496,7 +494,19 @@ class ApiRestServicesController extends Controller {
      */
     public function EditServiceAction(Request $request) {
 
-        $fechaNow = new \MongoDate();
+        //$fechaNow = new \MongoDate();
+        ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
+        $timeZ = $request->request->get("timeZ");
+        if ($timeZ == null) {
+            $timeZone = "America/Caracas";
+        } else {
+            $timeZone = $timeZ;
+        }
+        date_default_timezone_set($timeZone);
+        $dt = new \DateTime(date('Y-m-d H:i:s'), new \DateTimeZone('UTC'));
+        $ts = $dt->getTimestamp();
+        $fechaNow = new \MongoDate($ts);
+        ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
         $token = $request->headers->get('access-token');
 
         if ($token == "") {
@@ -719,7 +729,19 @@ class ApiRestServicesController extends Controller {
      */
     public function saveTemplateAction(Request $request) {
 
-        $fechaNow = new \MongoDate();
+        //$fechaNow = new \MongoDate();
+        ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
+        $timeZ = $request->request->get("timeZ");
+        if ($timeZ == null) {
+            $timeZone = "America/Caracas";
+        } else {
+            $timeZone = $timeZ;
+        }
+        date_default_timezone_set($timeZone);
+        $dt = new \DateTime(date('Y-m-d H:i:s'), new \DateTimeZone('UTC'));
+        $ts = $dt->getTimestamp();
+        $fechaNow = new \MongoDate($ts);
+        ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
 
         $token = $request->headers->get('access-token');
         if ($token == "") {
@@ -802,7 +824,19 @@ class ApiRestServicesController extends Controller {
      */
     public function editTemplateAction(Request $request) {
 
-        $fechaNow = new \MongoDate();
+        //$fechaNow = new \MongoDate();
+        ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
+        $timeZ = $request->request->get("timeZ");
+        if ($timeZ == null) {
+            $timeZone = "America/Caracas";
+        } else {
+            $timeZone = $timeZ;
+        }
+        date_default_timezone_set($timeZone);
+        $dt = new \DateTime(date('Y-m-d H:i:s'), new \DateTimeZone('UTC'));
+        $ts = $dt->getTimestamp();
+        $fechaNow = new \MongoDate($ts);
+        ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
 
         $token = $request->headers->get('access-token');
         if ($token == "") {
@@ -1005,7 +1039,19 @@ class ApiRestServicesController extends Controller {
      */
     public function deleteTemplateIdAction(Request $request) {
 
-        $fechaNow = new \MongoDate();
+        //$fechaNow = new \MongoDate();
+        ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
+        $timeZ = $request->request->get("timeZ");
+        if ($timeZ == null) {
+            $timeZone = "America/Caracas";
+        } else {
+            $timeZone = $timeZ;
+        }
+        date_default_timezone_set($timeZone);
+        $dt = new \DateTime(date('Y-m-d H:i:s'), new \DateTimeZone('UTC'));
+        $ts = $dt->getTimestamp();
+        $fechaNow = new \MongoDate($ts);
+        ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
 
         $token = $request->headers->get('access-token');
         if ($token == "") {
@@ -1045,6 +1091,8 @@ class ApiRestServicesController extends Controller {
                     $arrayTemplates = $medicalcenter->getTemplates();
 
                     $arrayTemplates[$posicion]["status"] = false;
+                    $arrayTemplates[$posicion]["updated_at"] = $fechaNow;
+                    $arrayTemplates[$posicion]["updated_by"] = $user_id;
 
                     $medicalcenter->setTemplates($arrayTemplates);
 

@@ -100,6 +100,17 @@ class GeneralConfiguration
      */
     protected $permits;    
     
+    /**
+     * @MongoDB\Field(type="collection")
+     */
+    protected $sex;    
+    
+    /**
+     * @MongoDB\Field(type="collection")
+     */
+    protected $civil_state;    
+    
+    
     function __construct() 
     {
         $this->created_at = new \DateTime();
@@ -472,5 +483,49 @@ class GeneralConfiguration
     public function getPermits()
     {
         return $this->permits;
+    }
+
+    /**
+     * Set sex
+     *
+     * @param collection $sex
+     * @return $this
+     */
+    public function setSex($sex)
+    {
+        $this->sex = $sex;
+        return $this;
+    }
+
+    /**
+     * Get sex
+     *
+     * @return collection $sex
+     */
+    public function getSex()
+    {
+        return $this->sex;
+    }
+
+    /**
+     * Set civilState
+     *
+     * @param collection $civilState
+     * @return $this
+     */
+    public function setCivilState($civilState)
+    {
+        $this->civil_state = $civilState;
+        return $this;
+    }
+
+    /**
+     * Get civilState
+     *
+     * @return collection $civilState
+     */
+    public function getCivilState()
+    {
+        return $this->civil_state;
     }
 }

@@ -49,6 +49,7 @@
                                 <div class="input-group mb-3">
 
                                     <input class="form-control" id="myInput" type="text" name="myInput" placeholder="Search..." on />
+                                    <input name="timeZ" id="timeZ" type="hidden" value="">
                                     <div class="input-group-btn">
                                         &nbsp;&nbsp;&nbsp;
                                         <button title="Search" class="btn btn-primary" type="button" onclick="loadAjax($('#myInput').val(), 'divPaymentsMedicalCenter', 7);
@@ -231,6 +232,10 @@
     <script type="text/javascript">
 
         $(document).ready(function () {
+            setTimeout(function () {
+                $("#timeZ").val($("#timeZone").val());
+            }, 1000);
+
             var licenseModal = document.getElementById('licenseModal');
             var paymentModal = document.getElementById('paymentModal');
             var infoLicenseModal = document.getElementById('infoLicenseModal');

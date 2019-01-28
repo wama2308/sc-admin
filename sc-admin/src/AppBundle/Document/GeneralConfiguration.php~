@@ -100,6 +100,17 @@ class GeneralConfiguration
      */
     protected $permits;    
     
+    /**
+     * @MongoDB\Field(type="collection")
+     */
+    protected $sex;    
+    
+    /**
+     * @MongoDB\Field(type="collection")
+     */
+    protected $civil_state;    
+    
+    
     function __construct() 
     {
         $this->created_at = new \DateTime();

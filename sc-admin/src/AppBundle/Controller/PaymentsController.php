@@ -504,7 +504,7 @@ class PaymentsController extends Controller {
     public function createLicensePaymentAction(Request $request) {
 
         $form = $this->createFormBuilder()->getForm();
-        $fechaNow = new \MongoDate();
+        //$fechaNow = new \MongoDate();
         $user = $this->getUser()->getId();
 
         $form->handleRequest($request);
@@ -515,6 +515,18 @@ class PaymentsController extends Controller {
 
         if (($countPayments != "0") && ($countLicenses != "0")) {
 //        if ($countLicenses != "0") {
+            ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
+            $timeZ = $request->request->get("timeZ");
+            if ($timeZ == null) {
+                $timeZone = "America/Caracas";
+            } else {
+                $timeZone = $timeZ;
+            }
+            date_default_timezone_set($timeZone);
+            $dt = new \DateTime(date('Y-m-d H:i:s'), new \DateTimeZone('UTC'));
+            $ts = $dt->getTimestamp();
+            $fechaNow = new \MongoDate($ts);
+            ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
 
             $medicalcenter = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->find($medicalCenterId);
             $arrayLicenses = $medicalcenter->getLicenses();
@@ -537,7 +549,7 @@ class PaymentsController extends Controller {
                     $nuevafecha = strtotime('+' . $durationData . 'day', strtotime($fecha));
                     $nuevafecha = date('Y-m-d h:i:s', $nuevafecha);
                     $fecha_expiration = new \MongoDate(strtotime($nuevafecha));
-                    
+
                     $arrayRenovation[] = array(
                         "previous_amount" => doubleval($amountData),
                         "amount" => doubleval($amountData),
@@ -545,7 +557,7 @@ class PaymentsController extends Controller {
                         "due_date" => $fecha_expiration,
                         "created_at" => $fechaNow,
                         "created_by" => $user);
-                    
+
                     $arrayLicenses[$i]["expiration_date"] = $fecha_expiration;
                     $arrayLicenses[$i]["renovation"] = $arrayRenovation;
 
@@ -553,7 +565,6 @@ class PaymentsController extends Controller {
 
                     $dm = $this->get('doctrine_mongodb')->getManager();
                     $dm->flush();
-                    
                 } else {
 
 
@@ -604,7 +615,7 @@ class PaymentsController extends Controller {
 
             for ($i = 0; $i < $countPayments; $i++) {
 
-                $status = true;                
+                $status = true;
 
                 $arrayPayments[] = array(
                     "waytopay" => $request->request->get("waytopay_" . $i),

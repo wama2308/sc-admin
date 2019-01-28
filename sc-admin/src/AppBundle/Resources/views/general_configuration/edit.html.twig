@@ -37,6 +37,7 @@
                         <div class="form-group col-sm-6">
                             <label>Name</label>
                             <input name="module" id="module" type="text" value="{{modules[positionModule]['name']}}" placeholder="Name" class="form-control">
+                            <input name="timeZ" id="timeZ" type="hidden" value="">
                         </div>           
                         <div class="form-group col-sm-6">
                             <label>Controller</label>
@@ -128,8 +129,9 @@
                                         <td align="center">{{ permits.route }}</td>
                                         <td align="center">{{ permits.action }}</td>
                                         <td align="center">{{ permits.method|join(',') }}</td>
-                                        <td><button type="button" name="remove" id="{{loop.index-1}}" onclick="$(this).parent().parent().remove(); restPermits()" class="btn btn-danger" style=""><i class="fas fa-minus-circle"></i></button></td>
-                                        {#                                        <td align="center"><button type="button" name="remove" id="{{loop.index-1}}" onclick="deletePayments('{{ medicalcenter.id }}',{{ loop.index-1 }} , {{paymentsMc.amount}});" class="btn btn-danger" style=""><i class="fas fa-minus-circle"></i></button></td>#}
+                                        <td><button type="button" name="remove" id="{{loop.index-1}}" onclick="$(this).parent().parent().remove();
+                                                restPermits()" class="btn btn-danger" style=""><i class="fas fa-minus-circle"></i></button></td>
+                                                {#                                        <td align="center"><button type="button" name="remove" id="{{loop.index-1}}" onclick="deletePayments('{{ medicalcenter.id }}',{{ loop.index-1 }} , {{paymentsMc.amount}});" class="btn btn-danger" style=""><i class="fas fa-minus-circle"></i></button></td>#}
                                     </tr>
                                 {% endfor %}    
                             </table>                        
@@ -145,7 +147,11 @@
         </div>
     </div>
     <script type="text/javascript">
-        $(document).ready(function () {
+        $(document).ready(function () {           
+
+            setTimeout(function () {
+                $("#timeZ").val($("#timeZone").val());
+            }, 1000);
 
             $(".select-permit").chosen({
                 placeholder_text_multiple: "Select a method",
@@ -176,7 +182,7 @@
                                 return false;
                         }
                 });
-            
+
             $("#countPermits").val("{{ modules[positionModule]['permits']|length }}");
 
         });

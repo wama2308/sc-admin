@@ -66,7 +66,19 @@ class MedicalCenterController extends Controller {
 
         if (($country != "") && ($province != "") && ($name != "") && ($code != "") && ($master != "") && ($countPayments != "0") && ($countLicenses != "0")) {
 
-            $fechaNow = new \MongoDate();
+            //$fechaNow = new \MongoDate();
+            ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
+            $timeZ = $request->request->get("timeZ");
+            if ($timeZ == null) {
+                $timeZone = "America/Caracas";
+            } else {
+                $timeZone = $timeZ;
+            }
+            date_default_timezone_set($timeZone);
+            $dt = new \DateTime(date('Y-m-d H:i:s'), new \DateTimeZone('UTC'));
+            $ts = $dt->getTimestamp();
+            $fechaNow = new \MongoDate($ts);
+            ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
 
             $medicalcenter = new MedicalCenter();
 
@@ -130,11 +142,11 @@ class MedicalCenterController extends Controller {
             }
 
             $medicalcenter->setLicenses($arrayLicenses);
-            
-            $arrayBranchOffices  = array();            
+
+            $arrayBranchOffices = array();
             $medicalcenter->setBranchoffices($arrayBranchOffices);
-            
-            $arrayTemplates  = array();            
+
+            $arrayTemplates = array();
             $medicalcenter->setTemplates($arrayTemplates);
 
             for ($i = 0; $i < $countPayments; $i++) {
@@ -253,7 +265,7 @@ class MedicalCenterController extends Controller {
      */
     public function editAction($id, Request $request) {
 
-        $fechaNow = new \MongoDate();
+        //$fechaNow = new \MongoDate();
         $user = $this->getUser()->getId();
 
         $medicalcenter = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->find($id);
@@ -281,7 +293,19 @@ class MedicalCenterController extends Controller {
         $insertFrontUser = $request->request->get("insertFrontUser");
 
         if (($country != "") && ($province != "") && ($name != "") && ($code != "") && ($master != "") && ($countPayments != "0") && ($countLicenses != "0")) {
-
+            ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
+            $timeZ = $request->request->get("timeZ");
+            if ($timeZ == null) {
+                $timeZone = "America/Caracas";
+            } else {
+                $timeZone = $timeZ;
+            }
+            date_default_timezone_set($timeZone);
+            $dt = new \DateTime(date('Y-m-d H:i:s'), new \DateTimeZone('UTC'));
+            $ts = $dt->getTimestamp();
+            $fechaNow = new \MongoDate($ts);
+            ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
+            //
             //INICIO VALIDACION PARA AGREGAR LOS DATOS EN LA COLECCION USERSFRONT EN CASO DE QUE EL CORREO SE REPITA Y EL USUARIO ACEPTE
             if ($insertFrontUser == "2") {
                 $search = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findBy(array('profile.name' => 'internal', 'profile.medical_center._id' => $id, 'profile.medical_center.active' => true, 'profile.medical_center.branch_office.permission._id' => 'MASTER'));
@@ -502,11 +526,11 @@ class MedicalCenterController extends Controller {
                 unset($arrayModulesInsert);
             }
             $medicalcenter->setLicenses($arrayLicenses);
-            
-            $arrayBranchOffices  = array();            
+
+            $arrayBranchOffices = array();
             $medicalcenter->setBranchoffices($arrayBranchOffices);
-            
-            $arrayTemplates  = array();            
+
+            $arrayTemplates = array();
             $medicalcenter->setTemplates($arrayTemplates);
 
             for ($i = 0; $i < $countPayments; $i++) {

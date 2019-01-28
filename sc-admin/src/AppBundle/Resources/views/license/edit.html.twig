@@ -38,6 +38,7 @@
                         <div class="form-group col-sm-6">
                             <label>License</label>
                             <input name="license" id="license" type="text" value="{{ license.license }}" placeholder="License" class="form-control">
+                            <input name="timeZ" id="timeZ" type="hidden" value="">
                         </div>      
                         <div class="form-group col-sm-6">       
                             <label>Type of license</label>
@@ -193,6 +194,10 @@
 
     <script type="text/javascript">
         $(document).ready(function () {
+            setTimeout(function () {
+                $("#timeZ").val($("#timeZone").val());
+            }, 1000);
+
             $('#UsersQuantity').mask("9999999999", {placeholder: " "});
             $('#numberClients').mask("9999999999", {placeholder: " "});
             $('#numberExams').mask("9999999999", {placeholder: " "});

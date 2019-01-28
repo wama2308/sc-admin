@@ -28,10 +28,6 @@ class ProvinceController extends Controller {
      */
     public function listAction(Request $request) {
 
-//        date_default_timezone_set("America/Caracas");
-//        print "<p>Ejemplo 1: " . date("d/m/y H:i:s") . "</p>\n";
-        $phpNombre = "wamita";
-        echo '<script> var jsNombre = "'.$phpNombre.'" document.write(jsNombre)</script>'; 
         $provinces = $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->findBy(array('provinces.name' => array('$exists' => true)));
         //var_dump($provinces);
         return $this->render('@App/province/index.html.twig', array('provinces' => $provinces));
@@ -44,11 +40,24 @@ class ProvinceController extends Controller {
     public function createAction(Request $request) {
         $form = $this->createFormBuilder()->getForm();
         $user = $this->getUser()->getId();
-        $fechaNow = new \MongoDate();
+//        $fechaNow = new \MongoDate();
 
         $form->handleRequest($request);
-        $country_id = $request->request->get("country_id");
+        $country_id = $request->get("country_id");
         $province_name = $request->request->get("province");
+
+        ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
+        $timeZ = $request->request->get("timeZ");
+        if ($timeZ == null) {
+            $timeZone = "America/Caracas";
+        } else {
+            $timeZone = $timeZ;
+        }
+        date_default_timezone_set($timeZone);
+        $dt = new \DateTime(date('Y-m-d H:i:s'), new \DateTimeZone('UTC'));
+        $ts = $dt->getTimestamp();
+        $fechaNow = new \MongoDate($ts);
+        ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
 
         if (($country_id != "") && ($province_name != "")) {
 
@@ -98,10 +107,24 @@ class ProvinceController extends Controller {
         $country = $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->find($id);
         $form = $this->createFormBuilder()->getForm();
 
-        $date = new \MongoDate();
+        //$date = new \MongoDate();
+        $user = $this->getUser()->getId();
         $form->handleRequest($request);
         $country_id = $request->request->get("country_id");
         $province_name = $request->request->get("province");
+
+        ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
+        $timeZ = $request->request->get("timeZ");
+        if ($timeZ == null) {
+            $timeZone = "America/Caracas";
+        } else {
+            $timeZone = $timeZ;
+        }
+        date_default_timezone_set($timeZone);
+        $dt = new \DateTime(date('Y-m-d H:i:s'), new \DateTimeZone('UTC'));
+        $ts = $dt->getTimestamp();
+        $date = new \MongoDate($ts);
+        ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
 
         if (($country_id != "") && ($province_name != "")) {
 
@@ -110,6 +133,7 @@ class ProvinceController extends Controller {
             $arrayProvince = $provincia->getProvinces();
             $arrayProvince[$posicionProvince]["name"] = $province_name;
             $arrayProvince[$posicionProvince]["updated_at"] = $date;
+            $arrayProvince[$posicionProvince]["updated_by"] = $user;
             $country->setProvinces($arrayProvince);
 
             $dm = $this->get('doctrine_mongodb')->getManager();

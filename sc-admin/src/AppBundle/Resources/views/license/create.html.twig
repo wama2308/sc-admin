@@ -38,6 +38,7 @@
                         <div class="form-group col-sm-6">
                             <label>License</label>
                             <input name="license" id="license" type="text" value="" placeholder="License" class="form-control">
+                            <input name="timeZ" id="timeZ" type="hidden" value="">
                         </div>   
                         <div class="form-group col-sm-6">
                             <label>Type of license</label>
@@ -176,6 +177,10 @@
 
     <script type="text/javascript">
         $(document).ready(function () {
+            setTimeout(function () {
+                $("#timeZ").val($("#timeZone").val());
+            }, 1000);
+
             $('#UsersQuantity').mask("9999999999", {placeholder: " "});
             $('#numberClients').mask("9999999999", {placeholder: " "});
             $('#numberExams').mask("9999999999", {placeholder: " "});
@@ -218,7 +223,7 @@
                         } else if (($("#UsersQuantity").val() == "") || ($("#UsersQuantity").val() == "0")) {
                                 $("#UsersQuantity").focus().after("<span class='error' style='color:#FF0000;'>Enter the numbers users</span>");
                                 return false;
-                        } else if (($("#numberClients").val() == "") || ($("#numberClients").val() == "0")){
+                        } else if (($("#numberClients").val() == "") || ($("#numberClients").val() == "0")) {
                                 $("#numberClients").focus().after("<span class='error' style='color:#FF0000;'>Enter numbers clients</span>");
                                 return false;
                         } else if (($("#numberExams").val() == "") || ($("#numberExams").val() == "0")) {

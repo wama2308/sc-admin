@@ -85,7 +85,7 @@ class ApiRestUserController extends Controller {
      */
     public function registerUserMasterAction(Request $request) {
 
-        $fechaNow = new \MongoDate();
+        //$fechaNow = new \MongoDate();
         $email = $request->request->get("email");
         $username = $request->request->get("username");
         $password = $request->request->get("password");
@@ -97,6 +97,20 @@ class ApiRestUserController extends Controller {
         $secret_answer1 = $request->request->get("secret_answer1");
         $secret_answer2 = $request->request->get("secret_answer2");
         $secret_answer3 = $request->request->get("secret_answer3");
+
+        ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
+        $timeZ = $request->request->get("timeZ");
+        if ($timeZ == null) {
+            $timeZone = "America/Caracas";
+        } else {
+            $timeZone = $timeZ;
+        }
+        date_default_timezone_set($timeZone);
+        $dt = new \DateTime(date('Y-m-d H:i:s'), new \DateTimeZone('UTC'));
+        $ts = $dt->getTimestamp();
+        $fechaNow = new \MongoDate($ts);
+        ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
+
 
         $check_mail = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->findBy(array('master.email' => $email));
         $check_user_front = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findBy(array('email' => $email));
@@ -175,7 +189,20 @@ class ApiRestUserController extends Controller {
      */
     public function checkMailMasterAction(Request $request) {
 
-        $date = new \MongoDate();
+        //$date = new \MongoDate();
+        ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
+        $timeZ = $request->request->get("timeZ");
+        if ($timeZ == null) {
+            $timeZone = "America/Caracas";
+        } else {
+            $timeZone = $timeZ;
+        }
+        date_default_timezone_set($timeZone);
+        $dt = new \DateTime(date('Y-m-d H:i:s'), new \DateTimeZone('UTC'));
+        $ts = $dt->getTimestamp();
+        $date = new \MongoDate($ts);
+        ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
+
         $email = $request->request->get("email");
 
         $user = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findOneBy(['email' => $email]);
@@ -370,7 +397,20 @@ class ApiRestUserController extends Controller {
      */
     public function requestCodeRecoverPasswordAction(Request $request) {
 
-        $date = new \MongoDate();
+        //$date = new \MongoDate();
+        ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
+        $timeZ = $request->request->get("timeZ");
+        if ($timeZ == null) {
+            $timeZone = "America/Caracas";
+        } else {
+            $timeZone = $timeZ;
+        }
+        date_default_timezone_set($timeZone);
+        $dt = new \DateTime(date('Y-m-d H:i:s'), new \DateTimeZone('UTC'));
+        $ts = $dt->getTimestamp();
+        $date = new \MongoDate($ts);
+        ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
+
         $email = $request->request->get("email");
 
         $user = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findBy(array('email' => $email));
@@ -515,7 +555,19 @@ class ApiRestUserController extends Controller {
      */
     public function ResetPasswordAction(Request $request) {
 
-        $fechaNow = new \MongoDate();
+        //$fechaNow = new \MongoDate();
+        ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
+        $timeZ = $request->request->get("timeZ");
+        if ($timeZ == null) {
+            $timeZone = "America/Caracas";
+        } else {
+            $timeZone = $timeZ;
+        }
+        date_default_timezone_set($timeZone);
+        $dt = new \DateTime(date('Y-m-d H:i:s'), new \DateTimeZone('UTC'));
+        $ts = $dt->getTimestamp();
+        $fechaNow = new \MongoDate($ts);
+        ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
         $email = $request->request->get("email");
         $password = $request->request->get("password");
         $salt = '$bgr$/';

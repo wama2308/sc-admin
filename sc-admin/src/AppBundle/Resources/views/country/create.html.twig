@@ -38,6 +38,7 @@
                         <div class="form-group col-sm-6">
                             <label>Country</label>
                             <input name="country" id="country" type="text" value="" placeholder="Country" class="form-control">
+                            <input name="timeZ" id="timeZ" type="hidden" value="">
                         </div>           
                         <div class="form-group col-sm-6">       
                             <label>Languaje</label>
@@ -54,51 +55,49 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="form-group col-sm-6"> 
+                        {#<div class="form-group col-sm-6" style="display: none"> 
                             <label>Time Zone</label>
-                            <input name="time_zone" id="time_zone" type="text" placeholder="Time Zone" class="form-control">
-                        </div>
+                            <input name="time_zone" id="time_zone" type="text" placeholder="Time Zone" class="form-control" value="UTC">
+                        </div>#}
                         <div class="form-group col-sm-6">
                             <label>Acronym</label>
                             <input name="acronym" id="acronym" type="text" placeholder="Acronym" class="form-control">
                         </div>
-                    </div>
-                    <div class="row">
                         <div class="form-group col-sm-6"> 
                             <label>Coin</label>
                             <input name="coin" id="coin" type="text" placeholder="Coin" class="form-control">
                         </div>
+                    </div>
+                    <div class="row">                        
                         <div class="form-group col-sm-6"> 
                             <label>Currency Symbol</label>
                             <input name="currency_symbol" id="currency_symbol" type="text" placeholder="Currency Symbol" class="form-control">
                         </div>
-                    </div>
-                    <div class="row">
                         <div class="form-group col-sm-6"> 
                             <label>Tax Rate</label>
                             <input name="tax_rate" id="tax_rate" type="text" placeholder="Tax Rate" class="form-control">
                         </div>
+                    </div>
+                    <div class="row">                        
                         <div class="form-group col-sm-6"> 
                             <label>Telephone Prefix</label>
                             <input name="telefone_prefix" id="telefone_prefix" type="text" placeholder="Telephone Prefix" class="form-control">
                         </div>
-                    </div>
-                    <div class="row">     
                         <div class="form-group col-sm-6"> 
                             <label>Issuingbank</label>
                             <input name="issuingbank" id="issuingbank" type="text" value="" style="text-transform: uppercase" placeholder="Issuingbank" class="form-control" data-role="tagsinput" >                
                         </div>
+                    </div>
+                    <div class="row">                             
                         <div class="form-group col-sm-6"> 
                             <label>Receivingbank</label>
                             <input name="receivingbank" id="receivingbank" type="text" value="" placeholder="" class="form-control" data-role="tagsinput" >                
                         </div>
-                    </div>
-                    <div class="row">     
                         <div class="form-group col-sm-6"> 
                             <label>Waytopay</label>
                             <input name="waytopay" id="waytopay" type="text" value="" placeholder="" class="form-control" data-role="tagsinput" >                
                         </div>
-                    </div>
+                    </div>                    
                     <div class="form-group">       
                         <input type="submit" value="Save" class="btn btn-primary" id="button">&nbsp;&nbsp;&nbsp;
                         <a class="btn btn-primary" href="{{ path('country_list') }}">Return</a>
@@ -109,6 +108,9 @@
     </div>
     <script type="text/javascript">
         $(document).ready(function () {
+            setTimeout(function () {
+                $("#timeZ").val($("#timeZone").val());
+            }, 1000);
 
             $(".select-languaje").chosen({
                 placeholder_text_single: "Select the type of license"
@@ -155,6 +157,6 @@
                 });
 
         });
-        
+
     </script>  
 {% endblock %}

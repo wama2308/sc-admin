@@ -172,7 +172,19 @@ class ApiRestUsersNoMasterController extends Controller {
      */
     public function saveRolAction(Request $request) {
 
-        $fechaNow = new \MongoDate();
+        //$fechaNow = new \MongoDate();
+        ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
+        $timeZ = $request->request->get("timeZ");
+        if ($timeZ == null) {
+            $timeZone = "America/Caracas";
+        } else {
+            $timeZone = $timeZ;
+        }
+        date_default_timezone_set($timeZone);
+        $dt = new \DateTime(date('Y-m-d H:i:s'), new \DateTimeZone('UTC'));
+        $ts = $dt->getTimestamp();
+        $fechaNow = new \MongoDate($ts);
+        ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
 
         $token = $request->headers->get('access-token');
         if ($token == "") {
@@ -278,7 +290,19 @@ class ApiRestUsersNoMasterController extends Controller {
      */
     public function editRolAction(Request $request) {
 
-        $fechaNow = new \MongoDate();
+        //$fechaNow = new \MongoDate();
+        ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
+        $timeZ = $request->request->get("timeZ");
+        if ($timeZ == null) {
+            $timeZone = "America/Caracas";
+        } else {
+            $timeZone = $timeZ;
+        }
+        date_default_timezone_set($timeZone);
+        $dt = new \DateTime(date('Y-m-d H:i:s'), new \DateTimeZone('UTC'));
+        $ts = $dt->getTimestamp();
+        $fechaNow = new \MongoDate($ts);
+        ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
 
         $token = $request->headers->get('access-token');
         if ($token == "") {
@@ -349,6 +373,8 @@ class ApiRestUsersNoMasterController extends Controller {
 
                         $arrayRoles[$posicion]["rol"] = $rol;
                         $arrayRoles[$posicion]["modules"] = $arrayModules;
+                        $arrayRoles[$posicion]["updated_at"] = $fechaNow;
+                        $arrayRoles[$posicion]["updated_by"] = $user_id;
                         $medicalcenter->setRoles($arrayRoles);
 
                         $dm = $this->get('doctrine_mongodb')->getManager();
@@ -934,7 +960,19 @@ class ApiRestUsersNoMasterController extends Controller {
      */
     public function saveUserNoMasterAction(Request $request) {
 
-        $fechaNow = new \MongoDate();
+        //$fechaNow = new \MongoDate();
+        ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
+        $timeZ = $request->request->get("timeZ");
+        if ($timeZ == null) {
+            $timeZone = "America/Caracas";
+        } else {
+            $timeZone = $timeZ;
+        }
+        date_default_timezone_set($timeZone);
+        $dt = new \DateTime(date('Y-m-d H:i:s'), new \DateTimeZone('UTC'));
+        $ts = $dt->getTimestamp();
+        $fechaNow = new \MongoDate($ts);
+        ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
 
         $token = $request->headers->get('access-token');
         if ($token == "") {
@@ -1050,7 +1088,7 @@ class ApiRestUsersNoMasterController extends Controller {
                                 );
                                 unset($arrayRoles);
                             }
-                            
+
                             $userExist = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findOneBy(array('email' => $email));
                             if ($userExist) {
 
@@ -1264,7 +1302,19 @@ class ApiRestUsersNoMasterController extends Controller {
      */
     public function editUserNoMasterAction(Request $request) {
 
-        $fechaNow = new \MongoDate();
+        //$fechaNow = new \MongoDate();
+        ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
+        $timeZ = $request->request->get("timeZ");
+        if ($timeZ == null) {
+            $timeZone = "America/Caracas";
+        } else {
+            $timeZone = $timeZ;
+        }
+        date_default_timezone_set($timeZone);
+        $dt = new \DateTime(date('Y-m-d H:i:s'), new \DateTimeZone('UTC'));
+        $ts = $dt->getTimestamp();
+        $fechaNow = new \MongoDate($ts);
+        ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
 
         $token = $request->headers->get('access-token');
         if ($token == "") {
@@ -1433,6 +1483,8 @@ class ApiRestUsersNoMasterController extends Controller {
 
                                 $userExist->setEmail($email);
                                 $userExist->setProfile($arrayProfile);
+                                $userExist->setUpdatedAt($fechaNow);
+                                $userExist->setUpdatedBy($user_id);
 //                        
                                 $dm = $this->get('doctrine_mongodb')->getManager();
                                 //$dm->persist($user_front);

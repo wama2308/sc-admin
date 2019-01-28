@@ -60,11 +60,23 @@ class LicenseController extends Controller {
 
         if (($license != "") && ($typelicense != "") && ($UsersQuantity != "") && ($numberClients != "") && ($numberExams != "") && ($exam != "") && ($numberbranchOffices != "") && ($modules != "") && ($country != "") && ($durationTime != "") && ($noticePayment != "") && ($description != "") && ($amount != "")) {
 
-            $fechaNow = new \MongoDate();
+            //$fechaNow = new \MongoDate();
+            ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
+            $timeZ = $request->request->get("timeZ");
+            if ($timeZ == null) {
+                $timeZone = "America/Caracas";
+            } else {
+                $timeZone = $timeZ;
+            }
+            date_default_timezone_set($timeZone);
+            $dt = new \DateTime(date('Y-m-d H:i:s'), new \DateTimeZone('UTC'));
+            $ts = $dt->getTimestamp();
+            $fechaNow = new \MongoDate($ts);
+            ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
 
             $licence = new License();
             $licence->setLicense($license);
-            $licence->setTypelicense($typelicense);            
+            $licence->setTypelicense($typelicense);
             $licence->setUsersquantity($UsersQuantity);
             $licence->setNumberClients($numberClients);
             $licence->setNumberExams($numberExams);
@@ -108,10 +120,10 @@ class LicenseController extends Controller {
      */
     public function editAction($id, Request $request) {
         $license = $this->get('doctrine_mongodb')->getRepository('AppBundle:License')->find($id);
-        $fechaNow = new \MongoDate();
+        //$fechaNow = new \MongoDate();
         $user = $this->getUser()->getId();
         $arrayExams = $license->getExams();
-        
+
         $license->setLicense($license->getLicense());
         $license->setTypelicense($license->getTypelicense());
         $license->setUsersquantity($license->getUsersquantity());
@@ -148,8 +160,21 @@ class LicenseController extends Controller {
             $dm = $this->get('doctrine_mongodb')->getManager();
             $license = $dm->getRepository('AppBundle:License')->find($id);
 
+            ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
+            $timeZ = $request->request->get("timeZ");
+            if ($timeZ == null) {
+                $timeZone = "America/Caracas";
+            } else {
+                $timeZone = $timeZ;
+            }
+            date_default_timezone_set($timeZone);
+            $dt = new \DateTime(date('Y-m-d H:i:s'), new \DateTimeZone('UTC'));
+            $ts = $dt->getTimestamp();
+            $fechaNow = new \MongoDate($ts);
+            ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
+
             $license->setLicense($licenceName);
-            $license->setTypelicense($typelicense);            
+            $license->setTypelicense($typelicense);
             $license->setUsersquantity($UsersQuantity);
             $license->setNumberClients($numberClients);
             $license->setNumberExams($numberExams);
@@ -161,6 +186,8 @@ class LicenseController extends Controller {
             $license->setNoticepayment($noticePayment);
             $license->setDescription($description);
             $license->setAmount($amount);
+            $license->setUpdatedAt($fechaNow);
+            $license->setUpdatedBy($user);
 
             $dm->flush();
 

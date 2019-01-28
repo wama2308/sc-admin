@@ -106,6 +106,21 @@ class MedicalCenter {
     /**
      * @MongoDB\Field(type="collection")
      */
+    protected $patients;
+    
+    /**
+     * @MongoDB\Field(type="collection")
+     */
+    protected $internal_staff;
+    
+    /**
+     * @MongoDB\Field(type="collection")
+     */
+    protected $positions;
+    
+    /**
+     * @MongoDB\Field(type="collection")
+     */
     protected $licenses;
     
     /**
@@ -760,5 +775,71 @@ class MedicalCenter {
     public function getTemplates()
     {
         return $this->templates;
+    }
+
+    /**
+     * Set patients
+     *
+     * @param collection $patients
+     * @return $this
+     */
+    public function setPatients($patients)
+    {
+        $this->patients = $patients;
+        return $this;
+    }
+
+    /**
+     * Get patients
+     *
+     * @return collection $patients
+     */
+    public function getPatients()
+    {
+        return $this->patients;
+    }
+
+    /**
+     * Set internalStaff
+     *
+     * @param collection $internalStaff
+     * @return $this
+     */
+    public function setInternalStaff($internalStaff)
+    {
+        $this->internal_staff = $internalStaff;
+        return $this;
+    }
+
+    /**
+     * Get internalStaff
+     *
+     * @return collection $internalStaff
+     */
+    public function getInternalStaff()
+    {
+        return $this->internal_staff;
+    }
+
+    /**
+     * Set positions
+     *
+     * @param collection $positions
+     * @return $this
+     */
+    public function setPositions($positions)
+    {
+        $this->positions = $positions;
+        return $this;
+    }
+
+    /**
+     * Get positions
+     *
+     * @return collection $positions
+     */
+    public function getPositions()
+    {
+        return $this->positions;
     }
 }

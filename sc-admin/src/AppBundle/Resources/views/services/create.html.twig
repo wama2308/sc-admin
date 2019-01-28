@@ -46,6 +46,7 @@
                         <div class="form-group">       
                             <label>Category</label>
                             <div class="selector-exam">
+                                <input name="timeZ" id="timeZ" type="hidden" value="">
                                 <select class="form-control select-category" name="category" id="category">
                                     <option value="">Select...</option>  
                                     {% for ArrayCategoryExams in ArrayCategoryExams %}
@@ -92,10 +93,14 @@
 
     <script type="text/javascript">
         $(document).ready(function () {
+            setTimeout(function () {
+                $("#timeZ").val($("#timeZone").val());
+            }, 1000);
+
             $(".select-category").chosen({
                 placeholder_text_single: "Select the category"
             });
-            
+
             $('#myTab a[href="#data"]').tab('show');
             $("#adicionados").val(0);
 
@@ -209,7 +214,7 @@
             var fields_split = fields.split(",");
             var fields_lenght = fields_split.length;
             var fields_replace = fields.replace(/,/g, " | ");
-            var i = 0;            
+            var i = 0;
 
             tinymce.init({
                 selector: 'textarea',

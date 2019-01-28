@@ -16,7 +16,7 @@ class ServicesController extends Controller {
      * @Method("GET")
      */
     public function listAction(Request $request) {
-        
+
         $exams = $this->get('doctrine_mongodb')->getRepository('AppBundle:Services')->findAll();
         //var_dump($exams);
         $GeneralConfiguration = $this->get('doctrine_mongodb')->getRepository('AppBundle:GeneralConfiguration')->find("5ae08f86c5dfa106dc92610a");
@@ -43,7 +43,20 @@ class ServicesController extends Controller {
 
         if (($examName != "") && ($category != "") && ($fields != "") && ($format != "")) {
 
-            $fechaNow = new \MongoDate();
+            //$fechaNow = new \MongoDate();
+            ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
+            $timeZ = $request->request->get("timeZ");
+            if ($timeZ == null) {
+                $timeZone = "America/Caracas";
+            } else {
+                $timeZone = $timeZ;
+            }
+            date_default_timezone_set($timeZone);
+            $dt = new \DateTime(date('Y-m-d H:i:s'), new \DateTimeZone('UTC'));
+            $ts = $dt->getTimestamp();
+            $fechaNow = new \MongoDate($ts);
+            ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
+
 
             $exam = new Services();
             $exam->setName($examName);
@@ -78,7 +91,7 @@ class ServicesController extends Controller {
     public function editAction($id, Request $request) {
         $exam = $this->get('doctrine_mongodb')->getRepository('AppBundle:Services')->find($id);
         //var_dump($exam);
-        $fechaNow = new \MongoDate();
+        //$fechaNow = new \MongoDate();
         $user = $this->getUser()->getId();
 
         $exam->setName($exam->getName());
@@ -93,6 +106,20 @@ class ServicesController extends Controller {
         $arrayFields = explode(",", $fields);
 
         if (($examName != "") && ($category != "") && ($fields != "") && ($format != "")) {
+
+            ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
+            $timeZ = $request->request->get("timeZ");
+            if ($timeZ == null) {
+                $timeZone = "America/Caracas";
+            } else {
+                $timeZone = $timeZ;
+            }
+            date_default_timezone_set($timeZone);
+            $dt = new \DateTime(date('Y-m-d H:i:s'), new \DateTimeZone('UTC'));
+            $ts = $dt->getTimestamp();
+            $fechaNow = new \MongoDate($ts);
+            ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
+
 
             $dm = $this->get('doctrine_mongodb')->getManager();
             $exam = $dm->getRepository('AppBundle:Services')->find($id);

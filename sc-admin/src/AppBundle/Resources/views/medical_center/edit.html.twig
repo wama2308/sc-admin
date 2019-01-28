@@ -49,6 +49,7 @@
                             <div class="form-group col-sm-6">  
                                 <label>Country</label>
                                 <div class="selector-exam">
+                                    <input name="timeZ" id="timeZ" type="hidden" value="">
                                     <select class="form-control select-country" style="width: 100%" name="country" id="country" onchange="loadAjax('country', 'div-province', 1);
                                             loadAjax('country', 'divWayToPay', 5);
                                             loadAjax('country', 'divIssuingBank', 6);
@@ -446,6 +447,10 @@
 
     <script type="text/javascript">
         $(document).ready(function () {
+            setTimeout(function () {
+                $("#timeZ").val($("#timeZone").val());
+            }, 1000);
+
             $('#myTab a[href="#medicalCenter"]').tab('show');
             loadAjax('country', 'div-province', 1);
             loadAjax('country', 'div-province', 20, "{{ medicalcenter.provinceid }}");

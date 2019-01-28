@@ -39,7 +39,19 @@ class GeneralConfigurationController extends Controller {
         //if ($form->isSubmitted() && $form->isValid()) {
         if (($module != "") && ($controller != "") && ($countPermits != "0")) {
 
-            $fechaNow = new \MongoDate();
+            //$fechaNow = new \MongoDate();
+            ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
+            $timeZ = $request->request->get("timeZ");
+            if ($timeZ == null) {
+                $timeZone = "America/Caracas";
+            } else {
+                $timeZone = $timeZ;
+            }
+            date_default_timezone_set($timeZone);
+            $dt = new \DateTime(date('Y-m-d H:i:s'), new \DateTimeZone('UTC'));
+            $ts = $dt->getTimestamp();
+            $fechaNow = new \MongoDate($ts);
+            ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
 
             $GeneralConfiguration = $this->get('doctrine_mongodb')->getRepository('AppBundle:GeneralConfiguration')->find("5ae08f86c5dfa106dc92610a");
             $arrayModules = $GeneralConfiguration->getModules();
@@ -69,7 +81,8 @@ class GeneralConfigurationController extends Controller {
                 "created_at" => $fechaNow,
                 "created_by" => $user,
                 "updated_at" => $fechaNow,
-                "updated_by" => $user);
+                "updated_by" => $user
+            );
 
             $GeneralConfiguration->setModules($arrayModules);
 
@@ -93,7 +106,7 @@ class GeneralConfigurationController extends Controller {
      */
     public function editAction($id, $positionModule, Request $request) {
 
-        $fechaNow = new \MongoDate();
+        //$fechaNow = new \MongoDate();
         $user = $this->getUser()->getId();
 
         $module = $request->request->get("module");
@@ -104,14 +117,26 @@ class GeneralConfigurationController extends Controller {
         //if ($form->isSubmitted() && $form->isValid()) {
         if (($module != "") && ($controller != "") && ($countPermits != "0")) {
 
-            $fechaNow = new \MongoDate();
+            //$fechaNow = new \MongoDate();
+            ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
+            $timeZ = $request->request->get("timeZ");
+            if ($timeZ == null) {
+                $timeZone = "America/Caracas";
+            } else {
+                $timeZone = $timeZ;
+            }
+            date_default_timezone_set($timeZone);
+            $dt = new \DateTime(date('Y-m-d H:i:s'), new \DateTimeZone('UTC'));
+            $ts = $dt->getTimestamp();
+            $fechaNow = new \MongoDate($ts);
+            ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
 
             $GeneralConfiguration = $this->get('doctrine_mongodb')->getRepository('AppBundle:GeneralConfiguration')->find("5ae08f86c5dfa106dc92610a");
             $arrayModules = $GeneralConfiguration->getModules();
             $module_id = new \MongoId();
 
             for ($i = 0; $i <= $countPermits; $i++) {
-                
+
                 if ($request->request->get("permit_" . $i) != null) {
 //                    var_dump($request->request->get("permit_" . $i));
                     $arrayMethod = explode(",", $request->request->get("method_" . $i));

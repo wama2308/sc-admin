@@ -175,7 +175,7 @@ class ApiRestMedicalCenterController extends Controller {
                     $encoders = array(new XmlEncoder(), new JsonEncoder());
                     $normalizers = array(new ObjectNormalizer());
 
-                    $serializer = new Serializer($normalizers, $encoders);                    
+                    $serializer = new Serializer($normalizers, $encoders);
 
                     $jsonContent = $serializer->serialize($medicalcenter, 'json');
 
@@ -277,7 +277,20 @@ class ApiRestMedicalCenterController extends Controller {
      */
     public function saveBranchOfficesAction(Request $request) {
 
-        $fechaNow = new \MongoDate();
+        //$fechaNow = new \MongoDate();
+        //var_dump($request->request->get("timeZ"));
+        ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
+        $timeZ = $request->request->get("timeZ");
+        if ($timeZ == null) {
+            $timeZone = "America/Caracas";
+        } else {
+            $timeZone = $timeZ;
+        }
+        date_default_timezone_set($timeZone);
+        $dt = new \DateTime(date('Y-m-d H:i:s'), new \DateTimeZone('UTC'));
+        $ts = $dt->getTimestamp();
+        $fechaNow = new \MongoDate($ts);
+        ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
 
         $token = $request->headers->get('access-token');
         if ($token == "") {
@@ -405,7 +418,20 @@ class ApiRestMedicalCenterController extends Controller {
      */
     public function editBranchOfficesAction(Request $request) {
 
-        $fechaNow = new \MongoDate();
+        //$fechaNow = new \MongoDate();
+        ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
+        //var_dump($request->request->get("timeZ"));
+        $timeZ = $request->request->get("timeZ");
+        if ($timeZ == null) {
+            $timeZone = "America/Caracas";
+        } else {
+            $timeZone = $timeZ;
+        }
+        date_default_timezone_set($timeZone);
+        $dt = new \DateTime(date('Y-m-d H:i:s'), new \DateTimeZone('UTC'));
+        $ts = $dt->getTimestamp();
+        $fechaNow = new \MongoDate($ts);
+        ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
 
         $token = $request->headers->get('access-token');
         if ($token == "") {
@@ -530,7 +556,19 @@ class ApiRestMedicalCenterController extends Controller {
      */
     public function deleteBranchOfficesAction(Request $request) {
 
-        $fechaNow = new \MongoDate();
+        //$fechaNow = new \MongoDate();
+        ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
+        $timeZ = $request->request->get("timeZ");
+        if ($timeZ == null) {
+            $timeZone = "America/Caracas";
+        } else {
+            $timeZone = $timeZ;
+        }
+        date_default_timezone_set($timeZone);
+        $dt = new \DateTime(date('Y-m-d H:i:s'), new \DateTimeZone('UTC'));
+        $ts = $dt->getTimestamp();
+        $fechaNow = new \MongoDate($ts);
+        ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
 
         $token = $request->headers->get('access-token');
         if ($token == "") {
@@ -598,7 +636,20 @@ class ApiRestMedicalCenterController extends Controller {
      */
     public function editPerfilMedicalCenterAction(Request $request) {
 
-        $fechaNow = new \MongoDate();
+        //$fechaNow = new \MongoDate();
+        
+        ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
+        $timeZ = $request->request->get("timeZ");
+        if ($timeZ == null) {
+            $timeZone = "America/Caracas";
+        } else {
+            $timeZone = $timeZ;
+        }
+        date_default_timezone_set($timeZone);
+        $dt = new \DateTime(date('Y-m-d H:i:s'), new \DateTimeZone('UTC'));
+        $ts = $dt->getTimestamp();
+        $fechaNow = new \MongoDate($ts);
+        ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
 
         $token = $request->headers->get('access-token');
         if ($token == "") {
@@ -667,7 +718,7 @@ class ApiRestMedicalCenterController extends Controller {
             }
         }
     }
-    
+
     /**
      * @Route("/api/LoadCountBranchOffices")     
      * @Method("GET")
@@ -723,14 +774,117 @@ class ApiRestMedicalCenterController extends Controller {
                         }
 
                         $licensesData = $this->get('doctrine_mongodb')->getRepository('AppBundle:License')->find($arrayLicenses['license_id']);
-                        
+
                         $acum = 0;
                         $numBranchOffices = $licensesData->getNumberbranchOffices();
                         $acum = $acum + $numBranchOffices;
-                        
                     }
 
                     $jsonContent = $serializer->serialize($acum, 'json');
+
+                    return new Response($jsonContent);
+                } else {
+
+                    $data = array('message' => 'Error al consultar los datos, problemas con el token');
+                    return new JsonResponse($data, 403);
+                }
+            }
+        }
+    }
+    
+    /**
+     * @Route("/api/countTableBranchOffices")     
+     * @Method("GET")
+     */
+    public function countTableBranchOfficesAction(Request $request) {
+
+        $token = $request->headers->get('access-token');
+        if ($token == "") {
+            $data = array('message' => 'Token invalido');
+            return new JsonResponse($data, 403);
+        } else {
+
+            $data_token = $this->get('lexik_jwt_authentication.encoder')->decode($token);
+
+            if ($data_token == false) {
+
+                $data = array('message' => 'Authentication Required');
+                return new JsonResponse($data, 403);
+            } else {
+
+                $user_id = $data_token["id"];
+                $user = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findOneBy(['_id' => $user_id]);
+                if ($user) {
+                    if ($data_token["profile_is_default"] == "internal") {
+                        foreach ($data_token['profile'] as $valor) {
+
+                            foreach ($valor->medical_center as $valorMedicalCenter) {
+                                if ($valorMedicalCenter->is_default == "1") {
+                                    $medicalcenter = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->find($valorMedicalCenter->_id);
+                                    $arrayBranchOffices = $medicalcenter->getBranchoffices();
+                                    $acumBranchOffices = 0;
+                                    foreach ($arrayBranchOffices as $travelArrayBranchOffices) {
+                                        if($travelArrayBranchOffices["status"] == true){
+                                            $acumBranchOffices++;
+                                        }
+                                        
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    return new Response($acumBranchOffices);
+                } else {
+
+                    $data = array('message' => 'Error al consultar los datos, problemas con el token');
+                    return new JsonResponse($data, 403);
+                }
+            }
+        }
+    }
+    
+    /**
+     * @Route("/api/LoadCurrentSymbol")     
+     * @Method("GET")
+     */
+    public function LoadCurrentSymbolAction(Request $request) {
+
+        $token = $request->headers->get('access-token');
+        if ($token == "") {
+            $data = array('message' => 'Token invalido');
+            return new JsonResponse($data, 403);
+        } else {
+
+            $data_token = $this->get('lexik_jwt_authentication.encoder')->decode($token);
+
+            if ($data_token == false) {
+
+                $data = array('message' => 'Authentication Required');
+                return new JsonResponse($data, 403);
+            } else {
+
+                $user_id = $data_token["id"];
+                $user = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findOneBy(['_id' => $user_id]);
+                if ($user) {
+                    if ($data_token["profile_is_default"] == "internal") {
+                        foreach ($data_token['profile'] as $valor) {
+
+                            foreach ($valor->medical_center as $valorMedicalCenter) {
+                                if ($valorMedicalCenter->is_default == "1") {
+                                    $medicalcenter = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->find($valorMedicalCenter->_id);
+                                    $countryId = $medicalcenter->getCountryid();
+                                    $country = $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->find($countryId);
+                                    $currentSymbol = $country->getCurrencySymbol();
+                                }
+                            }
+                        }
+                    }
+                    $encoders = array(new XmlEncoder(), new JsonEncoder());
+                    $normalizers = array(new ObjectNormalizer());
+
+                    $serializer = new Serializer($normalizers, $encoders);
+
+                    $jsonContent = $serializer->serialize($currentSymbol, 'json');
 
                     return new Response($jsonContent);
                 } else {

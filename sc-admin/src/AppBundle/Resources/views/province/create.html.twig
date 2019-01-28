@@ -47,6 +47,7 @@
                 <div class="form-group">
                     <label>Province/City</label>
                     <input name="province" id="province" type="text" value="" placeholder="Province" class="form-control">
+                    <input name="timeZ" id="timeZ" type="hidden" value="">
                 </div>
                 <div class="form-group">       
                     <input type="submit" value="Save" class="btn btn-primary" id="button">&nbsp;&nbsp;&nbsp;
@@ -62,8 +63,9 @@
     </div>
     <script type="text/javascript">
         $(document).ready(function () {
-            alert($("#timeZone").val());
-                    
+            setTimeout(function(){
+                $("#timeZ").val($("#timeZone").val());                
+            }, 1000);
             $(".select-country_id").chosen({
                 placeholder_text_single: "Select the country"
             });

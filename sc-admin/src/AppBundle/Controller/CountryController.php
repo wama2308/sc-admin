@@ -50,7 +50,7 @@ class CountryController extends Controller {
 
         $form->handleRequest($request);
         $name = $request->request->get("country");
-        $timeZone = $request->request->get("time_zone");
+        $timeZonePost = "UTC";
         $acronym = $request->request->get("acronym");
         $coin = $request->request->get("coin");
         $currencySymbol = $request->request->get("currency_symbol");
@@ -65,13 +65,25 @@ class CountryController extends Controller {
         $arrayWaytopay = explode(",", $waytopay);
 
         //if ($form->isSubmitted() && $form->isValid()) {
-        if (($name != "") && ($timeZone != "") && ($acronym != "") && ($coin != "") && ($currencySymbol != "") && ($taxRate != "") && ($telefonePrefix != "") && ($languaje != "")) {
+        if (($name != "") && ($timeZonePost != "") && ($acronym != "") && ($coin != "") && ($currencySymbol != "") && ($taxRate != "") && ($telefonePrefix != "") && ($languaje != "")) {
 
-            $fechaNow = new \MongoDate();
+            //$fechaNow = new \MongoDate();
+            ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
+            $timeZ = $request->request->get("timeZ");
+            if ($timeZ == null) {
+                $timeZone = "America/Caracas";
+            } else {
+                $timeZone = $timeZ;
+            }
+            date_default_timezone_set($timeZone);
+            $dt = new \DateTime(date('Y-m-d H:i:s'), new \DateTimeZone('UTC'));
+            $ts = $dt->getTimestamp();
+            $fechaNow = new \MongoDate($ts);
+            ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
 
             $country = new Country();
             $country->setName($name);
-            $country->setTimezone($timeZone);
+            $country->setTimezone($timeZonePost);
             $country->setAcronym($acronym);
             $country->setCoin($coin);
             $country->setCurrencySymbol($currencySymbol);
@@ -107,7 +119,7 @@ class CountryController extends Controller {
      */
     public function editAction($id, Request $request) {
         $country = $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->find($id);
-        $fechaNow = new \MongoDate();
+        //$fechaNow = new \MongoDate();
         $user = $this->getUser()->getId();
 
         $country->setName($country->getName());
@@ -123,7 +135,7 @@ class CountryController extends Controller {
         $country->setWaytopay($country->getWaytopay());
 
         $name = $request->request->get("country");
-        $timeZone = $request->request->get("time_zone");
+        $timeZonePost = "UTC";
         $acronym = $request->request->get("acronym");
         $coin = $request->request->get("coin");
         $currencySymbol = $request->request->get("currency_symbol");
@@ -137,13 +149,26 @@ class CountryController extends Controller {
         $waytopay = $request->request->get("waytopay");
         $arrayWaytopay = explode(",", $waytopay);
 
-        if (($name != "") && ($timeZone != "") && ($acronym != "") && ($coin != "") && ($currencySymbol != "") && ($taxRate != "") && ($telefonePrefix != "") && ($languaje != "")) {
+        if (($name != "") && ($timeZonePost != "") && ($acronym != "") && ($coin != "") && ($currencySymbol != "") && ($taxRate != "") && ($telefonePrefix != "") && ($languaje != "")) {
+
+            ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
+            $timeZ = $request->request->get("timeZ");
+            if ($timeZ == null) {
+                $timeZone = "America/Caracas";
+            } else {
+                $timeZone = $timeZ;
+            }            
+            date_default_timezone_set($timeZone);
+            $dt = new \DateTime(date('Y-m-d H:i:s'), new \DateTimeZone('UTC'));
+            $ts = $dt->getTimestamp();
+            $fechaNow = new \MongoDate($ts);
+            ///////////////////////PARA LA FECHA CON SU RESPECTIVA ZONA HORARIA
 
             $dm = $this->get('doctrine_mongodb')->getManager();
             $country = $dm->getRepository('AppBundle:Country')->find($id);
 
             $country->setName($name);
-            $country->setTimezone($timeZone);
+            $country->setTimezone($timeZonePost);
             $country->setAcronym($acronym);
             $country->setCoin($coin);
             $country->setCurrencySymbol($currencySymbol);
@@ -195,6 +220,6 @@ class CountryController extends Controller {
         $this->addFlash('error', 'Country Removed');
 
         return $this->redirectToRoute('country_details', array('id' => $id));
-    }    
+    }
 
 }
