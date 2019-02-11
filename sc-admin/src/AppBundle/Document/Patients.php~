@@ -1,0 +1,123 @@
+<?php
+
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+// src/AppBundle/Document/Patients.php
+namespace AppBundle\Document;
+use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+
+/**
+ * @MongoDB\Document 
+*/
+class Patients {
+    /**
+     * @MongoDB\Id
+     */
+    protected $id;
+    
+    /**
+     * @MongoDB\Field(type="string")
+     */
+    protected $type_identity;
+    
+    /**
+     * @MongoDB\Field(type="string")
+     */
+    protected $dni;
+    
+    /**
+     * @MongoDB\Field(type="string")
+     */
+    protected $names;
+    
+    /**
+     * @MongoDB\Field(type="string")
+     */
+    protected $surnames;
+    
+    /**
+     * @MongoDB\Field(type="string")
+     */
+    protected $civil_state;
+    
+    /**
+     * @MongoDB\Field(type="string")
+     */
+    protected $sex;    
+    
+    /**
+     * @MongoDB\Field(type="string")
+     */
+    protected $birth_date;
+    
+    /**
+     * @MongoDB\Field(type="collection")
+     */
+    protected $phone;
+    
+    /**
+     * @MongoDB\Field(type="collection")
+     */
+    protected $email;
+    
+    /**
+     * @MongoDB\Field(type="collection")
+     */
+    protected $province;
+    
+    /**
+     * @MongoDB\Field(type="collection")
+     */
+    protected $district;  
+    
+    /**
+     * @MongoDB\Field(type="string")
+     */
+    protected $address;    
+    
+    /**
+     * @MongoDB\Field(type="string")
+     */
+    protected $photo;    
+    
+    /**
+     * @MongoDB\Field(type="string")
+     */
+    protected $branchoffices_register;    
+    
+    /**
+     * @MongoDB\Field(type="int")
+     */
+    protected $active;    
+    
+    /**
+     * @MongoDB\Field(type="date")
+     */
+    protected $created_at;
+
+    /**
+     * @MongoDB\Field(type="string")
+     */
+    protected $created_by;
+
+    /**
+     * @MongoDB\Field(type="date")
+     */
+    protected $updated_at;
+
+    /**
+     * @MongoDB\Field(type="string")
+     */
+    protected $updated_by;
+
+    function __construct() {
+        $this->created_at = new \DateTime();
+        $this->updated_at = new \DateTime();
+    }    
+    
+
+    
+}

@@ -895,5 +895,93 @@ class ApiRestMedicalCenterController extends Controller {
             }
         }
     }
+    
+    /**
+     * @Route("/api/LoadServicesSelect")     
+     * @Method("GET")
+     */
+    public function LoadServicesSelectAction(Request $request) {
+
+        $token = $request->headers->get('access-token');
+
+        if ($token == "") {
+            $data = array('message' => 'Token invalido');
+            return new JsonResponse($data, 403);
+        } else {
+
+            $data_token = $this->get('lexik_jwt_authentication.encoder')->decode($token);
+
+            if ($data_token == false) {
+
+                $data = array('message' => 'Authentication Required');
+                return new JsonResponse($data, 403);
+            } else {
+
+                $user_id = $data_token["id"];
+                $user = $this->get('doctrine_mongodb')->getRepository('AppBundle:UsersFront')->findOneBy(['_id' => $user_id]);
+                if ($user) {
+                    if ($data_token["profile_is_default"] == "internal") {
+                        foreach ($data_token['profile'] as $valor) {
+
+                            foreach ($valor->medical_center as $valorMedicalCenter) {
+                                if ($valorMedicalCenter->is_default == "1") {
+                                    $medicalcenter = $this->get('doctrine_mongodb')->getRepository('AppBundle:MedicalCenter')->find($valorMedicalCenter->_id);
+                                    $countryId = $medicalcenter->getCountryid();
+                                    $country = $this->get('doctrine_mongodb')->getRepository('AppBundle:Country')->find($countryId);
+                                    $currencySymbol = $country->getCurrencySymbol();
+
+                                    $ArrayLicenses = $medicalcenter->getLicenses();
+                                    foreach ($ArrayLicenses as $TravelArrayLicenses) {
+
+                                        $arrayDate = date('Y-m-d H:i:s', $TravelArrayLicenses["expiration_date"]->sec);
+                                        $fechaActual = date('Y-m-d h:i:s');
+
+                                        if ($arrayDate >= $fechaActual) {
+
+                                            if (!empty($TravelArrayLicenses["services"])) {
+                                                $servicesArray = $TravelArrayLicenses["services"];
+
+                                                $acumServices = 0;
+                                                $licenseId = "";
+                                                $serviceId = "";
+                                                $serviceName = "";
+                                                $category = "";
+                                                $fields = "";
+                                                $format = "";
+                                                $amount = "";
+                                                $status = "";
+
+                                                foreach ($servicesArray as $keyServices => $travelServicesArray) {
+
+                                                    if ($travelServicesArray["active"] == 1) {
+
+                                                        $arrayServices[] = array(
+                                                            "label" => $travelServicesArray["name"],
+                                                            "value" => $travelServicesArray["_id"],
+                                                            "monto" => $travelServicesArray["amount"]
+                                                        );
+                                                    }
+                                                }
+
+                                                $encoders = array(new XmlEncoder(), new JsonEncoder());
+                                                $normalizers = array(new ObjectNormalizer());
+                                                $serializer = new Serializer($normalizers, $encoders);
+                                                $jsonContent = $serializer->serialize($arrayServices, 'json');
+                                                return new Response($jsonContent);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else {
+
+                    $data = array('message' => 'Error al consultar los datos, problemas con el token');
+                    return new JsonResponse($data, 403);
+                }
+            }
+        }
+    }
 
 }

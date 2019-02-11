@@ -82,7 +82,12 @@ class Country {
      * @MongoDB\Field(type="collection")
      */
     protected $waytopay;
-
+    
+    /**
+     * @MongoDB\Field(type="collection")
+     */
+    protected $type_identity;
+    
     /**
      * @MongoDB\Field(type="date")
      */
@@ -404,6 +409,28 @@ class Country {
     {
         return $this->waytopay;
     }
+    
+    /**
+     * Set typeIdentity
+     *
+     * @param collection $typeIdentity
+     * @return $this
+     */
+    public function setTypeIdentity($typeIdentity)
+    {
+        $this->type_identity = $typeIdentity;
+        return $this;
+    }
+
+    /**
+     * Get typeIdentity
+     *
+     * @return collection $typeIdentity
+     */
+    public function getTypeIdentity()
+    {
+        return $this->type_identity;
+    }
 
     /**
      * Set createdAt
@@ -674,4 +701,5 @@ class provinces{
     {
         return $this->updated_by;
     }    
+    
 }

@@ -110,6 +110,31 @@ class GeneralConfiguration
      */
     protected $civil_state;    
     
+    /**
+     * @MongoDB\Field(type="collection")
+     */
+    protected $payment_type;
+    
+    /**
+     * @MongoDB\Field(type="collection")
+     */
+    protected $type_supplies;
+    
+    /**
+     * @MongoDB\Field(type="collection")
+     */
+    protected $specialization;
+    
+    /**
+     * @MongoDB\Field(type="collection")
+     */
+    protected $profession;
+    
+    /**
+     * @MongoDB\Field(type="collection")
+     */
+    protected $referred;
+    
     
     function __construct() 
     {
@@ -527,5 +552,115 @@ class GeneralConfiguration
     public function getCivilState()
     {
         return $this->civil_state;
+    }
+    
+    /**
+     * Set paymentType
+     *
+     * @param collection $paymentType
+     * @return $this
+     */
+    public function setPaymentType($paymentType)
+    {
+        $this->payment_type = $paymentType;
+        return $this;
+    }
+
+    /**
+     * Get paymentType
+     *
+     * @return collection $paymentType
+     */
+    public function getPaymentType()
+    {
+        return $this->payment_type;
+    }
+
+    /**
+     * Set referred
+     *
+     * @param collection $referred
+     * @return $this
+     */
+    public function setReferred($referred)
+    {
+        $this->referred = $referred;
+        return $this;
+    }
+
+    /**
+     * Get referred
+     *
+     * @return collection $referred
+     */
+    public function getReferred()
+    {
+        return $this->referred;
+    }
+
+    /**
+     * Set typeSupplies
+     *
+     * @param collection $typeSupplies
+     * @return $this
+     */
+    public function setTypeSupplies($typeSupplies)
+    {
+        $this->type_supplies = $typeSupplies;
+        return $this;
+    }
+
+    /**
+     * Get typeSupplies
+     *
+     * @return collection $typeSupplies
+     */
+    public function getTypeSupplies()
+    {
+        return $this->type_supplies;
+    }
+
+    /**
+     * Set specialization
+     *
+     * @param collection $specialization
+     * @return $this
+     */
+    public function setSpecialization($specialization)
+    {
+        $this->specialization = $specialization;
+        return $this;
+    }
+
+    /**
+     * Get specialization
+     *
+     * @return collection $specialization
+     */
+    public function getSpecialization()
+    {
+        return $this->specialization;
+    }
+
+    /**
+     * Set profession
+     *
+     * @param collection $profession
+     * @return $this
+     */
+    public function setProfession($profession)
+    {
+        $this->profession = $profession;
+        return $this;
+    }
+
+    /**
+     * Get profession
+     *
+     * @return collection $profession
+     */
+    public function getProfession()
+    {
+        return $this->profession;
     }
 }

@@ -106,11 +106,6 @@ class MedicalCenter {
     /**
      * @MongoDB\Field(type="collection")
      */
-    protected $patients;
-    
-    /**
-     * @MongoDB\Field(type="collection")
-     */
     protected $internal_staff;
     
     /**
@@ -775,28 +770,6 @@ class MedicalCenter {
     public function getTemplates()
     {
         return $this->templates;
-    }
-
-    /**
-     * Set patients
-     *
-     * @param collection $patients
-     * @return $this
-     */
-    public function setPatients($patients)
-    {
-        $this->patients = $patients;
-        return $this;
-    }
-
-    /**
-     * Get patients
-     *
-     * @return collection $patients
-     */
-    public function getPatients()
-    {
-        return $this->patients;
     }
 
     /**
